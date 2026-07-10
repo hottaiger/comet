@@ -9885,7 +9885,9 @@ var classicArchiveCommand = async (args) => {
     const changeDir = activeExists ? activeDir : recoveredArchive;
     if (!changeDir || !await exists2(`${changeDir}/.comet.yaml`)) {
       throw new ArchiveFailure(
-        red(`FATAL: .comet.yaml not found in ${projectRelativePath(layout.projectRoot, activeDir)}/`)
+        red(
+          `FATAL: .comet.yaml not found in ${projectRelativePath(layout.projectRoot, activeDir)}/`
+        )
       );
     }
     if (recoveredArchive) {
@@ -9989,7 +9991,9 @@ var classicArchiveCommand = async (args) => {
       archiveDir = resolvedArchive;
       archiveName = path12.basename(resolvedArchive);
       output.stderr.push(
-        green(`  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`)
+        green(
+          `  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`
+        )
       );
       output.stepsOk += 1;
       output.stepsTotal += 1;
@@ -10071,7 +10075,9 @@ var classicArchiveCommand = async (args) => {
         );
       }
       output.stderr.push(
-        green(`  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`)
+        green(
+          `  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`
+        )
       );
       output.stepsOk += 1;
       output.stepsTotal += 1;
@@ -11894,7 +11900,11 @@ async function changeDirForOpenSpecPath(projectRoot, prefix, name) {
 async function governingChange(relativePath2, projectRoot) {
   const changePrefix = openSpecChangePrefix(relativePath2);
   if (changePrefix) {
-    const changeDir = await changeDirForOpenSpecPath(projectRoot, changePrefix.prefix, changePrefix.name);
+    const changeDir = await changeDirForOpenSpecPath(
+      projectRoot,
+      changePrefix.prefix,
+      changePrefix.name
+    );
     const stateFile2 = path16.join(changeDir, ".comet.yaml");
     if (existsSync2(stateFile2)) {
       const governing = await loadGoverningChange(changeDir);

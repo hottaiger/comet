@@ -230,7 +230,9 @@ export const classicArchiveCommand: ClassicCommandHandler = async (args) => {
     const changeDir = activeExists ? activeDir : recoveredArchive;
     if (!changeDir || !(await exists(`${changeDir}/.comet.yaml`))) {
       throw new ArchiveFailure(
-        red(`FATAL: .comet.yaml not found in ${projectRelativePath(layout.projectRoot, activeDir)}/`),
+        red(
+          `FATAL: .comet.yaml not found in ${projectRelativePath(layout.projectRoot, activeDir)}/`,
+        ),
       );
     }
     if (recoveredArchive) {
@@ -312,8 +314,8 @@ export const classicArchiveCommand: ClassicCommandHandler = async (args) => {
           ['archive', change, '--yes', ...layout.openSpec.commandArgs],
           {
             cwd: layout.openSpec.commandCwd,
-          encoding: 'utf8',
-          shell: process.platform === 'win32',
+            encoding: 'utf8',
+            shell: process.platform === 'win32',
           },
         );
         if (archiveRun.stdout) process.stderr.write(archiveRun.stdout);
@@ -344,7 +346,9 @@ export const classicArchiveCommand: ClassicCommandHandler = async (args) => {
       archiveDir = resolvedArchive;
       archiveName = path.basename(resolvedArchive);
       output.stderr.push(
-        green(`  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`),
+        green(
+          `  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`,
+        ),
       );
       output.stepsOk += 1;
       output.stepsTotal += 1;
@@ -433,7 +437,9 @@ export const classicArchiveCommand: ClassicCommandHandler = async (args) => {
         );
       }
       output.stderr.push(
-        green(`  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`),
+        green(
+          `  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`,
+        ),
       );
       output.stepsOk += 1;
       output.stepsTotal += 1;

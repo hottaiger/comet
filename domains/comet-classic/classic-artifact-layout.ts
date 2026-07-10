@@ -31,7 +31,7 @@ export interface ResolveCometArtifactLayoutOptions {
   explicitLayout?: CometArtifactLayoutKind;
 }
 
-export interface ResolveCometChangeDirectoryOptions extends ResolveCometArtifactLayoutOptions {}
+export type ResolveCometChangeDirectoryOptions = ResolveCometArtifactLayoutOptions;
 
 export interface ResolvedClassicChangeDirectory extends ClassicChangeDirectory {
   layout: CometArtifactLayoutKind;

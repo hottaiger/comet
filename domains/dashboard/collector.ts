@@ -212,7 +212,11 @@ async function buildChangeItem(input: BuildChangeInput): Promise<ChangeDashboard
     : '';
 
   const tasks = await readTasks(tasksPath);
-  const verify = await resolveVerify({ changeDir: input.dir, yaml, projectRoot: input.projectRoot });
+  const verify = await resolveVerify({
+    changeDir: input.dir,
+    yaml,
+    projectRoot: input.projectRoot,
+  });
 
   // Detect delta specs in change directory
   const deltaSpecPath = await findDeltaSpec(input.dir);

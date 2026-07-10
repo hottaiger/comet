@@ -159,8 +159,8 @@ async function activeChanges(projectRoot: string): Promise<GoverningChange[]> {
   for (const layout of await candidateArtifactLayouts(projectRoot)) {
     const changesDir = layout.openSpec.changesDir;
     if (!existsSync(changesDir)) continue;
-    for (const entry of (await fs.readdir(changesDir, { withFileTypes: true })).sort((left, right) =>
-      left.name.localeCompare(right.name),
+    for (const entry of (await fs.readdir(changesDir, { withFileTypes: true })).sort(
+      (left, right) => left.name.localeCompare(right.name),
     )) {
       if (!entry.isDirectory() || entry.name === 'archive') continue;
       const changeDir = path.join(changesDir, entry.name);
@@ -301,7 +301,11 @@ async function governingChange(
 ): Promise<GoverningChange | null> {
   const changePrefix = openSpecChangePrefix(relativePath);
   if (changePrefix) {
-    const changeDir = await changeDirForOpenSpecPath(projectRoot, changePrefix.prefix, changePrefix.name);
+    const changeDir = await changeDirForOpenSpecPath(
+      projectRoot,
+      changePrefix.prefix,
+      changePrefix.name,
+    );
     const stateFile = path.join(changeDir, '.comet.yaml');
     if (existsSync(stateFile)) {
       const governing = await loadGoverningChange(changeDir);

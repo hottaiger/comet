@@ -19,7 +19,10 @@ async function fileExists(file: string): Promise<boolean> {
   }
 }
 
-function projectRootFromStoredLayout(changeDir: string, projection: ClassicStateProjection): string | null {
+function projectRootFromStoredLayout(
+  changeDir: string,
+  projection: ClassicStateProjection,
+): string | null {
   const openSpecRoot = projection.classic?.openSpecRoot;
   const normalizedDir = path.resolve(changeDir).replaceAll('\\', '/');
   const normalizedRoot =
@@ -32,7 +35,10 @@ function projectRootFromStoredLayout(changeDir: string, projection: ClassicState
   return path.resolve(normalizedDir.slice(0, index + 1));
 }
 
-async function projectRootFor(changeDir: string, projection: ClassicStateProjection): Promise<string> {
+async function projectRootFor(
+  changeDir: string,
+  projection: ClassicStateProjection,
+): Promise<string> {
   try {
     const layout = await resolveCometArtifactLayout(process.cwd());
     const changePath = path.resolve(changeDir);
