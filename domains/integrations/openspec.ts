@@ -42,6 +42,26 @@ function buildOpenSpecInitInvocation(
   return { command: 'openspec', args };
 }
 
+function buildOpenSpecStoreSetupInvocation(
+  projectPath: string,
+  storeId: string,
+): { command: string; args: string[] } {
+  return {
+    command: 'openspec',
+    args: ['store', 'setup', storeId, '--path', path.join(projectPath, 'docs'), '--no-init-git'],
+  };
+}
+
+function buildOpenSpecStoreRegisterInvocation(
+  projectPath: string,
+  storeId: string,
+): { command: string; args: string[] } {
+  return {
+    command: 'openspec',
+    args: ['store', 'register', path.join(projectPath, 'docs'), '--id', storeId, '--yes'],
+  };
+}
+
 const ALL_WORKFLOWS_CONFIG =
   JSON.stringify(
     {
@@ -408,6 +428,8 @@ export {
   installOpenSpec,
   isCommandAvailable,
   buildOpenSpecInitInvocation,
+  buildOpenSpecStoreSetupInvocation,
+  buildOpenSpecStoreRegisterInvocation,
   getNpmExecutable,
   migrateOpenCodeOpenSpecPaths,
   migrateZCodeOpenSpecPaths,

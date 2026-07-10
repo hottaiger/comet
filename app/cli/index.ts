@@ -5,6 +5,7 @@ import { resumeProbeCommand } from '../commands/resume-probe.js';
 import { dashboardCommand } from '../commands/dashboard.js';
 import { doctorCommand } from '../commands/doctor.js';
 import { evalCommand as evalFacadeCommand } from '../commands/eval.js';
+import { openspecCommand } from '../commands/openspec.js';
 import { updateCommand } from '../commands/update.js';
 import { uninstallCommand } from '../commands/uninstall.js';
 import { getCurrentVersion } from '../../platform/version/version.js';
@@ -126,6 +127,15 @@ program
   )
   .action(async (targetPath = '.', options) => {
     await doctorCommand(targetPath, options);
+  });
+
+program
+  .command('openspec [args...]')
+  .description('Run OpenSpec through the Comet artifact layout resolver')
+  .option('--json', 'Preserve JSON command output')
+  .option('--project <dir>', 'Project root used for layout resolution', '.')
+  .action(async (args: string[] = [], options) => {
+    await openspecCommand(options.project, args, options);
   });
 
 program

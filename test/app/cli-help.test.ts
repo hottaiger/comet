@@ -118,4 +118,15 @@ describe('CLI help text', () => {
     expect(commandHelp.stdout).not.toContain('--no-non-trivial-work');
     expect(commandHelp.stdout).toContain('--already-in-comet-flow');
   });
+
+  it('exposes the OpenSpec facade command', () => {
+    const help = runCli('--help');
+    const commandHelp = runCli('openspec', '--help');
+
+    expect(help.status, help.stderr).toBe(0);
+    expect(commandHelp.status, commandHelp.stderr).toBe(0);
+    expect(help.stdout).toContain('openspec');
+    expect(commandHelp.stdout).toContain('Run OpenSpec through the Comet artifact layout resolver');
+    expect(commandHelp.stdout).toContain('--json');
+  });
 });

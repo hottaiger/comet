@@ -681,4 +681,44 @@ describe('openspec', () => {
       });
     });
   });
+
+  describe('OpenSpec store helpers', () => {
+    it('builds docs layout store setup invocation', async () => {
+      const { buildOpenSpecStoreSetupInvocation } =
+        await import('../../../domains/integrations/openspec.js');
+
+      expect(
+        buildOpenSpecStoreSetupInvocation('/tmp/project', 'comet-demo-1234'),
+      ).toEqual({
+        command: 'openspec',
+        args: [
+          'store',
+          'setup',
+          'comet-demo-1234',
+          '--path',
+          path.join('/tmp/project', 'docs'),
+          '--no-init-git',
+        ],
+      });
+    });
+
+    it('builds docs layout store register invocation', async () => {
+      const { buildOpenSpecStoreRegisterInvocation } =
+        await import('../../../domains/integrations/openspec.js');
+
+      expect(
+        buildOpenSpecStoreRegisterInvocation('/tmp/project', 'comet-demo-1234'),
+      ).toEqual({
+        command: 'openspec',
+        args: [
+          'store',
+          'register',
+          path.join('/tmp/project', 'docs'),
+          '--id',
+          'comet-demo-1234',
+          '--yes',
+        ],
+      });
+    });
+  });
 });
