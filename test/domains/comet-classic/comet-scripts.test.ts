@@ -327,10 +327,10 @@ describe('comet scripts', () => {
     expect(get.stdout.trim()).toBe('zh-CN');
   }, 20_000);
 
-  it('snapshots docs artifact layout roots when initializing a change', async () => {
+  it('snapshots resolved docs artifact layout roots when initializing a change', async () => {
     await writeFile(
       path.join(tmpDir, '.comet', 'config.yaml'),
-      'artifact_layout: docs\nopenspec:\n  root: docs\nsuperpowers:\n  root: docs/superpowers\n',
+      'artifact_layout: docs\nopenspec:\n  root: docs\nsuperpowers:\n  root: docs/comet-superpowers\n',
     );
 
     const result = runNode(tmpDir, stateScript, ['init', 'docs-layout-change', 'full']);
@@ -342,7 +342,7 @@ describe('comet scripts', () => {
     expect(result.status).toBe(0);
     expect(yaml).toContain('artifact_layout: docs');
     expect(yaml).toContain('openspec_root: docs');
-    expect(yaml).toContain('superpowers_root: docs/superpowers');
+    expect(yaml).toContain('superpowers_root: docs/comet-superpowers');
   }, 20_000);
 
   it('rejects zh as an invalid project language when initializing a change', async () => {
@@ -592,6 +592,65 @@ describe('comet scripts', () => {
     expect(get.stdout.trim()).toBe('false');
     expect(setInvalid.status).not.toBe(0);
     expect(setInvalid.stderr).toContain('Invalid value');
+  }, 20_000);
+
+  it('accepts artifact layout snapshot fields via comet-state set', async () => {
+    await createChange(
+      tmpDir,
+      'artifact-layout-set',
+      [
+        'workflow: full',
+        'phase: design',
+        'context_compression: off',
+        'build_mode: null',
+        'build_pause: null',
+        'subagent_dispatch: null',
+        'tdd_mode: null',
+        'review_mode: standard',
+        'isolation: null',
+        'verify_mode: null',
+        'auto_transition: true',
+        'design_doc: null',
+        'plan: null',
+        'verify_result: pending',
+        'verified_at: null',
+        'archived: false',
+        'artifact_layout: legacy',
+        'openspec_root: null',
+        'superpowers_root: null',
+        '',
+      ].join('\n'),
+    );
+
+    const setLayout = runNode(tmpDir, stateScript, [
+      'set',
+      'artifact-layout-set',
+      'artifact_layout',
+      'docs',
+    ]);
+    const setOpenSpecRoot = runNode(tmpDir, stateScript, [
+      'set',
+      'artifact-layout-set',
+      'openspec_root',
+      'docs',
+    ]);
+    const setSuperpowersRoot = runNode(tmpDir, stateScript, [
+      'set',
+      'artifact-layout-set',
+      'superpowers_root',
+      'docs/superpowers',
+    ]);
+    const yaml = await fs.readFile(
+      path.join(tmpDir, 'openspec', 'changes', 'artifact-layout-set', '.comet.yaml'),
+      'utf-8',
+    );
+
+    expect(setLayout.status, setLayout.stderr).toBe(0);
+    expect(setOpenSpecRoot.status, setOpenSpecRoot.stderr).toBe(0);
+    expect(setSuperpowersRoot.status, setSuperpowersRoot.stderr).toBe(0);
+    expect(yaml).toContain('artifact_layout: docs');
+    expect(yaml).toContain('openspec_root: docs');
+    expect(yaml).toContain('superpowers_root: docs/superpowers');
   }, 20_000);
 
   it('validates the language field in .comet.yaml', async () => {
@@ -1520,6 +1579,41 @@ describe('comet scripts', () => {
     expect(phase.stdout.trim()).toBe('design');
     expect(validate.status, validate.stderr).toBe(0);
     expect(handoff.status).toBe(0);
+  }, 20_000);
+
+  it('rejects invalid artifact layout snapshot values during yaml validation', async () => {
+    await createChange(
+      tmpDir,
+      'artifact-layout-invalid',
+      [
+        'workflow: full',
+        'phase: design',
+        'context_compression: off',
+        'build_mode: null',
+        'build_pause: null',
+        'subagent_dispatch: null',
+        'tdd_mode: null',
+        'review_mode: standard',
+        'isolation: null',
+        'verify_mode: null',
+        'auto_transition: true',
+        'design_doc: null',
+        'plan: null',
+        'verify_result: pending',
+        'verified_at: null',
+        'archived: false',
+        'artifact_layout: future',
+        'openspec_root: ../docs',
+        'superpowers_root: docs/superpowers',
+        '',
+      ].join('\n'),
+    );
+
+    const result = runNode(tmpDir, validateScript, ['artifact-layout-invalid']);
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("artifact_layout='future' is not valid. Expected: legacy docs");
+    expect(result.stderr).toContain("openspec_root='../docs' must be a relative repository path");
   }, 20_000);
 
   it('accepts design doc frontmatter after a BOM and leading blank lines', async () => {

@@ -13189,6 +13189,8 @@ async function init(output, name, workflow) {
   const preset = workflow !== "full";
   const reviewMode = preset ? "off" : await reviewModeDefault();
   const layout = await resolveCometArtifactLayout(process.cwd());
+  const openSpecRoot = layout.layout === "docs" ? projectRelativePath(layout.projectRoot, layout.openSpec.storeRoot) : null;
+  const superpowersRoot = projectRelativePath(layout.projectRoot, layout.superpowers.root);
   const document = new import_yaml7.Document({
     workflow,
     language: await projectLanguageDefault(),
@@ -13212,8 +13214,8 @@ async function init(output, name, workflow) {
     verified_at: null,
     archived: false,
     artifact_layout: layout.layout,
-    openspec_root: layout.layout === "docs" ? "docs" : null,
-    superpowers_root: "docs/superpowers"
+    openspec_root: openSpecRoot,
+    superpowers_root: superpowersRoot
   });
   await atomicWrite2(file, document.toString());
   output.stdout.push(green4(`Initialized: ${label}/.comet.yaml (workflow=${workflow})`));

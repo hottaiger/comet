@@ -5,7 +5,7 @@ import path from 'path';
 import { Document, parseDocument } from 'yaml';
 import type { ClassicCommandHandler, ClassicCommandResult } from './classic-cli.js';
 import { collectClassicEvidence } from './classic-evidence.js';
-import { resolveCometArtifactLayout } from './classic-artifact-layout.js';
+import { projectRelativePath, resolveCometArtifactLayout } from './classic-artifact-layout.js';
 import { openSpecChangeNameError, resolveClassicChangeDirectory } from './classic-paths.js';
 import { resolveClassicStepId } from './classic-resolver.js';
 import { transitionClassicRuntimeRun } from './classic-runtime-run.js';
@@ -485,6 +485,11 @@ async function init(output: CommandOutput, name: string, workflow: string): Prom
   const preset = workflow !== 'full';
   const reviewMode = preset ? 'off' : await reviewModeDefault();
   const layout = await resolveCometArtifactLayout(process.cwd());
+  const openSpecRoot =
+    layout.layout === 'docs'
+      ? projectRelativePath(layout.projectRoot, layout.openSpec.storeRoot)
+      : null;
+  const superpowersRoot = projectRelativePath(layout.projectRoot, layout.superpowers.root);
   const document = new Document({
     workflow,
     language: await projectLanguageDefault(),
@@ -508,8 +513,8 @@ async function init(output: CommandOutput, name: string, workflow: string): Prom
     verified_at: null,
     archived: false,
     artifact_layout: layout.layout,
-    openspec_root: layout.layout === 'docs' ? 'docs' : null,
-    superpowers_root: 'docs/superpowers',
+    openspec_root: openSpecRoot,
+    superpowers_root: superpowersRoot,
   });
   await atomicWrite(file, document.toString());
   output.stdout.push(green(`Initialized: ${label}/.comet.yaml (workflow=${workflow})`));
