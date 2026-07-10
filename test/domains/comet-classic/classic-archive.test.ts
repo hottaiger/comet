@@ -36,18 +36,40 @@ async function makeProject(): Promise<string> {
   return dir;
 }
 
-async function seedArchiveChange(dir: string): Promise<string> {
-  run(dir, ['state', 'init', 'demo', 'full']);
+async function seedArchiveChange(dir: string, name = 'demo'): Promise<string> {
+  run(dir, ['state', 'init', name, 'full']);
   // Direct phase writes are normally blocked; the force hatch is the documented
   // way for tooling/tests to seed a change into the archive phase.
-  run(dir, ['state', 'set', 'demo', 'phase', 'archive'], { COMET_FORCE_PHASE: '1' });
-  run(dir, ['state', 'set', 'demo', 'verify_result', 'pass']);
-  return path.join(dir, 'openspec', 'changes', 'demo');
+  run(dir, ['state', 'set', name, 'phase', 'archive'], { COMET_FORCE_PHASE: '1' });
+  run(dir, ['state', 'set', name, 'verify_result', 'pass']);
+  return path.join(dir, 'openspec', 'changes', name);
+}
+
+async function seedDocsArchiveChange(dir: string, name = 'add-auth'): Promise<string> {
+  await fs.mkdir(path.join(dir, '.comet'), { recursive: true });
+  await fs.writeFile(
+    path.join(dir, '.comet', 'config.yaml'),
+    [
+      'artifact_layout: docs',
+      'openspec:',
+      '  root: docs',
+      '  store: comet-demo-1234',
+      'superpowers:',
+      '  root: docs/superpowers',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+  run(dir, ['state', 'init', name, 'full']);
+  run(dir, ['state', 'set', name, 'phase', 'archive'], { COMET_FORCE_PHASE: '1' });
+  run(dir, ['state', 'set', name, 'verify_result', 'pass']);
+  return path.join(dir, 'docs', 'openspec', 'changes', name);
 }
 
 async function fakeOpenSpec(
   dir: string,
   mode: 'success' | 'fail' | 'move-fail',
+  changeRoot = 'openspec/changes',
 ): Promise<{ command: string; log: string }> {
   const script = path.join(dir, 'fake-openspec.mjs');
   const log = path.join(dir, 'fake-openspec.log');
@@ -57,13 +79,14 @@ async function fakeOpenSpec(
       "import { promises as fs } from 'fs';",
       "import path from 'path';",
       `const mode = ${JSON.stringify(mode)};`,
+      `const changeRoot = ${JSON.stringify(changeRoot)};`,
       `const log = ${JSON.stringify(log)};`,
       "await fs.appendFile(log, process.argv.slice(2).join(' ') + '\\n');",
       'const change = process.argv[3];',
       "if (mode === 'fail') process.exit(9);",
-      "const source = path.join('openspec', 'changes', change);",
+      'const source = path.join(...changeRoot.split(\'/\'), change);',
       'const name = `${new Date().toISOString().slice(0, 10)}-${change}`;',
-      "const target = path.join('openspec', 'changes', 'archive', name);",
+      'const target = path.join(...changeRoot.split(\'/\'), \'archive\', name);',
       'await fs.mkdir(path.dirname(target), { recursive: true });',
       'await fs.rename(source, target);',
       "if (mode === 'move-fail') process.exit(9);",
@@ -155,6 +178,28 @@ describe('Classic archive command', () => {
     expect(artifacts.archive_directory).toBe(
       `openspec/changes/archive/${path.basename(archiveDir)}`,
     );
+  });
+
+  it('passes --store when archiving docs layout changes', async () => {
+    const dir = await makeProject();
+    await seedDocsArchiveChange(dir);
+    const fake = await fakeOpenSpec(dir, 'success', 'docs/openspec/changes');
+
+    const result = run(dir, ['archive', 'add-auth'], { COMET_OPENSPEC: fake.command });
+
+    expect(result.status).toBe(0);
+    expect(await fs.readFile(fake.log, 'utf8')).toBe(
+      'archive add-auth --yes --store comet-demo-1234\n',
+    );
+    const archiveDir = path.join(
+      dir,
+      'docs',
+      'openspec',
+      'changes',
+      'archive',
+      `${new Date().toISOString().slice(0, 10)}-add-auth`,
+    );
+    await expect(fs.access(path.join(archiveDir, '.comet.yaml'))).resolves.toBeUndefined();
   });
 
   it('treats a completed archive retry as an idempotent no-op', async () => {

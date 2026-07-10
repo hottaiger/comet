@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { resolveCometArtifactLayout } from './classic-artifact-layout.js';
 import type { ClassicStateProjection } from './classic-state.js';
 
 export interface ClassicEvidence {
@@ -18,7 +19,38 @@ async function fileExists(file: string): Promise<boolean> {
   }
 }
 
-function projectRootFor(changeDir: string): string {
+function projectRootFromStoredLayout(changeDir: string, projection: ClassicStateProjection): string | null {
+  const openSpecRoot = projection.classic?.openSpecRoot;
+  const normalizedDir = path.resolve(changeDir).replaceAll('\\', '/');
+  const normalizedRoot =
+    openSpecRoot && openSpecRoot !== '.'
+      ? openSpecRoot.replaceAll('\\', '/').replace(/^\/+/u, '').replace(/\/+$/u, '')
+      : '';
+  const marker = normalizedRoot ? `/${normalizedRoot}/openspec/` : '/openspec/';
+  const index = normalizedDir.lastIndexOf(marker);
+  if (index < 0) return null;
+  return path.resolve(normalizedDir.slice(0, index + 1));
+}
+
+async function projectRootFor(changeDir: string, projection: ClassicStateProjection): Promise<string> {
+  try {
+    const layout = await resolveCometArtifactLayout(process.cwd());
+    const changePath = path.resolve(changeDir);
+    const relativeToChanges = path.relative(layout.openSpec.changesDir, changePath);
+    const relativeToArchive = path.relative(layout.openSpec.archiveDir, changePath);
+    if (
+      (!relativeToChanges.startsWith('..') && !path.isAbsolute(relativeToChanges)) ||
+      (!relativeToArchive.startsWith('..') && !path.isAbsolute(relativeToArchive))
+    ) {
+      return layout.projectRoot;
+    }
+  } catch {
+    // Ignore resolver failures here and fall back to path inference.
+  }
+
+  const storedRoot = projectRootFromStoredLayout(changeDir, projection);
+  if (storedRoot) return storedRoot;
+
   let cursor = path.resolve(changeDir);
   while (path.dirname(cursor) !== cursor) {
     if (path.basename(cursor) === 'openspec') return path.dirname(cursor);
@@ -108,7 +140,7 @@ export async function collectClassicEvidence(
   changeDir: string,
   projection: ClassicStateProjection,
 ): Promise<ClassicEvidence[]> {
-  const projectRoot = projectRootFor(changeDir);
+  const projectRoot = await projectRootFor(changeDir, projection);
   const classic = projection.classic;
   const proposal = path.join(changeDir, 'proposal.md');
   const design = path.join(changeDir, 'design.md');

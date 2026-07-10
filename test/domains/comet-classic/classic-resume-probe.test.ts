@@ -102,6 +102,47 @@ describe('resolveCometResumeProbe', () => {
     });
   });
 
+  it('auto resumes a docs layout active change', async () => {
+    const root = path.join(tmpDir, 'docs', 'openspec', 'changes', 'add-auth');
+    await fs.mkdir(root, { recursive: true });
+    await fs.mkdir(path.join(tmpDir, 'docs', 'openspec', 'specs'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, 'docs', 'openspec', 'config.yaml'),
+      'schema: spec-driven\n',
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(root, '.comet.yaml'),
+      [
+        'workflow: full',
+        'phase: build',
+        'design_doc: null',
+        'plan: null',
+        'build_mode: direct',
+        'isolation: branch',
+        'verify_mode: full',
+        'verify_result: pending',
+        'verified_at: null',
+        'archived: false',
+        'artifact_layout: docs',
+        'openspec_root: docs',
+        'superpowers_root: docs/superpowers',
+        '',
+      ].join('\n'),
+      'utf8',
+    );
+
+    const result = await resolveCometResumeProbe(tmpDir, {
+      schema_version: 'comet.resume_probe.v1',
+      utterance: '继续',
+      locale: 'zh-CN',
+      agent_context: { non_trivial_work: true, already_in_comet_flow: false },
+    });
+
+    expect(result.action).toBe('auto_resume');
+    expect(result.changeName).toBe('add-auth');
+  });
+
   it('does not rewrite legacy command fields while probing', async () => {
     await createChange('cache-ttl', `${buildYaml}build_command: npm test\n`);
     const yamlPath = path.join(tmpDir, 'openspec', 'changes', 'cache-ttl', '.comet.yaml');

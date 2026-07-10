@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import { spawn } from 'child_process';
 import { fileExists, readDir } from '../../platform/fs/file-system.js';
 import type { ClassicDiagnostic } from './classic-diagnostics.js';
+import { projectRelativePath, resolveCometArtifactLayout } from './classic-artifact-layout.js';
 import { readClassicState } from './classic-store.js';
 import type { ClassicStateProjection } from './classic-state.js';
 
@@ -40,6 +41,8 @@ export interface CometResumeProbeResult {
 
 interface ActiveProbeChange {
   name: string;
+  changeDir: string;
+  layout: 'legacy' | 'docs';
   workflow: string;
   phase: string;
   nextCommand: string | null;
@@ -49,6 +52,11 @@ interface ActiveProbeChange {
   verifyResult: 'pending' | 'pass' | 'fail' | null;
   text: string;
   missingCometState: boolean;
+}
+
+interface ActiveChangeDiscovery {
+  changes: ActiveProbeChange[];
+  layoutConflict: boolean;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -186,9 +194,20 @@ async function hasOpenSpecChangeFiles(changeDir: string): Promise<boolean> {
   );
 }
 
-async function discoverActiveChanges(projectRoot: string): Promise<ActiveProbeChange[]> {
-  const changesDir = path.join(projectRoot, 'openspec', 'changes');
-  if (!(await fileExists(changesDir))) return [];
+async function discoverActiveChanges(projectRoot: string): Promise<ActiveChangeDiscovery> {
+  let layout;
+  try {
+    layout = await resolveCometArtifactLayout(projectRoot);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (/multiple artifact layouts contain active comet changes/i.test(message)) {
+      return { changes: [], layoutConflict: true };
+    }
+    throw error;
+  }
+
+  const changesDir = layout.openSpec.changesDir;
+  if (!(await fileExists(changesDir))) return { changes: [], layoutConflict: false };
 
   const entries = await readDir(changesDir);
   const changes: ActiveProbeChange[] = [];
@@ -202,6 +221,8 @@ async function discoverActiveChanges(projectRoot: string): Promise<ActiveProbeCh
       if (!(await hasOpenSpecChangeFiles(changeDir))) continue;
       const missingStateChange: ActiveProbeChange = {
         name: entry,
+        changeDir,
+        layout: layout.layout,
         workflow: 'unknown',
         phase: 'invalid',
         nextCommand: null,
@@ -238,6 +259,8 @@ async function discoverActiveChanges(projectRoot: string): Promise<ActiveProbeCh
 
     const change: ActiveProbeChange = {
       name: entry,
+      changeDir,
+      layout: layout.layout,
       workflow,
       phase,
       nextCommand: diagnostic.nextCommand,
@@ -251,7 +274,7 @@ async function discoverActiveChanges(projectRoot: string): Promise<ActiveProbeCh
     change.text = await changeSearchText(changeDir, change);
     changes.push(change);
   }
-  return changes;
+  return { changes, layoutConflict: false };
 }
 
 const RESUME_WORDS = [
@@ -404,7 +427,13 @@ export async function resolveCometResumeProbe(
     ]);
   }
 
-  const changes = await discoverActiveChanges(projectRoot);
+  const discovery = await discoverActiveChanges(projectRoot);
+  if (discovery.layoutConflict) {
+    return result('ask_user', null, 'low', 'multiple artifact layouts contain active changes', [
+      { source: 'repo', quote: 'docs/openspec and openspec both contain active changes' },
+    ]);
+  }
+  const { changes } = discovery;
   if (changes.length === 0) {
     return result('none', null, 'none', 'no active Comet changes');
   }
@@ -451,6 +480,7 @@ export async function resolveCometResumeProbe(
   const evidence = relatedEvidence(utterance, change);
   if (resumeLike || evidence.length > 0) {
     return result('auto_resume', change, 'high', 'single active change and request is related', [
+      { source: 'repo', quote: `${change.layout}: ${projectRelativePath(projectRoot, change.changeDir)}` },
       { source: 'state', quote: `phase: ${change.phase}` },
       ...evidence,
     ]);

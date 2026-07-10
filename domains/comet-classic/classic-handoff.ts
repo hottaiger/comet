@@ -3,7 +3,7 @@ import { promises as fs, readFileSync } from 'fs';
 import path from 'path';
 import { parseDocument } from 'yaml';
 import type { ClassicCommandHandler, ClassicCommandResult } from './classic-cli.js';
-import { openSpecChangeNameError } from './classic-paths.js';
+import { openSpecChangeNameError, resolveClassicChangeDirectory } from './classic-paths.js';
 import { ensureClassicRuntimeRun, transitionClassicRuntimeRun } from './classic-runtime-run.js';
 import { readClassicState, writeClassicState } from './classic-store.js';
 import {
@@ -386,20 +386,20 @@ export const classicHandoffCommand: ClassicCommandHandler = async (args) => {
   const [change, phase, mode, fullFlag] = args;
   try {
     validateChangeName(change);
-    const changeDir = `openspec/changes/${change}`;
+    const { directory: changeDir, label } = await resolveClassicChangeDirectory(change);
 
     if (phase === '--hash-only') {
       if (!(await exists(changeDir))) {
-        throw new HandoffFailure(red(`ERROR: change directory not found: ${changeDir}`));
+        throw new HandoffFailure(red(`ERROR: change directory not found: ${label}`));
       }
       for (const required of ['proposal.md', 'design.md', 'tasks.md']) {
         if (!(await nonempty(`${changeDir}/${required}`))) {
           throw new HandoffFailure(
-            red(`ERROR: required file missing or empty: ${changeDir}/${required}`),
+            red(`ERROR: required file missing or empty: ${label}/${required}`),
           );
         }
       }
-      output.stdout.push(await computeContextHash(changeDir));
+      output.stdout.push(await computeContextHash(label));
       return output.toResult(0);
     }
 
@@ -418,10 +418,10 @@ export const classicHandoffCommand: ClassicCommandHandler = async (args) => {
 
     const yaml = `${changeDir}/.comet.yaml`;
     if (!(await exists(changeDir))) {
-      throw new HandoffFailure(red(`ERROR: change directory not found: ${changeDir}`));
+      throw new HandoffFailure(red(`ERROR: change directory not found: ${label}`));
     }
     if (!(await exists(yaml))) {
-      throw new HandoffFailure(red(`ERROR: .comet.yaml not found at ${yaml}`));
+      throw new HandoffFailure(red(`ERROR: .comet.yaml not found at ${label}/.comet.yaml`));
     }
     if ((await readField(changeDir, 'phase')) !== 'design') {
       throw new HandoffFailure(red('ERROR: design handoff requires phase: design'));
@@ -429,7 +429,7 @@ export const classicHandoffCommand: ClassicCommandHandler = async (args) => {
     for (const required of ['proposal.md', 'design.md', 'tasks.md']) {
       if (!(await nonempty(`${changeDir}/${required}`))) {
         throw new HandoffFailure(
-          red(`ERROR: required OpenSpec artifact missing or empty: ${changeDir}/${required}`),
+          red(`ERROR: required OpenSpec artifact missing or empty: ${label}/${required}`),
         );
       }
     }
@@ -439,8 +439,8 @@ export const classicHandoffCommand: ClassicCommandHandler = async (args) => {
     let contextJson: string;
     let contextMd: string;
     if (contextCompression === 'off') {
-      contextJson = `${handoffDir}/design-context.json`;
-      contextMd = `${handoffDir}/design-context.md`;
+      contextJson = `${label}/.comet/handoff/design-context.json`;
+      contextMd = `${label}/.comet/handoff/design-context.md`;
     } else if (contextCompression === 'beta') {
       if (handoffMode === 'full') {
         output.stderr.push(
@@ -448,8 +448,8 @@ export const classicHandoffCommand: ClassicCommandHandler = async (args) => {
         );
       }
       handoffMode = 'beta';
-      contextJson = `${handoffDir}/spec-context.json`;
-      contextMd = `${handoffDir}/spec-context.md`;
+      contextJson = `${label}/.comet/handoff/spec-context.json`;
+      contextMd = `${label}/.comet/handoff/spec-context.md`;
     } else {
       throw new HandoffFailure(
         [
@@ -458,7 +458,7 @@ export const classicHandoffCommand: ClassicCommandHandler = async (args) => {
         ].join('\n'),
       );
     }
-    const contextHash = await computeContextHash(changeDir);
+    const contextHash = await computeContextHash(label);
     const actionId = `classic-handoff:${contextHash}`;
     const initialProjection = await readClassicState(changeDir);
     if (!initialProjection.classic) {
@@ -525,11 +525,11 @@ export const classicHandoffCommand: ClassicCommandHandler = async (args) => {
 
     await fs.mkdir(handoffDir, { recursive: true });
     if (handoffMode === 'beta') {
-      await writeSpecMarkdownContext(changeDir, change, contextHash, contextMd);
-      await writeSpecJsonContext(changeDir, change, contextHash, contextJson);
+      await writeSpecMarkdownContext(label, change, contextHash, contextMd);
+      await writeSpecJsonContext(label, change, contextHash, contextJson);
     } else {
-      await writeMarkdownContext(changeDir, change, handoffMode, contextHash, contextMd);
-      await writeJsonContext(changeDir, change, handoffMode, contextHash, contextJson);
+      await writeMarkdownContext(label, change, handoffMode, contextHash, contextMd);
+      await writeJsonContext(label, change, handoffMode, contextHash, contextJson);
     }
 
     const context = await fs.readFile(contextMd, 'utf8');
