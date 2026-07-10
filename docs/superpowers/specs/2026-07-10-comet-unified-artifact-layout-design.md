@@ -75,6 +75,24 @@ OpenSpec 的 store root 应该是 `docs`，不是 `docs/openspec`。
 - 不在第一版支持多个 OpenSpec store 同时参与一个 Comet change。
 - 不改变 OpenSpec archive 的语义，Comet archive 仍委托给 OpenSpec archive。
 
+## 拒绝的备选方案
+
+### `.comet/docs`
+
+issue #158 中曾提出把 workflow 文档放到 `.comet/docs/{superpowers,openspec}`。这个方案对用户业务 `docs/` 目录的干扰最小，但第一版不采用，原因是 Superpowers 上游产物目录固定为 `docs/superpowers`。如果 Comet 把 Superpowers 产物迁到 `.comet/docs/superpowers`，就需要 fork 或深度改写 Superpowers Skill，与“不修改上游原始 Skill”的边界冲突。
+
+### 只做知识索引，不移动目录
+
+只做一个 Comet catalogue/index 可以改善 discoverability，但不能解决 issue #173 中“统一目录”的核心诉求。它也无法减少 Agent 在写 artifact 时必须记住多个根目录的问题。
+
+### 直接全局替换 `openspec/` 为 `docs/openspec/`
+
+这个方案风险最高。OpenSpec CLI 并不支持任意 `docs/openspec` root；它支持的是 store root，然后固定在 root 下使用 `openspec/`。直接替换会破坏 OpenSpec command resolution、Classic runtime、handoff hash、dashboard project root 推断和 eval baseline。
+
+### 第一版就实现 Comet 自己的 store registry
+
+OpenSpec 已经有用户级 store registry。Comet 再实现一套独立 registry 会引入同步问题：OpenSpec store 已注册但 Comet registry 未注册，或反过来。第一版只保存和传递 OpenSpec store id，并由 layout resolver 统一使用它。
+
 ## 术语
 
 ### Project root
@@ -195,6 +213,57 @@ superpowers_root: docs/superpowers
 
 不建议把 `openspec.store` 写入 change `.comet.yaml`。store id 是本机 registry key，写入可提交 artifact 会降低可移植性。
 
+## Layout 发现顺序
+
+不能只依赖 `.comet/config.yaml` 判断 layout。该文件位于本地 `.comet/`，当前会被 `.gitignore` 忽略；用户 clone 一个已经使用 docs layout 的项目时，可能没有本地 `.comet/config.yaml`。
+
+resolver 必须按以下顺序判断：
+
+1. 显式 CLI 参数或测试传入的 resolver option。
+2. `.comet/config.yaml` 中的 `artifact_layout`。
+3. active change `.comet.yaml` 中 snapshot 的 `artifact_layout`。
+4. 健康的 `docs/openspec/` planning root。
+5. 健康的 legacy `openspec/` planning root。
+6. 两者都不存在时使用 legacy 默认，以保持当前行为兼容。
+
+健康 OpenSpec planning root 至少需要满足：
+
+```text
+<root>/openspec/config.yaml 或 <root>/openspec/config.yml 存在
+<root>/openspec/changes/ 存在
+<root>/openspec/specs/ 存在
+```
+
+如果 `docs/openspec/` 和 root `openspec/` 都健康，但没有显式配置：
+
+- 只有一个 layout 有 active change 时，选择有 active change 的 layout。
+- 两者都有 active change 时 fail closed，要求用户运行 `comet doctor --artifact-layout` 或 `comet migrate docs --repair-store`。
+- 两者都没有 active change 时，命令不得猜测写入目标；交互命令询问用户，非交互命令要求显式 `--artifact-layout`。
+
+## State schema changes
+
+新增 change-level `.comet.yaml` 字段时必须同步三处：
+
+1. `domains/comet-classic/classic-state-command.ts`：`set` 白名单和 enum/值验证。
+2. `domains/comet-classic/classic-validate-command.ts`：schema 校验和 `KNOWN_KEYS`。
+3. `test/domains/comet-classic/comet-scripts.test.ts`：测试 fixture 中的 yaml 字符串和验证断言。
+
+新增字段：
+
+```yaml
+artifact_layout: legacy | docs
+openspec_root: docs
+superpowers_root: docs/superpowers
+```
+
+验证规则：
+
+- `artifact_layout` 只能是 `legacy` 或 `docs`。
+- `openspec_root` 和 `superpowers_root` 必须是 project-root-relative path。
+- 禁止绝对路径、`..`、空段和 Windows drive prefix。
+- legacy change 可以缺省这些字段，读取时按 legacy 解释。
+- docs layout change 写入时必须 snapshot 这些字段。
+
 ## Store id 策略
 
 OpenSpec store id 在用户级 registry 中必须唯一。不能让所有项目默认叫 `comet-docs`。
@@ -302,6 +371,8 @@ comet migrate docs --include-active
 ```
 
 默认行为是 dry-run。
+
+issue #173 中提到的命名是 `comet migrate doc`。本 spec 采用 `comet migrate docs`，原因是目标是 artifact layout，而不是单个 doc 文件。实现阶段如果产品命名决定使用单数 `doc`，必须在 CLI help、README、Skill、测试和 issue 评论中统一，不保留两个正式入口。可以提供临时 alias，但正式文档只写一个名称。
 
 ### Dry-run 输出
 
@@ -523,6 +594,14 @@ eval validation 需要区分：
 
 Dockerfile/task fixture 中创建目录的位置也要跟随 treatment。
 
+如果当前开发分支的完整流程 eval 需要同时覆盖未发布 Skill/runtime 行为，应新增 branch-specific treatment，例如：
+
+```text
+COMET_FULL_BRANCH_DOCS_LAYOUT
+```
+
+这个 treatment 只用于当前分支验证，不替代冻结 baseline，也不回写 039/040-beta.1 快照。
+
 ## Repository / Ignore 规则
 
 Comet 自身仓库已允许 `docs/`，但实现时仍需检查：
@@ -562,10 +641,39 @@ comet openspec new change add-auth
 
 ```text
 command starts
-  -> resolver reads project config
-  -> scans docs/openspec/changes and legacy fallback if needed
+  -> resolver applies layout discovery order
+  -> scans selected layout and legacy/docs fallback when needed
   -> resolves change dir
   -> reads state and artifact pointers relative to project root
+```
+
+## Cross-session Resume
+
+Cross-session resume 是 issue #173 的核心风险之一。新会话、上下文压缩恢复或用户说“继续”时，Comet 不能只扫描 root `openspec/changes`。
+
+resume-probe 和 context recovery 必须使用 layout resolver：
+
+1. 先按 layout 发现顺序确定候选 layout。
+2. 扫描候选 layout 下的 active changes。
+3. 如果显式配置为 docs layout，只扫描 `docs/openspec/changes`，但可以把 legacy active change 作为 conflict 诊断报告。
+4. 如果没有显式配置，扫描 docs 和 legacy 两套 layout。
+5. 单个 active change 且请求高置信相关时，返回 `auto_resume`。
+6. 多个 active change 或双 layout 冲突时，返回 `ask_user`，不得自动选择。
+7. 纯问答或明显新任务时，返回 `out_of_scope` 或 `ask_user`，不得只因存在 active change 就接管。
+
+需要同步的恢复文档：
+
+- `assets/skills-zh/comet/reference/context-recovery.md`
+- `assets/skills/comet/reference/context-recovery.md`
+- `assets/skills-zh/comet/rules/comet-phase-guard.md`
+- `assets/skills/comet/rules/comet-phase-guard*.md`
+- `assets/skills-zh/comet/reference/subagent-dispatch.md`
+- `assets/skills/comet/reference/subagent-dispatch.md`
+
+恢复提示必须包含 resolved change path 或 layout label，方便用户判断是否恢复到了预期目录：
+
+```text
+[COMET] 恢复 active change add-auth (docs layout: docs/openspec/changes/add-auth)。
 ```
 
 ### 归档
@@ -583,8 +691,8 @@ comet archive
 1. 旧项目不自动迁移。
 2. `resolveClassicChangeDirectory(name)` 同时查 docs 和 legacy。
 3. 如果两个布局都有同名 active change，命令必须失败并要求用户选择或迁移修复。
-4. `.comet.yaml` 中没有 layout 字段时按 legacy 解释。
-5. `.comet/config.yaml` 中没有 layout 字段时按 legacy 解释。
+4. `.comet.yaml` 中没有 layout 字段时，只有在没有更高优先级 layout 信号时才按 legacy 解释。
+5. `.comet/config.yaml` 中没有 layout 字段时，resolver 继续检查 healthy `docs/openspec` 和 active change snapshots，不直接退回 legacy。
 6. Skill 文案避免假设单一目录。
 
 ## 错误处理
@@ -627,10 +735,13 @@ repair 可以创建缺失的空目录，但不得覆盖现有文件。
 
 - resolver 默认识别 legacy layout。
 - resolver 识别 `.comet/config.yaml` docs layout。
+- resolver 在缺少 `.comet/config.yaml` 时能从 healthy `docs/openspec/` 识别 docs layout。
+- resolver 在 docs 和 legacy 都健康且都有 active change 时 fail closed。
 - resolver 输出 docs layout 下的 OpenSpec dirs。
 - resolver 处理缺失 store id 时生成 `cwd=docs` fallback。
 - store id 冲突时报错或生成替代 id。
 - change `.comet.yaml` snapshot layout 字段。
+- `.comet.yaml` 新字段同步 state set 白名单和 validate schema。
 
 ### Classic runtime tests
 
@@ -643,6 +754,8 @@ repair 可以创建缺失的空目录，但不得覆盖现有文件。
 - handoff hash 迁移后需要重新生成。
 - archive 通过 OpenSpec facade/store 调用。
 - hook guard 允许 docs layout OpenSpec artifact 写入，但不放开整个 `docs/`。
+- resume-probe 在 docs layout 下能恢复 active change。
+- resume-probe 遇到 docs/legacy 双 active change 时返回 `ask_user`。
 
 ### Dashboard tests
 
@@ -715,6 +828,7 @@ git diff --check
 | 风险 | 缓解 |
 | --- | --- |
 | OpenSpec store id 是本机 registry key，跨机器不稳定 | 只把 store id 写入本地 `.comet/config.yaml`，change artifact 只 snapshot root/layout |
+| clone 后缺少 `.comet/config.yaml` 导致误判 legacy | resolver 从 healthy `docs/openspec` 和 change snapshot 发现 docs layout |
 | Agent 忘记带 `--store` | Skill 改为使用 `comet openspec ...` facade |
 | `docs/openspec` 导致 project root 被误判为 `docs` | resolver 接收 project root，不从 changeDir 反推 |
 | handoff hash 因路径迁移变化 | active migration 默认阻塞；显式迁移时要求重新生成 handoff |
@@ -744,6 +858,7 @@ git diff --check
 5. hook guard 不因 docs layout 放宽无关文件写入。
 6. 双语 Skill 不再把 root `openspec/changes` 当成唯一事实。
 7. migration dry-run 能清楚报告移动计划、store 修复计划和 active change 阻塞原因。
-8. eval 冻结 baseline 不被破坏，新增 docs layout coverage。
-9. focused tests、architecture lint、build 和 full test 在实现完成后通过。
-
+8. clone 后即使没有本地 `.comet/config.yaml`，resolver 也能从 healthy `docs/openspec` 或 change snapshot 识别 docs layout。
+9. cross-session resume 在 docs layout、legacy layout 和双 layout 冲突下都有明确行为。
+10. eval 冻结 baseline 不被破坏，新增 docs layout coverage。
+11. focused tests、architecture lint、build 和 full test 在实现完成后通过。
