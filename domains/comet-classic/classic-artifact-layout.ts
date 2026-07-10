@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { parseDocument } from 'yaml';
+import { assertOpenSpecChangeName } from './classic-change-name.js';
 import type { ClassicChangeDirectory } from './classic-paths.js';
 
 export type CometArtifactLayoutKind = 'legacy' | 'docs';
@@ -254,6 +255,7 @@ export async function resolveCometChangeDirectory(
   name: string,
   options: ResolveCometChangeDirectoryOptions = {},
 ): Promise<ResolvedClassicChangeDirectory> {
+  assertOpenSpecChangeName(name);
   const layout = await resolveCometArtifactLayout(projectRoot, options);
   const active = path.join(layout.openSpec.changesDir, name);
   if (await exists(active)) {

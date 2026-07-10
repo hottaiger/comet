@@ -110,4 +110,29 @@ describe('resolveCometArtifactLayout', () => {
       layout: 'docs',
     });
   });
+
+  it('rejects invalid change names before resolving artifact directories', async () => {
+    const root = await tempProject();
+    await healthyOpenSpecRoot(root, 'docs');
+    await mkdir(path.join(root, 'docs', 'openspec', 'changes', 'archive', '2026-07-10-add-auth'), {
+      recursive: true,
+    });
+    await writeFile(
+      path.join(
+        root,
+        'docs',
+        'openspec',
+        'changes',
+        'archive',
+        '2026-07-10-add-auth',
+        '.comet.yaml',
+      ),
+      'phase: archived\n',
+      'utf8',
+    );
+
+    await expect(resolveCometChangeDirectory(root, '2026-07-10-add-auth')).rejects.toThrow(
+      /Invalid change name/u,
+    );
+  });
 });
