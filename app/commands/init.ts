@@ -21,6 +21,7 @@ import {
   installCometHooksForPlatform,
   createWorkingDirs,
 } from '../../domains/skill/platform-install.js';
+import type { ArtifactLayoutOption } from '../../domains/skill/platform-install.js';
 import { LANGUAGES, type LanguageConfig } from '../../domains/skill/languages.js';
 import { installOpenSpec, isCommandAvailable } from '../../domains/integrations/openspec.js';
 import { installSuperpowersForPlatforms } from '../../domains/integrations/superpowers.js';
@@ -41,6 +42,8 @@ type InitOptions = {
   scope?: InstallScope;
   language?: string;
   installMode?: InstallMode;
+  artifactLayout?: ArtifactLayoutOption;
+  openSpecStore?: string;
 };
 
 type InstallStatus = 'installed' | 'skipped' | 'failed';
@@ -569,7 +572,10 @@ export async function initCommand(targetPath: string, options: InitOptions = {})
   }
 
   if (scope === 'project') {
-    await createWorkingDirs(projectPath, language.artifactLanguage);
+    await createWorkingDirs(projectPath, language.artifactLanguage, {
+      artifactLayout: options.artifactLayout,
+      openSpecStore: options.openSpecStore,
+    });
     const projectTargets = await detectInstalledCometTargets(projectPath, { scopes: ['project'] });
     if (projectTargets.length > 0) {
       await upsertProjectInstallation(

@@ -6,6 +6,7 @@ import { dashboardCommand } from '../commands/dashboard.js';
 import { doctorCommand } from '../commands/doctor.js';
 import { evalCommand as evalFacadeCommand } from '../commands/eval.js';
 import { openspecCommand } from '../commands/openspec.js';
+import { migrateDocsCommand } from '../commands/migrate-docs.js';
 import { updateCommand } from '../commands/update.js';
 import { uninstallCommand } from '../commands/uninstall.js';
 import { getCurrentVersion } from '../../platform/version/version.js';
@@ -64,6 +65,13 @@ program
   .option('--json', 'Output as JSON')
   .addOption(new Option('--scope <scope>', 'Install scope').choices(['global', 'project']))
   .addOption(new Option('--language <lang>', 'Language for skills').choices(['en', 'zh']))
+  .addOption(
+    new Option('--artifact-layout <layout>', 'Artifact layout for initialized workflow').choices([
+      'legacy',
+      'docs',
+    ]),
+  )
+  .option('--openspec-store <id>', 'OpenSpec store id to persist for docs artifact layout')
   .action(async (targetPath = '.', options) => {
     try {
       await initCommand(targetPath, options);
@@ -138,6 +146,20 @@ program
   .action(async (args: string[] = [], options) => {
     const forwardedArgs = args.filter((arg) => arg !== '--');
     await openspecCommand(options.project, forwardedArgs, options);
+  });
+
+const migrate = program.command('migrate').description('Migrate Comet project artifacts');
+
+migrate
+  .command('docs [path]')
+  .description('Migrate legacy OpenSpec artifacts into docs layout')
+  .option('--dry-run', 'Preview migration without changing files', true)
+  .option('--apply', 'Apply the migration')
+  .option('--repair-store', 'Repair or register the OpenSpec store for docs layout')
+  .option('--include-active', 'Allow active changes to be migrated after review')
+  .option('--openspec-store <id>', 'OpenSpec store id to register or repair')
+  .action(async (targetPath = '.', options) => {
+    await migrateDocsCommand(targetPath, options);
   });
 
 program

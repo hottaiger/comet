@@ -155,6 +155,37 @@ describe('comet init E2E', () => {
   );
 
   it(
+    'creates docs OpenSpec directories and config for docs artifact layout',
+    async () => {
+      mockExternalSuccess();
+      await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+
+      const { initCommand } = await import('../../app/commands/init.js');
+      await captureJsonOutput(() =>
+        initCommand(tmpDir, {
+          yes: true,
+          scope: 'project',
+          json: true,
+          language: 'en',
+          artifactLayout: 'docs',
+          openSpecStore: 'comet-demo-1234',
+        }),
+      );
+
+      await expect(
+        fs.access(path.join(tmpDir, 'docs', 'openspec', 'changes', 'archive')),
+      ).resolves.toBeUndefined();
+      await expect(
+        fs.access(path.join(tmpDir, 'docs', 'openspec', 'specs')),
+      ).resolves.toBeUndefined();
+      const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
+      expect(config).toContain('artifact_layout: docs');
+      expect(config).toContain('store: comet-demo-1234');
+    },
+    INIT_E2E_TIMEOUT_MS,
+  );
+
+  it(
     'installs Comet skills at global scope',
     async () => {
       mockExternalSuccess();

@@ -1139,13 +1139,71 @@ function parseProjectConfigOverrides(content: string): Record<string, string> {
   return out;
 }
 
-function renderProjectConfig(existing: Record<string, string>, language: string = 'en'): string {
+type ArtifactLayoutOption = 'legacy' | 'docs';
+
+interface WorkingDirOptions {
+  artifactLayout?: ArtifactLayoutOption;
+  openSpecStore?: string;
+}
+
+function parseWorkingDirOptions(content: string): WorkingDirOptions {
+  if (!content.trim()) return {};
+  const doc = parseDocument(content, { uniqueKeys: false });
+  if (doc.errors.length > 0) return {};
+  const js = doc.toJS();
+  if (!js || typeof js !== 'object' || Array.isArray(js)) return {};
+
+  const record = js as Record<string, unknown>;
+  const artifactLayout =
+    record.artifact_layout === 'legacy' || record.artifact_layout === 'docs'
+      ? record.artifact_layout
+      : undefined;
+  const openspec =
+    record.openspec && typeof record.openspec === 'object' && !Array.isArray(record.openspec)
+      ? (record.openspec as Record<string, unknown>)
+      : null;
+  const openSpecStore =
+    openspec && typeof openspec.store === 'string' && openspec.store.trim().length > 0
+      ? openspec.store.trim()
+      : undefined;
+
+  return { artifactLayout, openSpecStore };
+}
+
+function resolveWorkingDirOptions(
+  existingOptions: WorkingDirOptions,
+  options: WorkingDirOptions = {},
+): WorkingDirOptions {
+  const merged: WorkingDirOptions = { ...existingOptions, ...options };
+  if (merged.openSpecStore && !merged.artifactLayout) {
+    merged.artifactLayout = 'docs';
+  }
+  return merged;
+}
+
+function renderProjectConfig(
+  existing: Record<string, string>,
+  language: string = 'en',
+  options: WorkingDirOptions = {},
+): string {
   const lines: string[] = [];
   const fields = getManagedConfigFields(language);
   const managed: Set<string> = new Set(fields.map((f) => f.key));
   for (const f of fields) {
     lines.push(f.comment);
     lines.push(`${f.key}: ${existing[f.key] ?? f.def}`);
+  }
+  if (options.artifactLayout === 'docs') {
+    managed.add('artifact_layout');
+    lines.push('# artifact_layout: legacy | docs');
+    lines.push('artifact_layout: docs');
+    lines.push('openspec:');
+    lines.push('  root: docs');
+    if (options.openSpecStore) {
+      lines.push(`  store: ${options.openSpecStore}`);
+    }
+    lines.push('superpowers:');
+    lines.push('  root: docs/superpowers');
   }
   for (const [k, v] of Object.entries(existing)) {
     if (!managed.has(k)) lines.push(`${k}: ${v}`);
@@ -1154,28 +1212,63 @@ function renderProjectConfig(existing: Record<string, string>, language: string 
   return lines.join('\n');
 }
 
-async function mergeProjectConfig(projectPath: string, language: string = 'en'): Promise<void> {
+async function mergeProjectConfig(
+  projectPath: string,
+  language: string = 'en',
+  options: WorkingDirOptions = {},
+): Promise<void> {
   const configPath = path.join(projectPath, '.comet', 'config.yaml');
   let existing: Record<string, string> = {};
+  let existingOptions: WorkingDirOptions = {};
   if (await fileExists(configPath)) {
-    existing = parseProjectConfigOverrides(await readFile(configPath, 'utf-8'));
+    const content = await readFile(configPath, 'utf-8');
+    existing = parseProjectConfigOverrides(content);
+    existingOptions = parseWorkingDirOptions(content);
   }
   await ensureDir(path.dirname(configPath));
-  await writeFile(configPath, renderProjectConfig(existing, language), 'utf-8');
+  await writeFile(
+    configPath,
+    renderProjectConfig(existing, language, resolveWorkingDirOptions(existingOptions, options)),
+    'utf-8',
+  );
 }
 
-async function createWorkingDirs(projectPath: string, language: string = 'en'): Promise<void> {
+async function createWorkingDirs(
+  projectPath: string,
+  language: string = 'en',
+  options: WorkingDirOptions = {},
+): Promise<void> {
+  const configPath = path.join(projectPath, '.comet', 'config.yaml');
+  let existingOptions: WorkingDirOptions = {};
+  if (await fileExists(configPath)) {
+    existingOptions = parseWorkingDirOptions(await readFile(configPath, 'utf-8'));
+  }
+  const resolvedOptions = resolveWorkingDirOptions(existingOptions, options);
   const dirs = [
     path.join(projectPath, 'docs', 'superpowers', 'specs'),
     path.join(projectPath, 'docs', 'superpowers', 'plans'),
+    path.join(projectPath, 'docs', 'superpowers', 'reports'),
     path.join(projectPath, '.comet'),
   ];
+  if (resolvedOptions.artifactLayout === 'docs') {
+    dirs.push(
+      path.join(projectPath, 'docs', 'openspec', 'changes', 'archive'),
+      path.join(projectPath, 'docs', 'openspec', 'specs'),
+    );
+  }
 
   for (const dir of dirs) {
     await ensureDir(dir);
   }
 
-  await mergeProjectConfig(projectPath, language);
+  if (resolvedOptions.artifactLayout === 'docs') {
+    const openSpecConfigPath = path.join(projectPath, 'docs', 'openspec', 'config.yaml');
+    if (!(await fileExists(openSpecConfigPath))) {
+      await writeFile(openSpecConfigPath, 'schema: spec-driven\n', 'utf-8');
+    }
+  }
+
+  await mergeProjectConfig(projectPath, language, resolvedOptions);
   await installCometProjectInstructions(projectPath, language === 'zh-CN' ? 'zh' : 'en');
 }
 
@@ -1199,4 +1292,11 @@ export {
   getCentralSkillsDir,
   installSkillsAsSymlink,
 };
-export type { Manifest, LanguageConfig, PlannedSkillFile, PlannedSkillSourceFile };
+export type {
+  ArtifactLayoutOption,
+  Manifest,
+  LanguageConfig,
+  PlannedSkillFile,
+  PlannedSkillSourceFile,
+  WorkingDirOptions,
+};

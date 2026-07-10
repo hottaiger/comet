@@ -124,7 +124,8 @@ const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
     skippedLabel: 'Skipped:',
     failedLabel: 'Failed:',
     failedStatus: 'failed',
-    workingDirs: 'Working directories: docs/superpowers/specs/, docs/superpowers/plans/',
+    workingDirs:
+      'Working directories: docs/superpowers/specs/, docs/superpowers/plans/, docs/superpowers/reports/ (docs/openspec/* when docs layout is enabled)',
     getStarted: 'Get started:',
     getStartedComet: '/comet "your idea"  — Start a new change with full workflow',
     getStartedHotfix: '/comet-hotfix       — Quick bug fix (skip brainstorming)',
@@ -210,7 +211,8 @@ const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
     skippedLabel: '已跳过：',
     failedLabel: '失败：',
     failedStatus: '失败',
-    workingDirs: '工作目录：docs/superpowers/specs/, docs/superpowers/plans/',
+    workingDirs:
+      '工作目录：docs/superpowers/specs/, docs/superpowers/plans/, docs/superpowers/reports/（启用 docs layout 时还会创建 docs/openspec/*）',
     getStarted: '开始使用：',
     getStartedComet: '/comet "你的想法"  — 启动完整工作流',
     getStartedHotfix: '/comet-hotfix       — 快速修复（跳过 brainstorming）',

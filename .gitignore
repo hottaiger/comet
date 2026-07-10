@@ -76,6 +76,7 @@ skills-lock.json
 
 # Superpowers local workspace
 .superpowers/
+docs/.openspec-store/
 
 # Auth / credentials
 .npmrc
