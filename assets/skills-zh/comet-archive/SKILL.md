@@ -49,9 +49,10 @@ node "$COMET_STATE" check <name> archive
 运行归档脚本，自动完成以下全部步骤：
 
 ```bash
-comet openspec archive "<change-name>" --yes
 node "$COMET_ARCHIVE" "<change-name>"
 ```
+
+其中 `comet openspec archive "<change-name>" --yes` 只是底层由 Classic 归档脚本内部调用的 OpenSpec facade 信息，**不要单独再执行一次**，否则会产生重复归档风险。
 
 脚本自动执行：
 1. 入口状态验证（phase=archive, verify_result=pass, archived=false）

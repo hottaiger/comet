@@ -49,9 +49,10 @@ Only after the user selects "Confirm archive" may Step 2 continue. After the use
 Run the archive script to automatically complete all steps:
 
 ```bash
-comet openspec archive "<change-name>" --yes
 node "$COMET_ARCHIVE" "<change-name>"
 ```
+
+Here `comet openspec archive "<change-name>" --yes` is informational only: the Classic archive script calls that OpenSpec facade internally, so **do not run it separately** or you risk a duplicate archive operation.
 
 The script automatically executes:
 1. Entry state validation (phase=archive, verify_result=pass, archived=false)

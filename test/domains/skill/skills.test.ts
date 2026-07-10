@@ -1788,6 +1788,19 @@ describe('skills', () => {
   });
 
   describe('Comet script discovery helper', () => {
+    const section = (content: string, heading: string) => {
+      const start = content.indexOf(heading);
+      expect(start, `missing heading ${heading}`).toBeGreaterThanOrEqual(0);
+
+      const rest = content.slice(start + heading.length);
+      const nextHeadingOffset = rest.search(/\n##?\s+/);
+      if (nextHeadingOffset === -1) {
+        return rest;
+      }
+
+      return rest.slice(0, nextHeadingOffset);
+    };
+
     it('teaches layout-aware OpenSpec access in both languages', async () => {
       const zhComet = await fs.readFile(
         path.resolve('assets', 'skills-zh', 'comet', 'SKILL.md'),
@@ -1806,6 +1819,32 @@ describe('skills', () => {
       expect(enComet).not.toContain('only from `openspec/changes/<name>/.comet.yaml`');
     });
 
+    it('keeps archive step 2 on a single authoritative command path in both languages', async () => {
+      const zhArchive = await fs.readFile(
+        path.resolve('assets', 'skills-zh', 'comet-archive', 'SKILL.md'),
+        'utf-8',
+      );
+      const enArchive = await fs.readFile(
+        path.resolve('assets', 'skills', 'comet-archive', 'SKILL.md'),
+        'utf-8',
+      );
+
+      const zhStep2 = section(zhArchive, '### 2. 执行归档');
+      const enStep2 = section(enArchive, '### 2. Execute Archive');
+      const executableBlock = (content: string) => {
+        const match = content.match(/```bash\n([\s\S]*?)\n```/);
+        expect(match, 'missing bash code block').not.toBeNull();
+        return match?.[1] ?? '';
+      };
+      const zhCommands = executableBlock(zhStep2);
+      const enCommands = executableBlock(enStep2);
+
+      expect(zhCommands.trim()).toBe('node "$COMET_ARCHIVE" "<change-name>"');
+      expect(enCommands.trim()).toBe('node "$COMET_ARCHIVE" "<change-name>"');
+      expect(zhStep2).toContain('不要单独再执行一次');
+      expect(enStep2).toContain('do not run it separately');
+    });
+
     it('ships a shared script locator helper', async () => {
       const manifest = await readManifest();
       expect(manifest.skills).toContain('comet/reference/intent-frame.md');
@@ -1818,10 +1857,7 @@ describe('skills', () => {
         path.resolve('assets', 'skills-zh', 'comet', 'SKILL.md'),
         'utf-8',
       );
-      const en = await fs.readFile(
-        path.resolve('assets', 'skills', 'comet', 'SKILL.md'),
-        'utf-8',
-      );
+      const en = await fs.readFile(path.resolve('assets', 'skills', 'comet', 'SKILL.md'), 'utf-8');
 
       expect(zh).toContain('Comet Ambient Resume');
       expect(zh).toContain('node "$COMET_RESUME_PROBE" probe --stdin');
