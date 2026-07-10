@@ -471,27 +471,32 @@ function parseSimpleYaml(raw) {
 }
 
 async function activeCometChanges() {
-  const changesRoot = path.join(runRoot, 'openspec', 'changes');
-  let entries;
-  try {
-    entries = await fs.readdir(changesRoot, { withFileTypes: true });
-  } catch (error) {
-    if (error && typeof error === 'object' && error.code === 'ENOENT') return [];
-    throw error;
-  }
   const changes = [];
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const statePath = path.join(changesRoot, entry.name, '.comet.yaml');
-    let state;
+  for (const changesRoot of [
+    path.join(runRoot, 'openspec', 'changes'),
+    path.join(runRoot, 'docs', 'openspec', 'changes'),
+  ]) {
+    let entries;
     try {
-      state = parseSimpleYaml(await fs.readFile(statePath, 'utf8'));
+      entries = await fs.readdir(changesRoot, { withFileTypes: true });
     } catch (error) {
       if (error && typeof error === 'object' && error.code === 'ENOENT') continue;
       throw error;
     }
-    const archived = state.archived === true || String(state.archived ?? '').toLowerCase() === 'true';
-    if (!archived) changes.push({ name: entry.name, statePath, state });
+    for (const entry of entries) {
+      if (!entry.isDirectory() || entry.name === 'archive') continue;
+      const statePath = path.join(changesRoot, entry.name, '.comet.yaml');
+      let state;
+      try {
+        state = parseSimpleYaml(await fs.readFile(statePath, 'utf8'));
+      } catch (error) {
+        if (error && typeof error === 'object' && error.code === 'ENOENT') continue;
+        throw error;
+      }
+      const archived =
+        state.archived === true || String(state.archived ?? '').toLowerCase() === 'true';
+      if (!archived) changes.push({ name: entry.name, statePath, state });
+    }
   }
   return changes.sort((left, right) => left.name.localeCompare(right.name));
 }

@@ -454,6 +454,63 @@ describe('Factory skill package generation', () => {
     );
   });
 
+  it('discovers docs layout active changes for comet-five-phase-overlay runtime helpers', async () => {
+    const workflow = normalizeWorkflowDefinition(
+      builtinCometFivePhaseWorkflow({
+        name: 'overlay-docs-layout',
+        goal: 'Route from a docs layout active Comet change state.',
+      }),
+    );
+    const output = await generateFactorySkillPackage(
+      packagePlan({ root, name: 'overlay-docs-layout', workflow }),
+    );
+
+    const runRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'comet-overlay-docs-layout-run-'));
+    const env = { ...process.env, COMET_RUN_ROOT: runRoot };
+    const stateScript = path.join(output.packageRoot, 'scripts', 'workflow-state.mjs');
+    try {
+      const changeRoot = path.join(runRoot, 'docs', 'openspec', 'changes', 'docs-layout-change');
+      await fs.mkdir(changeRoot, { recursive: true });
+      await fs.writeFile(
+        path.join(changeRoot, '.comet.yaml'),
+        'phase: build\nbuild_pause: plan-ready\nreview_mode: standard\n',
+        'utf8',
+      );
+
+      const next = await execFileAsync(process.execPath, [stateScript, 'next'], { env });
+      expect(next.stdout).toContain('NODE: plan');
+
+      const record = await execFileAsync(
+        process.execPath,
+        [stateScript, 'record', 'plan', '{"producer-summary":"done"}'],
+        { env },
+      );
+      expect(record.stdout).toContain('EVIDENCE: plan');
+      await expect(
+        fs.access(
+          path.join(
+            runRoot,
+            '.comet',
+            'workflow-evidence',
+            'docs-layout-change',
+            'overlay-docs-layout.json',
+          ),
+        ),
+      ).resolves.toBeUndefined();
+
+      const status = await execFileAsync(process.execPath, [stateScript, 'status'], { env });
+      expect(JSON.parse(status.stdout)).toMatchObject({
+        status: 'running',
+        change: 'docs-layout-change',
+        statePath: expect.stringContaining(path.join('docs', 'openspec', 'changes')),
+        currentNode: 'plan',
+        phase: 'build',
+      });
+    } finally {
+      await fs.rm(runRoot, { recursive: true, force: true });
+    }
+  });
+
   it('renders augmentations into entry, node, and handoff outputs', async () => {
     const workflow = normalizeWorkflowDefinition({
       ...builtinCometFivePhaseWorkflow({
