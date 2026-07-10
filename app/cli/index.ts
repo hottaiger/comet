@@ -132,10 +132,12 @@ program
 program
   .command('openspec [args...]')
   .description('Run OpenSpec through the Comet artifact layout resolver')
+  .allowUnknownOption()
   .option('--json', 'Preserve JSON command output')
   .option('--project <dir>', 'Project root used for layout resolution', '.')
   .action(async (args: string[] = [], options) => {
-    await openspecCommand(options.project, args, options);
+    const forwardedArgs = args.filter((arg) => arg !== '--');
+    await openspecCommand(options.project, forwardedArgs, options);
   });
 
 program
