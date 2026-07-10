@@ -73,7 +73,7 @@ node "$COMET_STATE" next <name>
 
 **立即执行：** 按 tasks.md 逐个执行任务：
 
-1. 读取 `openspec/changes/<name>/tasks.md`，获取未完成任务列表
+1. 先运行 `comet openspec status --change "<name>" --json` 确认 `<openspec-change-dir>`，再读取 `<openspec-change-dir>/tasks.md`，获取未完成任务列表
 2. 对每个未完成任务：
    - 根据任务描述修改代码
    - 运行项目格式化命令（如 `mvn spotless:apply`、`npm run format` 等）
@@ -87,7 +87,7 @@ node "$COMET_STATE" next <name>
 具体调查、最小失败测试、修复验证和保持当前 change 验证闭环的要求，按 `comet/reference/debug-gate.md` 执行。
 
 **如修复影响已有 spec 验收场景**：
-- 在 `openspec/changes/<name>/specs/<capability>/spec.md` 创建 delta spec
+- 在 `<openspec-change-dir>/specs/<capability>/spec.md` 创建 delta spec
 - 仅包含 `## MODIFIED Requirements` 部分
 
 ### 3. 根因消除检查

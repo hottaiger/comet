@@ -102,13 +102,13 @@ change 骨架创建后，按以下标准产物循环逐个生成 `proposal`、`d
 
 **标准产物循环**（对每个 `artifact-id`：`proposal` → `design` → `tasks`）：
 
-1. 刷新状态：`openspec status --change "<name>" --json`
+1. 刷新状态：`comet openspec status --change "<name>" --json`
 2. 获取产物指令：
 
    ```bash
-   openspec instructions proposal --change "<name>" --json
-   openspec instructions design --change "<name>" --json
-   openspec instructions tasks --change "<name>" --json
+   comet openspec instructions proposal --change "<name>" --json
+   comet openspec instructions design --change "<name>" --json
+   comet openspec instructions tasks --change "<name>" --json
    ```
 
 3. 对返回的 JSON 指令载荷，必须：
@@ -118,16 +118,16 @@ change 骨架创建后，按以下标准产物循环逐个生成 `proposal`、`d
    - 将 `context` 和 `rules` 作为约束条件应用，**不得复制到 artifact 内容中**
    - 写入 `resolvedOutputPath`
    - 验证输出文件存在且非空
-4. 每创建一个 artifact 后，重新运行 `openspec status --change "<name>" --json` 确认状态，然后继续下一个 artifact
+4. 每创建一个 artifact 后，重新运行 `comet openspec status --change "<name>" --json` 确认状态，然后继续下一个 artifact
 
 **失败处理**：如果 `openspec instructions` 失败、返回无效 JSON、报告未满足的 `dependencies`、或未提供可用的 `resolvedOutputPath`，必须立即停止 artifact 创建并报告 OpenSpec 错误。不得回退为硬编码文档结构，因为那样会绕过项目规则。
 
 **命名与范围守卫**：change name 必须使用 Step 1c 中用户确认的 kebab-case 英文名，不得自动生成、推断或使用非 kebab-case（如中文）名称。变更范围必须与用户描述一致，不得自行扩大或缩小。
 
-确认以下产物已创建：
+确认以下产物已创建。先通过 `comet openspec status --change "<name>" --json` 解析 `<openspec-change-dir>`；它可能是 `openspec/changes/<name>`（legacy）或 `docs/openspec/changes/<name>`（docs）：
 
 ```
-openspec/changes/<name>/
+<openspec-change-dir>/
 ├── .openspec.yaml
 ├── .comet.yaml
 ├── proposal.md       # Why + What：问题、目标、范围

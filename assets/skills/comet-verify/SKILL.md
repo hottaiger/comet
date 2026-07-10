@@ -144,7 +144,7 @@ When scale assessment result is "large":
 
 After the skill loads, follow its guidance to verify. Check items:
 1. All tasks.md tasks completed (`[x]`)
-2. Implementation matches `openspec/changes/<name>/design.md` high-level design decisions
+2. First run `comet openspec status --change "<name>" --json` to confirm `<openspec-change-dir>`, then verify implementation matches `<openspec-change-dir>/design.md` high-level design decisions
 3. Implementation matches Design Doc (technical design documents under `docs/superpowers/specs/`)
 4. All capability spec scenarios pass
 5. proposal.md goals are satisfied

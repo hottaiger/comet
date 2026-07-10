@@ -2,7 +2,7 @@
 
 规范路径：`comet/reference/comet-yaml-fields.md`
 
-本文件是 `openspec/changes/<name>/` 下每个 change 级 `.comet.yaml` 状态文件的字段参考。按需查阅，不随 skill 一次性加载。项目级默认配置只放在 `.comet/config.yaml`。
+本文件是每个 change 级 `.comet.yaml` 状态文件的字段参考，位置为 `<openspec-change-dir>/`。`<openspec-change-dir>` 可能是 `openspec/changes/<name>`（legacy）或 `docs/openspec/changes/<name>`（docs）。按需查阅，不随 skill 一次性加载。项目级默认配置只放在 `.comet/config.yaml`。
 
 ## 示例
 

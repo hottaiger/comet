@@ -34,7 +34,7 @@ You are an implementation planning expert. Create an implementation plan based o
 
 1. **Immediately execute:** Use the Skill tool to load the Superpowers `writing-plans` skill. Skipping this step is prohibited. After the skill loads, ARGUMENTS must include: `Language: Use the configured Comet artifact language from "$COMET_BASH" "$COMET_STATE" get <name> language`
 2. Read the Design Doc (technical design document under `docs/superpowers/specs/`)
-3. Read `openspec/changes/<name>/tasks.md` (task boundaries)
+3. First run `comet openspec status --change "<name>" --json` to confirm `<openspec-change-dir>`, then read `<openspec-change-dir>/tasks.md` (task boundaries)
 4. Follow the skill's guidance to create the plan
 
 Plan requirements:

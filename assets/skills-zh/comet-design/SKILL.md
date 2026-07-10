@@ -36,24 +36,24 @@ node "$COMET_HANDOFF" <change-name> design --write
 
 脚本会根据 change `.comet.yaml` 的 `context_compression` 快照生成并记录交接包。
 
-默认 `context_compression: off` 时生成：
+默认 `context_compression: off` 时生成。先通过 `comet openspec status --change "<name>" --json` 解析 `<openspec-change-dir>`；它可能是 `openspec/changes/<name>`（legacy）或 `docs/openspec/changes/<name>`（docs）：
 
 ```text
-openspec/changes/<name>/.comet/handoff/design-context.json
-openspec/changes/<name>/.comet/handoff/design-context.md
+<openspec-change-dir>/.comet/handoff/design-context.json
+<openspec-change-dir>/.comet/handoff/design-context.md
 ```
 
 启用 beta（项目 `.comet/config.yaml` 中 `context_compression: beta`，创建 change 时快照进入 `.comet.yaml`）时生成：
 
 ```text
-openspec/changes/<name>/.comet/handoff/spec-context.json
-openspec/changes/<name>/.comet/handoff/spec-context.md
+<openspec-change-dir>/.comet/handoff/spec-context.json
+<openspec-change-dir>/.comet/handoff/spec-context.md
 ```
 
 并在 `.comet.yaml` 写入：
 
 ```yaml
-handoff_context: openspec/changes/<name>/.comet/handoff/design-context.json
+handoff_context: <openspec-change-dir>/.comet/handoff/design-context.json
 handoff_hash: <sha256>
 ```
 
@@ -93,12 +93,12 @@ Language: 使用 `"$COMET_BASH" "$COMET_STATE" get <name> language` 读取到的
 
 ```text
 Change: <change-name>
-OpenSpec Context Pack: openspec/changes/<name>/.comet/handoff/design-context.md
-Machine handoff: openspec/changes/<name>/.comet/handoff/design-context.json
+OpenSpec Context Pack: <openspec-change-dir>/.comet/handoff/design-context.md
+Machine handoff: <openspec-change-dir>/.comet/handoff/design-context.json
 
 如 context_compression: beta，则使用：
-OpenSpec Context Pack: openspec/changes/<name>/.comet/handoff/spec-context.md
-Machine handoff: openspec/changes/<name>/.comet/handoff/spec-context.json
+OpenSpec Context Pack: <openspec-change-dir>/.comet/handoff/spec-context.md
+Machine handoff: <openspec-change-dir>/.comet/handoff/spec-context.json
 
 OpenSpec 产物是上游事实源，但不得用“跳过重复上下文探索”削弱 Superpowers `brainstorming` 的澄清流程。
 你的任务是基于交接包做深度技术设计：实现方案、技术风险、测试策略、边界条件。
@@ -147,10 +147,10 @@ brainstorming 产出设计方案后，**必须按 `comet/reference/decision-poin
 用户确认设计方案后，在创建 Design Doc 前，创建或更新已增量维护的检查点文件，将其定稿为确认后的设计方案摘要：
 
 ```bash
-mkdir -p openspec/changes/<name>/.comet/handoff
+mkdir -p <openspec-change-dir>/.comet/handoff
 ```
 
-`openspec/changes/<name>/.comet/handoff/brainstorm-summary.md` 结构：
+`<openspec-change-dir>/.comet/handoff/brainstorm-summary.md` 结构：
 
 ```markdown
 # Brainstorm Summary
@@ -176,9 +176,9 @@ mkdir -p openspec/changes/<name>/.comet/handoff
 ```
 
 **上下文压缩说明**：每次增量更新 `brainstorm-summary.md` 后，都是相对安全的压缩恢复点。Brainstorming 完成后，如上下文窗口紧张，应优先在此处进行压缩。压缩后重新加载以下文件继续 Step 2：
-- `openspec/changes/<name>/.comet/handoff/brainstorm-summary.md`
-- `openspec/changes/<name>/.comet/handoff/design-context.md`（或 beta 模式的 `spec-context.md`）
-- `openspec/changes/<name>/.comet/handoff/design-context.json`（或 beta 模式的 `spec-context.json`）
+- `<openspec-change-dir>/.comet/handoff/brainstorm-summary.md`
+- `<openspec-change-dir>/.comet/handoff/design-context.md`（或 beta 模式的 `spec-context.md`）
+- `<openspec-change-dir>/.comet/handoff/design-context.json`（或 beta 模式的 `spec-context.json`）
 
 ### 1e. 主动式上下文压缩
 

@@ -2,7 +2,7 @@
 
 Canonical path: `comet/reference/comet-yaml-fields.md`
 
-This file is the field reference for each change-level `.comet.yaml` state file under `openspec/changes/<name>/`.
+This file is the field reference for each change-level `.comet.yaml` state file under `<openspec-change-dir>/`. `<openspec-change-dir>` may be `openspec/changes/<name>` (legacy) or `docs/openspec/changes/<name>` (docs).
 Consult on demand; not loaded inline with skills. Project defaults live in `.comet/config.yaml`.
 
 ## Example

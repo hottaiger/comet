@@ -73,8 +73,8 @@ Before continuing or starting changes, handle uncommitted changes through `comet
 
 After the skill loads, use the current `<change-name>` as input and follow `openspec-apply-change` to execute the OpenSpec apply flow:
 
-1. Run or follow `openspec status --change "<name>" --json` to confirm the schema and task artifact
-2. Run or follow `openspec instructions apply --change "<name>" --json` to read OpenSpec's apply instructions, `contextFiles`, task progress, and dynamic instruction
+1. Run or follow `comet openspec status --change "<name>" --json` to confirm the schema, `<openspec-change-dir>`, and task artifact
+2. Run or follow `comet openspec instructions apply --change "<name>" --json` to read OpenSpec's apply instructions, `contextFiles`, task progress, and dynamic instruction
 3. Read every context file listed by the apply instructions; do not implement from stale conversation context or a handwritten tasks loop alone
 4. Complete unchecked tasks one by one according to the apply instructions, keeping changes minimal and focused
 5. After each completed task:

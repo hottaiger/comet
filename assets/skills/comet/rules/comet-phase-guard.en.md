@@ -8,7 +8,7 @@
 
 ### Phase Awareness (Highest Priority)
 
-When there is an active comet change (`openspec/changes/<name>/.comet.yaml` exists), **before starting any operation** you must read the `phase` field to confirm the current phase.
+When there is an active comet change, first run `comet openspec status --change "<name>" --json` to resolve `<openspec-change-dir>` and confirm `<openspec-change-dir>/.comet.yaml` exists. **Before starting any operation** you must read the `phase` field to confirm the current phase.
 
 **Phases and allowed operations:**
 
@@ -104,7 +104,7 @@ After recovery, first re-run the "Phase-Entry Self-Consistency Check" table: if 
 **Special attention to `build_mode`**: If recovery script outputs `build_mode: subagent-driven-development`, you are the coordinator, not the executor. Must:
 1. Use the Skill tool to reload the Superpowers `subagent-driven-development` skill
 2. Re-read `comet/reference/subagent-dispatch.md` for Comet-specific extensions
-3. Read `openspec/changes/<name>/.comet/subagent-progress.md` to recover the exact stage, evidence, and review-fix round
+3. Read `<openspec-change-dir>/.comet/subagent-progress.md` to recover the exact stage, evidence, and review-fix round
 4. Do not execute tasks directly in the main session
 5. Resume from the checkpoint; start from the first unchecked task only when it is missing or mismatched
 6. Tasks already committed but not yet validated according to `review_mode` remain unchecked; continue the corresponding validation/review/fix loop

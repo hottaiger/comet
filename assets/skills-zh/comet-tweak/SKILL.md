@@ -73,8 +73,8 @@ node "$COMET_GUARD" <change-name> open --apply
 
 技能加载后，以当前 `<change-name>` 作为输入，按 `openspec-apply-change` 的指引执行 OpenSpec apply 流程：
 
-1. 运行或遵循 `openspec status --change "<name>" --json`，确认 schema 和任务 artifact
-2. 运行或遵循 `openspec instructions apply --change "<name>" --json`，读取 OpenSpec 返回的 apply 指令、`contextFiles`、任务进度和动态 instruction
+1. 运行或遵循 `comet openspec status --change "<name>" --json`，确认 schema、`<openspec-change-dir>` 和任务 artifact
+2. 运行或遵循 `comet openspec instructions apply --change "<name>" --json`，读取 OpenSpec 返回的 apply 指令、`contextFiles`、任务进度和动态 instruction
 3. 读取 apply 指令列出的所有 context files，不得只凭旧对话或手写 tasks 循环实现
 4. 按 apply 指令逐个完成未勾选任务，保持改动最小且聚焦
 5. 每完成一个任务后：

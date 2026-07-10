@@ -126,6 +126,23 @@ def test_comet_state_accepts_archived_change_without_active_state(monkeypatch, t
     }
 
 
+def test_comet_state_accepts_docs_layout_active_change(monkeypatch, tmp_path: Path):
+    from scaffold.python.validation import comet_workflow
+
+    active = tmp_path / "docs" / "openspec" / "changes" / "add-auth"
+    active.mkdir(parents=True)
+    (active / ".comet.yaml").write_text("phase: build\n", encoding="utf-8")
+    monkeypatch.setattr(comet_workflow, "WORKSPACE", tmp_path)
+
+    result = comet_workflow.check_comet_state()
+
+    assert result == {
+        "check": "comet_state",
+        "status": "passed",
+        "message": "phase=build",
+    }
+
+
 def test_workflow_phases_accepts_verification_report_name(monkeypatch, tmp_path: Path):
     from scaffold.python.validation import comet_workflow
 
@@ -141,3 +158,30 @@ def test_workflow_phases_accepts_verification_report_name(monkeypatch, tmp_path:
 
     assert result["status"] == "passed"
     assert "verify" in result["message"]
+
+
+def test_workflow_phases_accepts_docs_layout_paths(monkeypatch, tmp_path: Path):
+    from scaffold.python.validation import comet_workflow
+
+    archived = tmp_path / "docs" / "openspec" / "changes" / "archive" / "2026-06-20-refactor"
+    archived.mkdir(parents=True)
+    (archived / "proposal.md").write_text("# Proposal\n", encoding="utf-8")
+    (archived / "design.md").write_text("# Design\n", encoding="utf-8")
+    (archived / "tasks.md").write_text("- [x] Done\n", encoding="utf-8")
+    (archived / "verification.md").write_text("# Verification\n", encoding="utf-8")
+    (tmp_path / "docs" / "superpowers" / "specs").mkdir(parents=True)
+    (tmp_path / "docs" / "superpowers" / "specs" / "add-auth.md").write_text(
+        "# Design Doc\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "docs" / "superpowers" / "plans").mkdir(parents=True)
+    (tmp_path / "docs" / "superpowers" / "plans" / "add-auth.md").write_text(
+        "# Plan\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(comet_workflow, "WORKSPACE", tmp_path)
+
+    result = comet_workflow.check_workflow_phases()
+
+    assert result["status"] == "passed"
+    assert "archive" in result["message"]

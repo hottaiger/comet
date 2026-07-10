@@ -102,13 +102,13 @@ After the change skeleton is created, generate `proposal`, `design`, and `tasks`
 
 **Standard Artifact Loop** (for each `artifact-id`: `proposal` → `design` → `tasks`):
 
-1. Refresh status: `openspec status --change "<name>" --json`
+1. Refresh status: `comet openspec status --change "<name>" --json`
 2. Fetch artifact instructions:
 
    ```bash
-   openspec instructions proposal --change "<name>" --json
-   openspec instructions design --change "<name>" --json
-   openspec instructions tasks --change "<name>" --json
+   comet openspec instructions proposal --change "<name>" --json
+   comet openspec instructions design --change "<name>" --json
+   comet openspec instructions tasks --change "<name>" --json
    ```
 
 3. For the returned JSON instruction payload, you must:
@@ -118,16 +118,16 @@ After the change skeleton is created, generate `proposal`, `design`, and `tasks`
    - Apply `context` and `rules` as constraints — **must not copy them into the artifact content**
    - Write to `resolvedOutputPath`
    - Verify the output file exists and is non-empty
-4. After creating each artifact, re-run `openspec status --change "<name>" --json` to confirm status before continuing to the next artifact
+4. After creating each artifact, re-run `comet openspec status --change "<name>" --json` to confirm status before continuing to the next artifact
 
 **Failure handling**: If `openspec instructions` fails, returns invalid JSON, reports unmet `dependencies`, or does not provide a usable `resolvedOutputPath`, must immediately stop artifact creation and report the OpenSpec error. Must not fall back to hard-coded artifact prose because that would silently bypass project rules.
 
 **Naming and scope guard**: Change name must be the kebab-case English name confirmed by the user in Step 1c — must not auto-generate, infer, or use a non-kebab-case (e.g. Chinese) name. Change scope must match the user's description — must not expand or narrow it independently.
 
-Confirm the following artifacts have been created:
+Confirm the following artifacts have been created. Resolve `<openspec-change-dir>` through `comet openspec status --change "<name>" --json`; it may be `openspec/changes/<name>` (legacy) or `docs/openspec/changes/<name>` (docs):
 
 ```
-openspec/changes/<name>/
+<openspec-change-dir>/
 ├── .openspec.yaml
 ├── .comet.yaml
 ├── proposal.md       # Why + What: problem, goals, scope

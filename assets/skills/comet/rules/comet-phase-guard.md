@@ -8,7 +8,7 @@
 
 ### 阶段感知（最高优先级）
 
-有活跃 comet change 时（`openspec/changes/<name>/.comet.yaml` 存在），**每次开始执行操作前**必须读取 `phase` 字段确认当前阶段。
+有活跃 comet change 时（先通过 `comet openspec status --change "<name>" --json` 解析 `<openspec-change-dir>`，并确认 `<openspec-change-dir>/.comet.yaml` 存在），**每次开始执行操作前**必须读取 `phase` 字段确认当前阶段。
 
 **阶段与允许操作：**
 
@@ -105,7 +105,7 @@ node "$COMET_STATE" check <name> <phase> --recover
 **特别注意 `build_mode`**：若恢复脚本输出 `build_mode: subagent-driven-development`，你是协调者，不是执行者。必须：
 1. 使用 Skill 工具重新加载 Superpowers `subagent-driven-development` 技能 (Use the Skill tool to reload the Superpowers `subagent-driven-development` skill)
 2. 读取 `comet/reference/subagent-dispatch.md` 获取 Comet 专属扩展 (re-read `comet/reference/subagent-dispatch.md` for Comet-specific extensions)
-3. 读取 `openspec/changes/<name>/.comet/subagent-progress.md` 恢复精确阶段、证据和审查-修复轮次 (Read `openspec/changes/<name>/.comet/subagent-progress.md` to recover the exact stage, evidence, and review-fix round)
+3. 读取 `<openspec-change-dir>/.comet/subagent-progress.md` 恢复精确阶段、证据和审查-修复轮次 (Read `<openspec-change-dir>/.comet/subagent-progress.md` to recover the exact stage, evidence, and review-fix round)
 4. 禁止在主会话中直接执行 task (Do not execute the pending task directly in the main window)
 5. 按检查点恢复；缺失或不匹配时才从第一个未勾选 task 开始
 6. 已提交但未按 `review_mode` 完成验收的 task 保持未勾选，继续对应的验证/审查/修复循环

@@ -9,7 +9,7 @@ description: "Use when a Comet change has passed verification and needs archive 
 
 - Verification passed (Phase 4 complete)
 - Branch handled
-- `verify_result: pass` in `openspec/changes/<name>/.comet.yaml`
+- Confirm `<openspec-change-dir>` through `comet openspec status --change "<name>" --json`, then verify `verify_result: pass` in `<openspec-change-dir>/.comet.yaml`
 
 ## Steps
 
@@ -49,6 +49,7 @@ Only after the user selects "Confirm archive" may Step 2 continue. After the use
 Run the archive script to automatically complete all steps:
 
 ```bash
+comet openspec archive "<change-name>" --yes
 node "$COMET_ARCHIVE" "<change-name>"
 ```
 
@@ -78,7 +79,7 @@ brainstorming → delta spec → implementation → verification → main spec m
 ### 4. Commit the Archive Changes
 
 The archive script only moves files and merges the spec; it does not commit. After archiving, the worktree holds these uncommitted changes:
-- The change directory moved from `openspec/changes/<name>/` to `openspec/changes/archive/YYYY-MM-DD-<name>/`
+- The change directory moved from `<openspec-change-dir>/` to `<openspec-archive-dir>/`
 - The main spec content merged via delta semantics
 - Archive metadata annotations on the design doc / plan
 
@@ -94,10 +95,10 @@ If branch handling (phase 4) chose not to merge into the main branch yet, finish
 ## Exit Conditions
 
 - Archive script executed successfully (exit code 0)
-- Archive directory `openspec/changes/archive/YYYY-MM-DD-<change-name>/` exists
+- Archive directory `<openspec-archive-dir>` exists (legacy example: `openspec/changes/archive/YYYY-MM-DD-<change-name>/`; docs example: `docs/openspec/changes/archive/YYYY-MM-DD-<change-name>/`)
 - Archived `.comet.yaml` contains `archived: true`
 
-The archive script moves `openspec/changes/<name>/` to `openspec/changes/archive/YYYY-MM-DD-<name>/`.
+The archive script moves `<openspec-change-dir>/` to `<openspec-archive-dir>`.
 
 > **WARNING**: After successful archive, **do not run** `node "$COMET_GUARD" <change-name> archive` against the old active change name; the active directory no longer exists. Doing so will cause the guard to error with "change directory not found". Archive completeness is determined by script exit code and archived directory state.
 

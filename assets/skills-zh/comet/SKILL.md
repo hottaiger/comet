@@ -22,7 +22,7 @@ agent 做决策只需读本节，参考附录按需查阅。
 
 ### 输出语言规则
 
-所有 OpenSpec 和 Superpowers 产物都必须使用 Comet 配置的产物语言。配置值是规范化语言 ID，`en` 或 `zh-CN`。已有 change 优先通过 `"$COMET_BASH" "$COMET_STATE" get <name> language` 读取 `openspec/changes/<name>/.comet.yaml` 中的 `language`；`.comet.yaml` 尚不存在时读取 `.comet/config.yaml` 的 `language`；两者都不存在时才回退到当前用户请求语言。调用外部 OpenSpec/Superpowers skill 时，必须把解析后的语言显式写入 prompt 或 ARGUMENTS。
+所有 OpenSpec 和 Superpowers 产物都必须使用 Comet 配置的产物语言。配置值是规范化语言 ID，`en` 或 `zh-CN`。已有 change 时，先运行 `comet openspec status --change "<name>" --json` 解析 `<openspec-change-dir>`，再通过 `"$COMET_BASH" "$COMET_STATE" get <name> language` 或读取 `<openspec-change-dir>/.comet.yaml` 中的 `language` 获取产物语言。`<openspec-change-dir>` 可能是 `openspec/changes/<name>`（legacy）或 `docs/openspec/changes/<name>`（docs）。`.comet.yaml` 尚不存在时读取 `.comet/config.yaml` 的 `language`；两者都不存在时才回退到当前用户请求语言。调用外部 OpenSpec/Superpowers skill 时，必须把解析后的语言显式写入 prompt 或 ARGUMENTS。
 
 ### 阶段自动检测
 
@@ -112,7 +112,7 @@ node "$COMET_RESUME_PROBE" probe --stdin
 
 **Step 1: 读取 `.comet.yaml` 状态元数据**
 
-优先读取 `openspec/changes/<name>/.comet.yaml`。不存在时回退到 `openspec status --change "<name>" --json`、`tasks.md` 和 `docs/superpowers/` 文件检查。
+先运行 `comet openspec status --change "<name>" --json` 确认 `<openspec-change-dir>`。优先读取 `<openspec-change-dir>/.comet.yaml`。不存在时回退到 `comet openspec status --change "<name>" --json`、`<openspec-change-dir>/tasks.md` 和 `docs/superpowers/` 文件检查。
 
 **断点恢复规则**：
 - 每次恢复上下文时，先重新执行 Step 0 和 Step 1，不依赖对话历史判断阶段

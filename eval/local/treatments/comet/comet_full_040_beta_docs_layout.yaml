@@ -1,0 +1,129 @@
+# Full comet skill treatment using the live worktree Skill bundle and the docs-based
+# OpenSpec artifact layout introduced by the unified artifact layout work.
+COMET_FULL_040_BETA_DOCS_LAYOUT:
+  description: "Full comet skill (workflow 0.4.0-beta.4 live bundle) with docs-based OpenSpec layout, OpenSpec, and Superpowers dependencies"
+  claude_md: |
+    For this treatment, create and use workflow change artifacts under `docs/openspec/changes/<change-name>/` instead of the legacy `openspec/changes/<change-name>/` root.
+
+    Before reading or writing change-local files, resolve the live change directory with `comet openspec status --change "<name>" --json` and treat the returned directory as `<openspec-change-dir>`.
+  skills:
+    - name: comet
+      source: path
+      path: ../assets/skills/comet
+    - name: comet-open
+      source: path
+      path: ../assets/skills/comet-open
+    - name: comet-design
+      source: path
+      path: ../assets/skills/comet-design
+    - name: comet-build
+      source: path
+      path: ../assets/skills/comet-build
+    - name: comet-verify
+      source: path
+      path: ../assets/skills/comet-verify
+    - name: comet-archive
+      source: path
+      path: ../assets/skills/comet-archive
+    - name: comet-hotfix
+      source: path
+      path: ../assets/skills/comet-hotfix
+    - name: comet-tweak
+      source: path
+      path: ../assets/skills/comet-tweak
+    - name: openspec-apply-change
+      skill: dependency/openspec/openspec-apply-change
+      variant: all
+      base: benchmarks
+    - name: openspec-archive-change
+      skill: dependency/openspec/openspec-archive-change
+      variant: all
+      base: benchmarks
+    - name: openspec-bulk-archive-change
+      skill: dependency/openspec/openspec-bulk-archive-change
+      variant: all
+      base: benchmarks
+    - name: openspec-continue-change
+      skill: dependency/openspec/openspec-continue-change
+      variant: all
+      base: benchmarks
+    - name: openspec-explore
+      skill: dependency/openspec/openspec-explore
+      variant: all
+      base: benchmarks
+    - name: openspec-ff-change
+      skill: dependency/openspec/openspec-ff-change
+      variant: all
+      base: benchmarks
+    - name: openspec-new-change
+      skill: dependency/openspec/openspec-new-change
+      variant: all
+      base: benchmarks
+    - name: openspec-onboard
+      skill: dependency/openspec/openspec-onboard
+      variant: all
+      base: benchmarks
+    - name: openspec-propose
+      skill: dependency/openspec/openspec-propose
+      variant: all
+      base: benchmarks
+    - name: openspec-sync-specs
+      skill: dependency/openspec/openspec-sync-specs
+      variant: all
+      base: benchmarks
+    - name: openspec-verify-change
+      skill: dependency/openspec/openspec-verify-change
+      variant: all
+      base: benchmarks
+    - name: brainstorming
+      skill: dependency/superpowers/brainstorming
+      variant: all
+      base: benchmarks
+    - name: dispatching-parallel-agents
+      skill: dependency/superpowers/dispatching-parallel-agents
+      variant: all
+      base: benchmarks
+    - name: executing-plans
+      skill: dependency/superpowers/executing-plans
+      variant: all
+      base: benchmarks
+    - name: finishing-a-development-branch
+      skill: dependency/superpowers/finishing-a-development-branch
+      variant: all
+      base: benchmarks
+    - name: receiving-code-review
+      skill: dependency/superpowers/receiving-code-review
+      variant: all
+      base: benchmarks
+    - name: requesting-code-review
+      skill: dependency/superpowers/requesting-code-review
+      variant: all
+      base: benchmarks
+    - name: subagent-driven-development
+      skill: dependency/superpowers/subagent-driven-development
+      variant: all
+      base: benchmarks
+    - name: systematic-debugging
+      skill: dependency/superpowers/systematic-debugging
+      variant: all
+      base: benchmarks
+    - name: test-driven-development
+      skill: dependency/superpowers/test-driven-development
+      variant: all
+      base: benchmarks
+    - name: using-git-worktrees
+      skill: dependency/superpowers/using-git-worktrees
+      variant: all
+      base: benchmarks
+    - name: verification-before-completion
+      skill: dependency/superpowers/verification-before-completion
+      variant: all
+      base: benchmarks
+    - name: writing-plans
+      skill: dependency/superpowers/writing-plans
+      variant: all
+      base: benchmarks
+    - name: writing-skills
+      skill: dependency/superpowers/writing-skills
+      variant: all
+      base: benchmarks

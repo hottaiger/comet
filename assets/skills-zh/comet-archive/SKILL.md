@@ -9,7 +9,7 @@ description: "Use when Comet change 验证已通过，需要用户确认归档�
 
 - 验证已通过（阶段 4 完成）
 - 分支已处理
-- `openspec/changes/<name>/.comet.yaml` 中 `verify_result: pass`
+- 先通过 `comet openspec status --change "<name>" --json` 确认 `<openspec-change-dir>`，并在 `<openspec-change-dir>/.comet.yaml` 中看到 `verify_result: pass`
 
 ## 步骤
 
@@ -49,6 +49,7 @@ node "$COMET_STATE" check <name> archive
 运行归档脚本，自动完成以下全部步骤：
 
 ```bash
+comet openspec archive "<change-name>" --yes
 node "$COMET_ARCHIVE" "<change-name>"
 ```
 
@@ -78,7 +79,7 @@ brainstorming → delta spec → 实施 → 验证 → 主 spec 合并 → desig
 ### 4. 提交归档改动
 
 归档脚本只移动文件和合并 spec，不会自动提交。归档完成后工作区会有以下未提交改动：
-- change 目录从 `openspec/changes/<name>/` 移动到 `openspec/changes/archive/YYYY-MM-DD-<name>/`
+- change 目录从 `<openspec-change-dir>/` 移动到 `<openspec-archive-dir>/`
 - 主 spec 按 delta 语义合并的内容
 - design doc / plan 的归档元数据标注
 
@@ -94,10 +95,10 @@ git commit -m "chore: archive <change-name>"
 ## 退出条件
 
 - 归档脚本执行成功（退出码 0）
-- 归档目录 `openspec/changes/archive/YYYY-MM-DD-<change-name>/` 存在
+- 归档目录 `<openspec-archive-dir>` 存在（legacy 示例：`openspec/changes/archive/YYYY-MM-DD-<change-name>/`；docs 示例：`docs/openspec/changes/archive/YYYY-MM-DD-<change-name>/`）
 - 归档后的 `.comet.yaml` 中 `archived: true`
 
-归档脚本会把 `openspec/changes/<name>/` 移动到 `openspec/changes/archive/YYYY-MM-DD-<name>/`。
+归档脚本会把 `<openspec-change-dir>/` 移动到 `<openspec-archive-dir>`。
 
 > **WARNING**: 归档成功后**不要再对原 change 名运行** `node "$COMET_GUARD" <change-name> archive`，因为原活跃目录已经不存在。误调会导致 guard 报错"change directory not found"。归档完整性以脚本退出码和归档目录状态为准。
 

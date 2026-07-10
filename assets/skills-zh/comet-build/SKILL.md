@@ -34,7 +34,7 @@ node "$COMET_STATE" check <name> build
 
 1. **立即执行：** 使用 Skill 工具加载 Superpowers `writing-plans` 技能。禁止跳过此步骤。技能加载后，ARGUMENTS 必须包含：`Language: 使用 "$COMET_BASH" "$COMET_STATE" get <name> language 读取到的 Comet 配置产物语言输出`
 2. 读取 Design Doc（`docs/superpowers/specs/` 下的技术设计文档）
-3. 读取 `openspec/changes/<name>/tasks.md`（任务边界）
+3. 先运行 `comet openspec status --change "<name>" --json` 确认 `<openspec-change-dir>`，再读取 `<openspec-change-dir>/tasks.md`（任务边界）
 4. 按技能指引创建计划
 
 计划要求：

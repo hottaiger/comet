@@ -92,7 +92,7 @@ The implementer or fix-agent return must provide **RED failure command and failu
 
 ### 4. Durable Progress Checkpoint
 
-The coordinator must maintain `openspec/changes/<name>/.comet/subagent-progress.md` and update it immediately after every dispatch, agent return, review result, review-fix round change, and task checkoff. The checkpoint must record at least:
+The coordinator must maintain `<openspec-change-dir>/.comet/subagent-progress.md` and update it immediately after every dispatch, agent return, review result, review-fix round change, and task checkoff. Resolve `<openspec-change-dir>` through `comet openspec status --change "<name>" --json`. The checkpoint must record at least:
 
 - The unique current plan task text and mapped OpenSpec task text
 - Current stage: `implementing | task-review | checkoff | done | blocked | final-review | final-fix`
@@ -143,7 +143,7 @@ When a reviewer returns an item that cannot be verified from review material alo
 
 ```bash
 node "$COMET_STATE" task-checkoff "$PLAN_FILE" "$PLAN_TASK_TEXT"
-node "$COMET_STATE" task-checkoff "openspec/changes/<name>/tasks.md" "$OPENSPEC_TASK_TEXT"
+node "$COMET_STATE" task-checkoff "<openspec-change-dir>/tasks.md" "$OPENSPEC_TASK_TEXT"
 ```
 
 Run the second command only when the corresponding mapping exists. The script requires the task text to appear exactly once and be checked; verification failure blocks moving to the next task.
@@ -158,7 +158,7 @@ Run the second command only when the corresponding mapping exists. The script re
 
 ## Context Recovery
 
-Reload the Superpowers `subagent-driven-development` skill and re-read this document. Read `openspec/changes/<name>/.comet/subagent-progress.md`, then compare it with the first unchecked task and the current worktree:
+Reload the Superpowers `subagent-driven-development` skill and re-read this document. Read `<openspec-change-dir>/.comet/subagent-progress.md`, then compare it with the first unchecked task and the current worktree:
 
 - When the checkpoint matches the unchecked task, resume from its exact recorded stage while preserving the implementation commit, RED/GREEN evidence, `review_mode`, review stages already passed, unresolved feedback, and current review-fix round. Never reset the round or repeat an already passed stage.
 - If the loaded Superpowers `subagent-driven-development` skill reports a task complete through its own progress record, reconcile that report against git history and Comet plan/OpenSpec checkboxes before dispatching. When the commits and task identity match, update Comet's checkpoint/checkoff state instead of re-dispatching completed work.

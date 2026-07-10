@@ -108,26 +108,28 @@ _DECISION_MUTATIONS = (
 # Files whose creation signals a given phase produced artefacts.
 # Comet writes to several locations; cover both the canonical openspec/changes
 # layout and the docs/superpowers/ + openspec/archive/ layouts actually used.
+OPEN_SPEC_CHANGE_ROOT = r"(?:openspec/changes|docs/openspec/changes)"
 _PHASE_SIGNALS = {
     "open": (
-        re.compile(r"openspec/changes/[^/]+/(?:proposal|tasks)\.md"),
-        re.compile(r"openspec/changes/archive/[^/]+/(?:proposal|tasks)\.md"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/[^/]+/(?:proposal|tasks)\.md"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/archive/[^/]+/(?:proposal|tasks)\.md"),
     ),
     "design": (
         re.compile(r"docs/superpowers/specs/.+\.md"),
-        re.compile(r"openspec/changes/(?:archive/)?[^/]+/design\.md"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/(?:archive/)?[^/]+/design\.md"),
     ),
     "build": (
-        re.compile(r"openspec/changes/(?:archive/)?[^/]+/plan\.md"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/(?:archive/)?[^/]+/plan\.md"),
         re.compile(r"docs/superpowers/plans/.+\.md"),
-        re.compile(r"openspec/changes/(?:archive/)?[^/]+/\.comet/"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/(?:archive/)?[^/]+/\.comet/"),
     ),
     "verify": (
-        re.compile(r"openspec/changes/(?:archive/)?[^/]+/verification\.md"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/(?:archive/)?[^/]+/verification\.md"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/(?:archive/)?[^/]+/verification-report\.md"),
         re.compile(r"docs/superpowers/reports/.+\.md"),
     ),
     "archive": (
-        re.compile(r"openspec/changes/archive/"),
+        re.compile(rf"{OPEN_SPEC_CHANGE_ROOT}/archive/"),
         re.compile(r"openspec/archive/"),
     ),
 }
@@ -187,29 +189,33 @@ def _binary_score(checks: list[bool]) -> tuple[float, str]:
 
 def _find_change_dir(test_dir: Path) -> Path | None:
     """Find the comet change directory (active or archived)."""
-    changes_root = test_dir / "openspec" / "changes"
-    if not changes_root.exists():
-        return None
-
-    for d in changes_root.iterdir():
-        if not d.is_dir():
+    change_roots = (
+        test_dir / "openspec" / "changes",
+        test_dir / "docs" / "openspec" / "changes",
+    )
+    for changes_root in change_roots:
+        if not changes_root.exists():
             continue
-        if d.name == "archive":
-            for sub in d.iterdir():
-                if sub.is_dir() and (
-                    (sub / ".comet.yaml").exists()
-                    or (sub / ".comet").exists()
-                    or (sub / "proposal.md").exists()
-                    or (sub / "tasks.md").exists()
-                ):
-                    return sub
-        elif (
-            (d / ".comet.yaml").exists()
-            or (d / ".comet").exists()
-            or (d / "proposal.md").exists()
-            or (d / "tasks.md").exists()
-        ):
-            return d
+
+        for d in changes_root.iterdir():
+            if not d.is_dir():
+                continue
+            if d.name == "archive":
+                for sub in d.iterdir():
+                    if sub.is_dir() and (
+                        (sub / ".comet.yaml").exists()
+                        or (sub / ".comet").exists()
+                        or (sub / "proposal.md").exists()
+                        or (sub / "tasks.md").exists()
+                    ):
+                        return sub
+            elif (
+                (d / ".comet.yaml").exists()
+                or (d / ".comet").exists()
+                or (d / "proposal.md").exists()
+                or (d / "tasks.md").exists()
+            ):
+                return d
     return None
 
 
@@ -354,8 +360,12 @@ def _score_spec_drift(events: dict[str, Any], test_dir: Path) -> tuple[float, st
     cmds = _join_commands(events)
     files = list(events.get("files_modified", [])) + list(events.get("files_created", []))
 
-    spec_touched = any("specs/" in f and "openspec/changes" in f for f in files)
-    spec_synced = bool(re.search(r"openspec\s+(?:sync|archive)", cmds))
+    spec_touched = any(
+        "specs/" in f
+        and ("openspec/changes" in f or "docs/openspec/changes" in f)
+        for f in files
+    )
+    spec_synced = bool(re.search(r"(?:comet\s+)?openspec\s+(?:sync|archive)\b", cmds))
 
     if not spec_touched:
         # No delta spec needed — neutral pass (not applicable)
@@ -433,9 +443,13 @@ def _score_decision_point_compliance(
 
 def _score_artifact_quality(test_dir: Path, workflow: str) -> tuple[float, str]:
     """Check artifact quality via binary checks per artifact type."""
-    changes_root = test_dir / "openspec" / "changes"
     change_dirs: list[Path] = []
-    if changes_root.exists():
+    for changes_root in (
+        test_dir / "openspec" / "changes",
+        test_dir / "docs" / "openspec" / "changes",
+    ):
+        if not changes_root.exists():
+            continue
         for d in changes_root.iterdir():
             if not d.is_dir():
                 continue

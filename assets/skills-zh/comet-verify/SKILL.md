@@ -144,7 +144,7 @@ node "$COMET_STATE" transition <change-name> verify-fail
 
 技能加载后，按其指引验证。检查项：
 1. tasks.md 全部任务已完成（`[x]`）
-2. 实现符合 `openspec/changes/<name>/design.md` 高层设计决策
+2. 先运行 `comet openspec status --change "<name>" --json` 确认 `<openspec-change-dir>`，实现符合 `<openspec-change-dir>/design.md` 高层设计决策
 3. 实现符合 Design Doc（`docs/superpowers/specs/` 下的技术设计文档）
 4. 能力规格场景全部通过
 5. proposal.md 目标已满足

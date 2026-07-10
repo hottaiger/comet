@@ -16,6 +16,7 @@ from pathlib import Path
 
 WORKSPACE = Path("/workspace")
 RESULTS_FILE = "_test_results.json"
+CHANGE_ROOTS = ("openspec/changes", "docs/openspec/changes")
 
 
 def _passed(name: str, message: str = "") -> dict:
@@ -26,20 +27,35 @@ def _failed(name: str, message: str) -> dict:
     return {"check": name, "status": "failed", "message": message}
 
 
+def _iter_change_roots():
+    for root in CHANGE_ROOTS:
+        yield root, WORKSPACE / Path(root)
+
+
+def _first_existing_change_root() -> tuple[str, Path] | None:
+    for root, root_path in _iter_change_roots():
+        if root_path.exists():
+            return root, root_path
+        if _glob_exists(f"{root}/**/.comet.yaml") or _glob_exists(f"{root}/**/proposal.md"):
+            return root, root_path
+    return None
+
+
 def check_openspec_artifacts() -> dict:
     """proposal.md + tasks.md exist in a change dir (active or archived)."""
-    changes_dir = WORKSPACE / "openspec" / "changes"
-    if not changes_dir.exists():
+    existing_roots = [(root, root_path) for root, root_path in _iter_change_roots() if root_path.exists()]
+    if not existing_roots:
         return _failed("openspec_artifacts", "openspec/changes/ directory not found")
 
     candidates: list[Path] = []
-    for d in changes_dir.iterdir():
-        if not d.is_dir():
-            continue
-        if d.name == "archive":
-            candidates.extend(s for s in d.iterdir() if s.is_dir())
-        else:
-            candidates.append(d)
+    for _root, changes_dir in existing_roots:
+        for d in changes_dir.iterdir():
+            if not d.is_dir():
+                continue
+            if d.name == "archive":
+                candidates.extend(s for s in d.iterdir() if s.is_dir())
+            else:
+                candidates.append(d)
 
     if not candidates:
         return _failed("openspec_artifacts", "No change directories found")
@@ -53,20 +69,23 @@ def check_openspec_artifacts() -> dict:
 
 def check_comet_state() -> dict:
     """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
-    changes_dir = WORKSPACE / "openspec" / "changes"
-    if not changes_dir.exists():
+    existing_roots = [(root, root_path) for root, root_path in _iter_change_roots() if root_path.exists()]
+    if not existing_roots:
         return _failed("comet_state", "openspec/changes/ not found")
 
     # Search active + archived change dirs for .comet.yaml.
     state_files: list[Path] = []
-    for root, _dirs, files in os_walk(changes_dir):
-        for f in files:
-            if f == ".comet.yaml":
-                state_files.append(Path(root) / f)
+    for _root, changes_dir in existing_roots:
+        for root, _dirs, files in os_walk(changes_dir):
+            for f in files:
+                if f == ".comet.yaml":
+                    state_files.append(Path(root) / f)
 
     if not state_files:
-        archive_dir = changes_dir / "archive"
-        if archive_dir.exists():
+        for _root, changes_dir in existing_roots:
+            archive_dir = changes_dir / "archive"
+            if not archive_dir.exists():
+                continue
             for change_dir in archive_dir.iterdir():
                 if not change_dir.is_dir():
                     continue
@@ -94,26 +113,39 @@ def check_workflow_phases() -> dict:
     """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
     evidence = 0
     found: list[str] = []
+    change_roots = CHANGE_ROOTS
 
     # Phase 1 (open): proposal/tasks
-    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
-        evidence += 1; found.append("open")
+    if any(
+        _glob_exists(f"{root}/**/proposal.md") or _glob_exists(f"{root}/**/tasks.md")
+        for root in change_roots
+    ):
+        evidence += 1
+        found.append("open")
     # Phase 2 (design): design.md or docs/superpowers/specs/
-    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
-        evidence += 1; found.append("design")
+    if any(_glob_exists(f"{root}/**/design.md") for root in change_roots) or _glob_exists("docs/superpowers/specs/*.md"):
+        evidence += 1
+        found.append("design")
     # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
-    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
-        evidence += 1; found.append("build")
+    if (
+        any(_glob_exists(f"{root}/**/plan.md") for root in change_roots)
+        or _glob_exists("docs/superpowers/plans/*.md")
+        or any(_glob_exists(f"{root}/**/.comet/") for root in change_roots)
+    ):
+        evidence += 1
+        found.append("build")
     # Phase 4 (verify): verification report or docs/superpowers/reports/
     if (
-        _glob_exists("openspec/changes/**/verification.md")
-        or _glob_exists("openspec/changes/**/verification-report.md")
+        any(_glob_exists(f"{root}/**/verification.md") for root in change_roots)
+        or any(_glob_exists(f"{root}/**/verification-report.md") for root in change_roots)
         or _glob_exists("docs/superpowers/reports/*.md")
     ):
-        evidence += 1; found.append("verify")
-    # Phase 5 (archive): openspec/changes/archive/
-    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
-        evidence += 1; found.append("archive")
+        evidence += 1
+        found.append("verify")
+    # Phase 5 (archive): openspec/changes/archive/ or docs/openspec/changes/archive/
+    if any((WORKSPACE / Path(root) / "archive").exists() for root in change_roots):
+        evidence += 1
+        found.append("archive")
 
     if evidence >= 4:
         return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")

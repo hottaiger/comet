@@ -854,7 +854,7 @@ describe('skills', () => {
       );
 
       // LOW: comet-verify Step 2b disambiguates design.md vs Design Doc
-      expect(zhVerify).toContain('实现符合 `openspec/changes/<name>/design.md` 高层设计决策');
+      expect(zhVerify).toContain('实现符合 `<openspec-change-dir>/design.md` 高层设计决策');
       expect(zhTweak).not.toContain('停止 tweak，升级为完整 `/comet`');
 
       // IMPORTANT: main /comet preset detection must match the current tweak positioning.
@@ -1230,7 +1230,7 @@ describe('skills', () => {
         'must follow the `comet/reference/decision-point.md` protocol to pause and wait for the user to decide whether to split into a new change',
       );
       expect(enVerify).toContain(
-        'Implementation matches `openspec/changes/<name>/design.md` high-level design decisions',
+        'implementation matches `<openspec-change-dir>/design.md` high-level design decisions',
       );
       expect(enBuild).toContain('create independent change through `/comet-open`');
       expect(enBuild).not.toContain('create independent change through `/opsx:new`');
@@ -1275,7 +1275,7 @@ describe('skills', () => {
       );
       expect(enDesign).toContain('Default `context_compression: off` generates');
       expect(enDesign).toContain('If context_compression is beta, use:');
-      expect(enDesign).toContain('openspec/changes/<name>/.comet/handoff/spec-context.md');
+      expect(enDesign).toContain('<openspec-change-dir>/.comet/handoff/spec-context.md');
       expect(enDesign).toContain('In beta mode, `spec-context.json` must be structurally valid');
       expect(enDesign).toContain('incrementally update `brainstorm-summary.md`');
       expect(enDesign).toContain('### 1e. Active Context Compaction Gate');
@@ -1494,7 +1494,7 @@ describe('skills', () => {
       expect(zhDispatch).toContain('implementer 不得勾选 plan 或 OpenSpec task');
       expect(zhDispatch).toContain('协调者唯一允许的文件修改');
       expect(zhDispatch).toContain('plan、OpenSpec task 和 subagent 进度检查点');
-      expect(zhDispatch).toContain('openspec/changes/<name>/.comet/subagent-progress.md');
+      expect(zhDispatch).toContain('<openspec-change-dir>/.comet/subagent-progress.md');
       expect(zhDispatch).toContain('final-review | final-fix');
       expect(zhDispatch).toContain('当前审查-修复轮次');
       expect(zhDispatch).toContain('已通过的审查阶段');
@@ -1547,10 +1547,10 @@ describe('skills', () => {
       expect(zhDispatch).toContain('返回 `comet-build` 继续执行退出条件、阶段守卫和后续阶段衔接');
       expect(zhRecovery).toContain('重新加载 Superpowers `subagent-driven-development` 技能');
       expect(zhRecovery).toContain('重新阅读 `comet/reference/subagent-dispatch.md`');
-      expect(zhRecovery).toContain('读取 `openspec/changes/<name>/.comet/subagent-progress.md`');
+      expect(zhRecovery).toContain('读取 `<openspec-change-dir>/.comet/subagent-progress.md`');
       expect(zhGuard).toContain('重新加载 Superpowers `subagent-driven-development` 技能');
       expect(zhGuard).toContain('读取 `comet/reference/subagent-dispatch.md` 获取 Comet 专属扩展');
-      expect(zhGuard).toContain('读取 `openspec/changes/<name>/.comet/subagent-progress.md`');
+      expect(zhGuard).toContain('读取 `<openspec-change-dir>/.comet/subagent-progress.md`');
     });
 
     it('keeps the English dispatch contract behaviorally aligned', async () => {
@@ -1624,7 +1624,7 @@ describe('skills', () => {
       );
       expect(enDispatch).toContain('The coordinator may modify only');
       expect(enDispatch).toContain('plan, OpenSpec task, and subagent progress checkpoint');
-      expect(enDispatch).toContain('openspec/changes/<name>/.comet/subagent-progress.md');
+      expect(enDispatch).toContain('<openspec-change-dir>/.comet/subagent-progress.md');
       expect(enDispatch).toContain('final-review | final-fix');
       expect(enDispatch).toContain('current review-fix round');
       expect(enDispatch).toContain('review stages already passed');
@@ -1643,12 +1643,14 @@ describe('skills', () => {
       );
       expect(enRecovery).toContain('reload the Superpowers `subagent-driven-development` skill');
       expect(enRecovery).toContain('Re-read `comet/reference/subagent-dispatch.md`');
-      expect(enRecovery).toContain('Read `openspec/changes/<name>/.comet/subagent-progress.md`');
+      expect(enRecovery).toContain(
+        'then read `<openspec-change-dir>/.comet/subagent-progress.md` to recover the current task or final review',
+      );
       expect(enGuard).toContain('reload the Superpowers `subagent-driven-development` skill');
       expect(enGuard).toContain(
         'Re-read `comet/reference/subagent-dispatch.md` for Comet-specific extensions',
       );
-      expect(enGuard).toContain('Read `openspec/changes/<name>/.comet/subagent-progress.md`');
+      expect(enGuard).toContain('Read `<openspec-change-dir>/.comet/subagent-progress.md`');
       expect(enGuard).toContain('according to the current `review_mode`');
       expect(enGuard).toContain('validated according to `review_mode`');
       expect(enGuard).not.toContain('wait for both spec compliance and code quality reviews');
@@ -1786,6 +1788,24 @@ describe('skills', () => {
   });
 
   describe('Comet script discovery helper', () => {
+    it('teaches layout-aware OpenSpec access in both languages', async () => {
+      const zhComet = await fs.readFile(
+        path.resolve('assets', 'skills-zh', 'comet', 'SKILL.md'),
+        'utf-8',
+      );
+      const enComet = await fs.readFile(
+        path.resolve('assets', 'skills', 'comet', 'SKILL.md'),
+        'utf-8',
+      );
+
+      expect(zhComet).toContain('comet openspec status --change "<name>" --json');
+      expect(enComet).toContain('comet openspec status --change "<name>" --json');
+      expect(zhComet).toContain('<openspec-change-dir>');
+      expect(enComet).toContain('<openspec-change-dir>');
+      expect(zhComet).not.toContain('只来自 `openspec/changes/<name>/.comet.yaml`');
+      expect(enComet).not.toContain('only from `openspec/changes/<name>/.comet.yaml`');
+    });
+
     it('ships a shared script locator helper', async () => {
       const manifest = await readManifest();
       expect(manifest.skills).toContain('comet/reference/intent-frame.md');

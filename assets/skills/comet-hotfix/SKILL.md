@@ -73,7 +73,7 @@ Before continuing or starting changes, handle uncommitted changes through `comet
 
 **Immediately execute:** Execute tasks one by one according to tasks.md:
 
-1. Read `openspec/changes/<name>/tasks.md`, get incomplete task list
+1. First run `comet openspec status --change "<name>" --json` to confirm `<openspec-change-dir>`, then read `<openspec-change-dir>/tasks.md` to get the incomplete task list
 2. For each incomplete task:
    - Modify code according to task description
    - Run project formatter (e.g., `mvn spotless:apply`, `npm run format`)
@@ -83,7 +83,7 @@ Before continuing or starting changes, handle uncommitted changes through `comet
 3. After all tasks complete, explicitly run relevant project tests and build commands
 
 **If fix affects existing spec acceptance scenarios**:
-- Create delta spec in `openspec/changes/<name>/specs/<capability>/spec.md`
+- Create delta spec in `<openspec-change-dir>/specs/<capability>/spec.md`
 - Only include `## MODIFIED Requirements` section
 
 During hotfix execution, whenever a crash, unexpected behavior, test failure, or build failure appears while running the program, tests, build, or manual verification, must use the Skill tool to load the Superpowers `systematic-debugging` skill. Before root-cause investigation is complete, must not propose or implement source-code fixes.

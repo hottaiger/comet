@@ -303,6 +303,73 @@ def test_comet_profile_scores_full_with_full_specific_rubric(tmp_path: Path):
     assert any("workflow=full" in msg and "design=deep" in msg for msg in passed)
 
 
+def test_comet_profile_scores_docs_layout_full_workflow(tmp_path: Path):
+    change_dir = tmp_path / "docs" / "openspec" / "changes" / "archive" / "2026-07-01-add-api"
+    change_dir.mkdir(parents=True)
+    (change_dir / ".comet" / "handoff").mkdir(parents=True)
+    (change_dir / ".comet.yaml").write_text(
+        "workflow: full\nphase: archive\nverify_result: pass\n",
+        encoding="utf-8",
+    )
+    (change_dir / ".comet" / "handoff" / "design-context.md").write_text(
+        "context",
+        encoding="utf-8",
+    )
+    (change_dir / "proposal.md").write_text(
+        "\n".join(f"line {i}" for i in range(12)),
+        encoding="utf-8",
+    )
+    (change_dir / "design.md").write_text(
+        "Tradeoff and alternative option with risk to consider.",
+        encoding="utf-8",
+    )
+    (change_dir / "tasks.md").write_text(
+        "- [x] Design API\n- [x] Implement API\n- [x] Verify API\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "test_api.py").write_text("def test_api():\n    assert True\n", encoding="utf-8")
+
+    outputs = {
+        "completion": {"passed": ["api added"], "failed": []},
+        "events": {
+            "skills_invoked": [
+                "comet",
+                "comet-open",
+                "openspec-new-change",
+                "comet-design",
+                "brainstorming",
+                "comet-build",
+                "writing-plans",
+                "comet-verify",
+                "verification-before-completion",
+                "comet-archive",
+            ],
+            "commands_run": [
+                "node comet-state.mjs set add-api build_mode executing-plans",
+                "node comet-state.mjs transition add-api verify-pass",
+                "comet openspec archive add-api --yes",
+            ],
+            "tool_calls": [{"tool": "AskUserQuestion", "input": {}}],
+            "files_created": [
+                "docs/openspec/changes/archive/2026-07-01-add-api/proposal.md",
+                "docs/openspec/changes/archive/2026-07-01-add-api/tasks.md",
+                "docs/superpowers/specs/add-api.md",
+                "docs/superpowers/plans/add-api.md",
+                "docs/openspec/changes/archive/2026-07-01-add-api/verification.md",
+            ],
+            "files_modified": [],
+            "num_turns": 1,
+            "duration_seconds": 5,
+        },
+        "interaction": {"mode": "auto_user", "max_turns": 3},
+    }
+
+    passed, _ = run_profile_rubric("comet-workflow", tmp_path, outputs)
+
+    assert any("[RUBRIC] main_flow: 1.00 - workflow=full" in msg for msg in passed)
+    assert any("[RUBRIC] spec_drift: 1.00" in msg for msg in passed)
+
+
 def test_generic_profile_scores_completion_skill_artifact_and_efficiency(tmp_path: Path):
     (tmp_path / "result.md").write_text("done")
     outputs = {
