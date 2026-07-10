@@ -1,6 +1,10 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { resolveCometArtifactLayout } from '../../domains/comet-classic/classic-artifact-layout.js';
+import {
+  buildOpenSpecStoreRegisterInvocation,
+  buildOpenSpecStoreSetupInvocation,
+} from '../../domains/integrations/openspec.js';
 
 interface MigrateDocsOptions {
   dryRun?: boolean;
@@ -31,39 +35,70 @@ async function activeChanges(changesRoot: string): Promise<string[]> {
   return out.sort();
 }
 
+function formatInvocation(invocation: { command: string; args: string[] }): string {
+  return `${invocation.command} ${invocation.args.join(' ')}`;
+}
+
 export async function migrateDocsCommand(
   targetPath: string,
   options: MigrateDocsOptions = {},
 ): Promise<void> {
   const projectRoot = path.resolve(targetPath);
   const log = options.log ?? ((line: string) => process.stdout.write(`${line}\n`));
-  const layout = await resolveCometArtifactLayout(projectRoot).catch(() => null);
   const legacyRoot = path.join(projectRoot, 'openspec');
   const docsRoot = path.join(projectRoot, 'docs', 'openspec');
-  const active = await activeChanges(path.join(legacyRoot, 'changes'));
+  const legacyActive = await activeChanges(path.join(legacyRoot, 'changes'));
+  const docsActive = await activeChanges(path.join(docsRoot, 'changes'));
+  const legacyRootExists = await exists(legacyRoot);
+  const docsRootExists = await exists(docsRoot);
 
+  if (options.apply) {
+    throw new Error(
+      'comet migrate docs is dry-run only in Task 4. --apply is not implemented yet.',
+    );
+  }
+
+  const active = [
+    ...legacyActive.map((name) => `openspec/changes/${name}`),
+    ...docsActive.map((name) => `docs/openspec/changes/${name}`),
+  ];
   if (active.length > 0 && !options.includeActive) {
     throw new Error(
       `Active changes exist: ${active.join(', ')}. Re-run with --include-active after review.`,
     );
   }
 
+  const layout = await resolveCometArtifactLayout(projectRoot);
+
+  if (docsRootExists) {
+    throw new Error(
+      'Target docs OpenSpec root already exists. Remove or repair docs/openspec before previewing migration.',
+    );
+  }
+
   log(`Current layout: ${layout?.layout ?? 'unknown'}`);
   log('Target layout: docs');
-  log(`Legacy OpenSpec root: ${(await exists(legacyRoot)) ? 'present' : 'missing'}`);
-  log(`Docs OpenSpec root: ${(await exists(docsRoot)) ? 'present' : 'missing'}`);
+  log(`Legacy OpenSpec root: ${legacyRootExists ? 'present' : 'missing'}`);
+  log(`Docs OpenSpec root: ${docsRootExists ? 'present' : 'missing'}`);
   log(`Active changes: ${active.length}`);
-  if (await exists(legacyRoot)) log('Would move: openspec -> docs/openspec');
+  if (legacyRootExists) log('Would move: openspec -> docs/openspec');
   if (options.repairStore) {
     if (options.openSpecStore) {
       log(
-        `Would repair OpenSpec store root: ${path.join(projectRoot, 'docs')} (store: ${options.openSpecStore})`,
+        `Would run: ${formatInvocation(
+          buildOpenSpecStoreSetupInvocation(projectRoot, options.openSpecStore),
+        )}`,
+      );
+      log(
+        `Would run: ${formatInvocation(
+          buildOpenSpecStoreRegisterInvocation(projectRoot, options.openSpecStore),
+        )}`,
       );
     } else {
-      log(`Would repair OpenSpec store root: ${path.join(projectRoot, 'docs')}`);
+      log('Would repair OpenSpec store metadata after --openspec-store <id> is provided.');
     }
   }
-  if (!options.apply) log('No files were changed. Re-run with --apply to execute.');
+  log('No files were changed. This preview does not perform migration moves in Task 4.');
 }
 
 export type { MigrateDocsOptions };
