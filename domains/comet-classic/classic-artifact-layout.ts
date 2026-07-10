@@ -37,6 +37,12 @@ export interface ResolvedClassicChangeDirectory extends ClassicChangeDirectory {
   layout: CometArtifactLayoutKind;
 }
 
+interface ChangeDirectoryLookup {
+  active: ResolvedClassicChangeDirectory | null;
+  archived: ResolvedClassicChangeDirectory | null;
+  fallback: ResolvedClassicChangeDirectory;
+}
+
 async function exists(target: string): Promise<boolean> {
   try {
     await fs.access(target);
@@ -250,26 +256,129 @@ async function resolveArchive(
     : null;
 }
 
+function buildCompatibilityLayout(
+  projectRoot: string,
+  layout: CometArtifactLayoutKind,
+  configuredSuperpowersRoot?: string,
+): CometArtifactLayout {
+  return buildLayout(projectRoot, layout, {
+    openspecRoot: layout === 'docs' ? 'docs' : '.',
+    superpowersRoot: configuredSuperpowersRoot,
+  });
+}
+
+function orderLayouts(
+  layouts: readonly CometArtifactLayout[],
+  preferredLayout?: CometArtifactLayoutKind,
+): CometArtifactLayout[] {
+  if (!preferredLayout) return [...layouts];
+  return [...layouts].sort((left, right) => {
+    if (left.layout === right.layout) return 0;
+    if (left.layout === preferredLayout) return -1;
+    if (right.layout === preferredLayout) return 1;
+    return 0;
+  });
+}
+
+async function lookupChangeDirectoryInLayout(
+  layout: CometArtifactLayout,
+  name: string,
+): Promise<ChangeDirectoryLookup> {
+  const active = path.join(layout.openSpec.changesDir, name);
+  const activeMatch = (await exists(active))
+    ? {
+        label: projectRelativePath(layout.projectRoot, active),
+        directory: active,
+        layout: layout.layout,
+      }
+    : null;
+  const archivedMatch = activeMatch ? null : await resolveArchive(layout, name);
+  return {
+    active: activeMatch,
+    archived: archivedMatch,
+    fallback: {
+      label: projectRelativePath(layout.projectRoot, active),
+      directory: active,
+      layout: layout.layout,
+    },
+  };
+}
+
+function sameActiveChangeConflictError(
+  name: string,
+  matches: readonly ResolvedClassicChangeDirectory[],
+): Error {
+  const labels = matches.map((match) => match.label).join(', ');
+  return new Error(
+    `Same active change "${name}" exists in multiple artifact layouts: ${labels}. Configure artifact_layout or repair the project layout.`,
+  );
+}
+
+async function resolveDefaultCometChangeDirectory(
+  projectRootInput: string,
+  name: string,
+): Promise<ResolvedClassicChangeDirectory> {
+  const projectRoot = path.resolve(projectRootInput);
+  const configured = await configuredLayout(projectRoot);
+  const candidateLayouts = orderLayouts(
+    [
+      buildCompatibilityLayout(projectRoot, 'legacy', configured.superpowersRoot),
+      buildCompatibilityLayout(projectRoot, 'docs', configured.superpowersRoot),
+    ],
+    configured.layout,
+  );
+
+  let preferredLayout: CometArtifactLayout | null = null;
+  let preferredLayoutError: Error | null = null;
+  try {
+    preferredLayout = await resolveCometArtifactLayout(projectRoot);
+  } catch (error) {
+    preferredLayoutError = error as Error;
+  }
+
+  const lookups = await Promise.all(
+    orderLayouts(candidateLayouts, preferredLayout?.layout).map((layout) =>
+      lookupChangeDirectoryInLayout(layout, name),
+    ),
+  );
+
+  const activeMatches = lookups.flatMap((lookup) => (lookup.active ? [lookup.active] : []));
+  if (activeMatches.length > 1) {
+    throw sameActiveChangeConflictError(name, activeMatches);
+  }
+  if (activeMatches.length === 1) {
+    return activeMatches[0];
+  }
+
+  const archivedMatches = lookups.flatMap((lookup) => (lookup.archived ? [lookup.archived] : []));
+  if (archivedMatches.length > 0) {
+    return archivedMatches[0];
+  }
+
+  if (preferredLayout) {
+    return (
+      lookups.find((lookup) => lookup.fallback.layout === preferredLayout.layout)?.fallback ??
+      lookups[0].fallback
+    );
+  }
+
+  if (preferredLayoutError) {
+    throw preferredLayoutError;
+  }
+
+  return lookups[0].fallback;
+}
+
 export async function resolveCometChangeDirectory(
   projectRoot: string,
   name: string,
   options: ResolveCometChangeDirectoryOptions = {},
 ): Promise<ResolvedClassicChangeDirectory> {
   assertOpenSpecChangeName(name);
-  const layout = await resolveCometArtifactLayout(projectRoot, options);
-  const active = path.join(layout.openSpec.changesDir, name);
-  if (await exists(active)) {
-    return {
-      label: projectRelativePath(layout.projectRoot, active),
-      directory: active,
-      layout: layout.layout,
-    };
+  if (options.explicitLayout) {
+    const layout = await resolveCometArtifactLayout(projectRoot, options);
+    const lookup = await lookupChangeDirectoryInLayout(layout, name);
+    return lookup.active ?? lookup.archived ?? lookup.fallback;
   }
-  const archived = await resolveArchive(layout, name);
-  if (archived) return archived;
-  return {
-    label: projectRelativePath(layout.projectRoot, active),
-    directory: active,
-    layout: layout.layout,
-  };
+  return resolveDefaultCometChangeDirectory(projectRoot, name);
 }

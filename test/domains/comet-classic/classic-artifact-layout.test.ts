@@ -22,6 +22,27 @@ async function healthyOpenSpecRoot(root: string, relativeRoot: string): Promise<
   await writeFile(path.join(base, 'config.yaml'), 'schema: spec-driven\n', 'utf8');
 }
 
+async function writeArtifactLayoutConfig(
+  root: string,
+  artifactLayout: 'legacy' | 'docs',
+): Promise<void> {
+  await mkdir(path.join(root, '.comet'), { recursive: true });
+  await writeFile(
+    path.join(root, '.comet', 'config.yaml'),
+    `artifact_layout: ${artifactLayout}\n`,
+    'utf8',
+  );
+}
+
+async function writeActiveChange(
+  root: string,
+  relativeDirectory: string,
+  phase = 'open',
+): Promise<void> {
+  await mkdir(path.join(root, relativeDirectory), { recursive: true });
+  await writeFile(path.join(root, relativeDirectory, '.comet.yaml'), `phase: ${phase}\n`, 'utf8');
+}
+
 afterEach(async () => {
   const { rm } = await import('fs/promises');
   await Promise.all(roots.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
@@ -134,5 +155,65 @@ describe('resolveCometArtifactLayout', () => {
     await expect(resolveCometChangeDirectory(root, '2026-07-10-add-auth')).rejects.toThrow(
       /Invalid change name/u,
     );
+  });
+
+  it('returns a legacy active change when docs layout is configured but the named change exists only in legacy', async () => {
+    const root = await tempProject();
+    await healthyOpenSpecRoot(root, '.');
+    await healthyOpenSpecRoot(root, 'docs');
+    await writeArtifactLayoutConfig(root, 'docs');
+    await writeActiveChange(root, path.join('openspec', 'changes', 'add-auth'));
+
+    await expect(resolveCometChangeDirectory(root, 'add-auth')).resolves.toMatchObject({
+      label: 'openspec/changes/add-auth',
+      directory: path.join(root, 'openspec', 'changes', 'add-auth'),
+      layout: 'legacy',
+    });
+  });
+
+  it('returns a docs active change when legacy layout is configured but the named change exists only in docs', async () => {
+    const root = await tempProject();
+    await healthyOpenSpecRoot(root, '.');
+    await healthyOpenSpecRoot(root, 'docs');
+    await writeArtifactLayoutConfig(root, 'legacy');
+    await writeActiveChange(root, path.join('docs', 'openspec', 'changes', 'add-auth'));
+
+    await expect(resolveCometChangeDirectory(root, 'add-auth')).resolves.toMatchObject({
+      label: 'docs/openspec/changes/add-auth',
+      directory: path.join(root, 'docs', 'openspec', 'changes', 'add-auth'),
+      layout: 'docs',
+    });
+  });
+
+  it('rejects same active change names found in both layouts', async () => {
+    const root = await tempProject();
+    await healthyOpenSpecRoot(root, '.');
+    await healthyOpenSpecRoot(root, 'docs');
+    await writeArtifactLayoutConfig(root, 'docs');
+    await writeActiveChange(root, path.join('openspec', 'changes', 'add-auth'));
+    await writeActiveChange(root, path.join('docs', 'openspec', 'changes', 'add-auth'));
+
+    await expect(resolveCometChangeDirectory(root, 'add-auth')).rejects.toThrow(
+      /same active change.*multiple artifact layouts|multiple artifact layouts.*same active change/i,
+    );
+  });
+
+  it('falls back to an archived change match in the non-preferred layout when no active match exists', async () => {
+    const root = await tempProject();
+    await healthyOpenSpecRoot(root, '.');
+    await healthyOpenSpecRoot(root, 'docs');
+    await writeArtifactLayoutConfig(root, 'docs');
+    await writeActiveChange(root, path.join('docs', 'openspec', 'changes', 'preferred-change'));
+    await writeActiveChange(
+      root,
+      path.join('openspec', 'changes', 'archive', '2026-07-10-add-auth'),
+      'archived',
+    );
+
+    await expect(resolveCometChangeDirectory(root, 'add-auth')).resolves.toMatchObject({
+      label: 'openspec/changes/archive/2026-07-10-add-auth',
+      directory: path.join(root, 'openspec', 'changes', 'archive', '2026-07-10-add-auth'),
+      layout: 'legacy',
+    });
   });
 });
