@@ -62,6 +62,32 @@ function buildOpenSpecStoreRegisterInvocation(
   };
 }
 
+function runOpenSpecInvocation(invocation: { command: string; args: string[] }, cwd: string): void {
+  const useShell = process.platform === 'win32';
+  execFileSync(
+    invocation.command,
+    useShell ? quoteArgsForShell(invocation.args) : invocation.args,
+    {
+      cwd,
+      stdio: ['inherit', 'inherit', 'pipe'],
+      timeout: 120_000,
+      shell: useShell,
+    },
+  );
+}
+
+function configureOpenSpecStore(projectPath: string, storeId: string): 'installed' | 'failed' {
+  try {
+    runOpenSpecInvocation(buildOpenSpecStoreSetupInvocation(projectPath, storeId), projectPath);
+    runOpenSpecInvocation(buildOpenSpecStoreRegisterInvocation(projectPath, storeId), projectPath);
+    return 'installed';
+  } catch (error) {
+    console.error(`    OpenSpec store configuration failed: ${(error as Error).message}`);
+    printCommandErrorDetails(error);
+    return 'failed';
+  }
+}
+
 const ALL_WORKFLOWS_CONFIG =
   JSON.stringify(
     {
@@ -427,6 +453,7 @@ async function installOpenSpec(
 export {
   installOpenSpec,
   isCommandAvailable,
+  configureOpenSpecStore,
   buildOpenSpecInitInvocation,
   buildOpenSpecStoreSetupInvocation,
   buildOpenSpecStoreRegisterInvocation,

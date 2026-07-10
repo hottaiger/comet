@@ -1821,6 +1821,22 @@ describe('skills', () => {
       expect(enComet).toContain('<openspec-change-dir>');
       expect(zhComet).not.toContain('只来自 `openspec/changes/<name>/.comet.yaml`');
       expect(enComet).not.toContain('only from `openspec/changes/<name>/.comet.yaml`');
+
+      const layoutAwareFiles = [
+        'skills-zh/comet-any/SKILL.md',
+        'skills-zh/comet-any/reference/bundle-authoring.md',
+        'skills-zh/comet-any/reference/subagents/script-author.md',
+        'skills/comet-any/SKILL.md',
+        'skills/comet-any/reference/bundle-authoring.md',
+        'skills/comet-any/reference/subagents/script-author.md',
+      ];
+      for (const file of layoutAwareFiles) {
+        const content = await fs.readFile(path.resolve('assets', file), 'utf-8');
+        expect(content, file).toContain('<openspec-change-dir>');
+        expect(content, file).toContain('comet openspec status --change "<name>" --json');
+        expect(content, file).not.toContain('只来自 `openspec/changes/<name>/.comet.yaml`');
+        expect(content, file).not.toContain('only from `openspec/changes/<name>/.comet.yaml`');
+      }
     });
 
     it('keeps archive step 2 on a single authoritative command path in both languages', async () => {

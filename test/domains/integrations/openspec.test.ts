@@ -39,6 +39,41 @@ describe('openspec', () => {
   });
 
   describe('installOpenSpec', () => {
+    it('configures an OpenSpec store with setup and register commands', async () => {
+      mockedExecFileSync.mockReturnValue(Buffer.from('ok'));
+
+      const { configureOpenSpecStore } = await import('../../../domains/integrations/openspec.js');
+      const result = configureOpenSpecStore('/tmp/project', 'comet-demo-1234');
+
+      expect(result).toBe('installed');
+      expect(mockedExecFileSync).toHaveBeenNthCalledWith(
+        1,
+        'openspec',
+        [
+          'store',
+          'setup',
+          'comet-demo-1234',
+          '--path',
+          path.join('/tmp/project', 'docs'),
+          '--no-init-git',
+        ],
+        expect.objectContaining({ cwd: '/tmp/project' }),
+      );
+      expect(mockedExecFileSync).toHaveBeenNthCalledWith(
+        2,
+        'openspec',
+        [
+          'store',
+          'register',
+          path.join('/tmp/project', 'docs'),
+          '--id',
+          'comet-demo-1234',
+          '--yes',
+        ],
+        expect.objectContaining({ cwd: '/tmp/project' }),
+      );
+    });
+
     it('accepts the Kimi OpenSpec tool id from platform definitions', async () => {
       mockedExecFileSync.mockReturnValueOnce(Buffer.from('/usr/bin/openspec'));
       mockedExecFileSync.mockReturnValueOnce(Buffer.from('ok'));
@@ -687,9 +722,7 @@ describe('openspec', () => {
       const { buildOpenSpecStoreSetupInvocation } =
         await import('../../../domains/integrations/openspec.js');
 
-      expect(
-        buildOpenSpecStoreSetupInvocation('/tmp/project', 'comet-demo-1234'),
-      ).toEqual({
+      expect(buildOpenSpecStoreSetupInvocation('/tmp/project', 'comet-demo-1234')).toEqual({
         command: 'openspec',
         args: [
           'store',
@@ -706,9 +739,7 @@ describe('openspec', () => {
       const { buildOpenSpecStoreRegisterInvocation } =
         await import('../../../domains/integrations/openspec.js');
 
-      expect(
-        buildOpenSpecStoreRegisterInvocation('/tmp/project', 'comet-demo-1234'),
-      ).toEqual({
+      expect(buildOpenSpecStoreRegisterInvocation('/tmp/project', 'comet-demo-1234')).toEqual({
         command: 'openspec',
         args: [
           'store',

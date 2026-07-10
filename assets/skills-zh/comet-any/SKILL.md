@@ -32,7 +32,7 @@ description: "Use when 用户想定制 Comet 五阶段 Skill、创建 workflow S
 
 `comet-five-phase-overlay` 保留 Comet 主流程和 `.comet.yaml` 状态语义。普通模式下：
 
-- `comet-five-phase-overlay` 的主状态只来自 `openspec/changes/<name>/.comet.yaml`；没有 active change 或多个 active changes 时必须阻塞并请用户选择。
+- `comet-five-phase-overlay` 的主状态只来自解析后的 `<openspec-change-dir>/.comet.yaml`；先通过 `comet openspec status --change "<name>" --json` 解析 change 目录，它可能是 `openspec/changes/<name>`（legacy）或 `docs/openspec/changes/<name>`（docs）。没有 active change 或多个 active changes 时必须阻塞并请用户选择。
 - 不得创建 `.comet/runs/<workflow>/state.json` 作为 Comet overlay 主状态。Bundle 草稿、eval evidence 和 publish readiness 可以有自己的证据文件，但不能替代 `.comet.yaml`。
 - `control` Node 不允许 override：`open`、`execute`、`verify`、`archive`。
 - `producer` Node 可以 override：`design`、`plan`，但必须满足对应 Output Schema。

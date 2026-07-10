@@ -181,6 +181,36 @@ describe('comet init E2E', () => {
       const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
       expect(config).toContain('artifact_layout: docs');
       expect(config).toContain('store: comet-demo-1234');
+      const storeSetupCall = mockedExecFileSync.mock.calls.find(
+        ([command, args]) =>
+          command === 'openspec' &&
+          Array.isArray(args) &&
+          args[0] === 'store' &&
+          args[1] === 'setup',
+      );
+      const storeRegisterCall = mockedExecFileSync.mock.calls.find(
+        ([command, args]) =>
+          command === 'openspec' &&
+          Array.isArray(args) &&
+          args[0] === 'store' &&
+          args[1] === 'register',
+      );
+      expect(storeSetupCall?.[1]).toEqual([
+        'store',
+        'setup',
+        'comet-demo-1234',
+        '--path',
+        path.join(tmpDir, 'docs'),
+        '--no-init-git',
+      ]);
+      expect(storeRegisterCall?.[1]).toEqual([
+        'store',
+        'register',
+        path.join(tmpDir, 'docs'),
+        '--id',
+        'comet-demo-1234',
+        '--yes',
+      ]);
     },
     INIT_E2E_TIMEOUT_MS,
   );

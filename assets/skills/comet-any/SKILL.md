@@ -32,7 +32,7 @@ Every path compiles to one Workflow Contract:
 
 `comet-five-phase-overlay` preserves the Comet control flow and `.comet.yaml` state semantics. In ordinary mode:
 
-- `comet-five-phase-overlay` primary state comes only from `openspec/changes/<name>/.comet.yaml`; no active change or multiple active changes must block and ask the user to choose.
+- `comet-five-phase-overlay` primary state comes only from the resolved `<openspec-change-dir>/.comet.yaml`; first resolve the change directory with `comet openspec status --change "<name>" --json`. It may be `openspec/changes/<name>` (legacy) or `docs/openspec/changes/<name>` (docs). No active change or multiple active changes must block and ask the user to choose.
 - The overlay must not create `.comet/runs/<workflow>/state.json` as the Comet overlay primary state. Bundle drafts, eval evidence, and publish readiness may keep their own evidence files, but they cannot replace `.comet.yaml`.
 - `control` Nodes cannot be overridden: `open`, `execute`, `verify`, `archive`.
 - `producer` Nodes may be overridden: `design`, `plan`, but only when the replacement satisfies the matching Output Schema.

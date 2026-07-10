@@ -23,7 +23,11 @@ import {
 } from '../../domains/skill/platform-install.js';
 import type { ArtifactLayoutOption } from '../../domains/skill/platform-install.js';
 import { LANGUAGES, type LanguageConfig } from '../../domains/skill/languages.js';
-import { installOpenSpec, isCommandAvailable } from '../../domains/integrations/openspec.js';
+import {
+  configureOpenSpecStore,
+  installOpenSpec,
+  isCommandAvailable,
+} from '../../domains/integrations/openspec.js';
 import { installSuperpowersForPlatforms } from '../../domains/integrations/superpowers.js';
 import {
   hasCodegraphProjectIndex,
@@ -576,6 +580,12 @@ export async function initCommand(targetPath: string, options: InitOptions = {})
       artifactLayout: options.artifactLayout,
       openSpecStore: options.openSpecStore,
     });
+    if (options.openSpecStore) {
+      const storeStatus = configureOpenSpecStore(projectPath, options.openSpecStore);
+      if (storeStatus === 'failed') {
+        throw new Error(`OpenSpec store configuration failed for ${options.openSpecStore}`);
+      }
+    }
     const projectTargets = await detectInstalledCometTargets(projectPath, { scopes: ['project'] });
     if (projectTargets.length > 0) {
       await upsertProjectInstallation(
