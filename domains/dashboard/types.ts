@@ -95,6 +95,7 @@ export interface ChangeDashboardItem {
   displayName: string;
   status: ChangeStatus;
   path: string;
+  layout?: 'legacy' | 'docs';
   workflow: string | null;
   phase: ChangePhase;
   updatedAt?: string;

@@ -53,6 +53,20 @@ async function seedDesignChange(dir: string): Promise<string> {
   return changeDir;
 }
 
+async function writeDocsLayoutState(
+  dir: string,
+  changeName: string,
+  phase: 'open' | 'design' | 'build' | 'verify' | 'archive',
+): Promise<string> {
+  const openspecRoot = path.join(dir, 'docs', 'openspec');
+  const changeDir = path.join(openspecRoot, 'changes', changeName);
+  await fs.mkdir(path.join(openspecRoot, 'specs'), { recursive: true });
+  await fs.mkdir(changeDir, { recursive: true });
+  await fs.writeFile(path.join(openspecRoot, 'config.yaml'), 'schema: spec-driven\n');
+  await fs.writeFile(path.join(changeDir, '.comet.yaml'), `phase: ${phase}\n`);
+  return changeDir;
+}
+
 describe('Classic hook guard command', () => {
   it('allows writes when no active change exists', async () => {
     const dir = await makeProject();
@@ -93,6 +107,26 @@ describe('Classic hook guard command', () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toContain('phase: design, handoff/spec');
+  });
+
+  it('allows docs layout OpenSpec artifacts in open phase', async () => {
+    const dir = await makeProject();
+    const target = path.join(dir, 'docs', 'openspec', 'changes', 'add-auth', 'proposal.md');
+    await writeDocsLayoutState(dir, 'add-auth', 'open');
+
+    const result = run(dir, 'hook-guard', [], hookInput(target));
+
+    expect(result.status).toBe(0);
+    expect(result.stderr).toContain('docs/openspec/changes/add-auth/proposal.md');
+  });
+
+  it('does not allow unrelated docs files just because docs layout exists', async () => {
+    const dir = await makeProject();
+    await writeDocsLayoutState(dir, 'add-auth', 'open');
+
+    const result = run(dir, 'hook-guard', [], hookInput(path.join(dir, 'docs', 'product-notes.md')));
+
+    expect(result.status).toBe(2);
   });
 
   it('allows Superpowers workspace writes during guarded phases', async () => {

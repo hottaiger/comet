@@ -44,11 +44,27 @@ describe('workflow contract normalization', () => {
     );
     expect(workflow.protocol.state).toEqual({
       kind: 'comet-overlay',
-      statePath: 'openspec/changes/*/.comet.yaml',
+      statePath: '{openspec/changes/*/.comet.yaml,docs/openspec/changes/*/.comet.yaml}',
       currentNodeField: 'phase',
       completedNodesField: 'completedNodes',
       evidenceField: 'evidence',
     });
+    expect(
+      workflow.protocol.outputSchemas.find((schema) => schema.id === 'comet.intake.v1')?.artifacts[0]
+        ?.paths,
+    ).toEqual(['openspec/changes/*/.comet.yaml', 'docs/openspec/changes/*/.comet.yaml']);
+    expect(
+      workflow.protocol.outputSchemas.find((schema) => schema.id === 'comet.design.v1')?.artifacts[1]
+        ?.paths,
+    ).toEqual(['openspec/changes/*/specs/*/spec.md', 'docs/openspec/changes/*/specs/*/spec.md']);
+    expect(
+      workflow.protocol.outputSchemas.find((schema) => schema.id === 'comet.plan.v1')?.artifacts[1]
+        ?.paths,
+    ).toEqual(['openspec/changes/*/tasks.md', 'docs/openspec/changes/*/tasks.md']);
+    expect(
+      workflow.protocol.outputSchemas.find((schema) => schema.id === 'comet.execution-evidence.v1')
+        ?.artifacts[0]?.paths,
+    ).toEqual(['openspec/changes/*/tasks.md', 'docs/openspec/changes/*/tasks.md']);
   });
 
   it('allows required Skill calls without replacing Node implementations', () => {

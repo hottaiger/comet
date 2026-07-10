@@ -1,5 +1,9 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import {
+  resolveCometArtifactLayout,
+  type CometArtifactLayoutKind,
+} from '../comet-classic/classic-artifact-layout.js';
 import { fileExists, readDir } from '../../platform/fs/file-system.js';
 import { collectGitSnapshot } from './git.js';
 import { recommendNextAction } from './next-action.js';
@@ -28,7 +32,6 @@ const VALID_PHASES: ReadonlySet<ChangePhase> = new Set([
   'unknown',
 ]);
 
-const CHANGES_DIR = path.join('openspec', 'changes');
 const ARCHIVE_SEGMENT = 'archive';
 const ARCHIVE_NAME_PATTERN = /^(\d{4}-\d{2}-\d{2})-(.+)$/u;
 const ARTIFACT_PREVIEW_LIMIT_BYTES = 256 * 1024;
@@ -44,11 +47,23 @@ export async function collectDashboardSnapshot(
   options: { now?: Date; projectName?: string } = {},
 ): Promise<DashboardSnapshot> {
   const resolvedRoot = path.resolve(projectPath);
-  const changesRoot = path.join(resolvedRoot, CHANGES_DIR);
+  const layout = await resolveCometArtifactLayout(resolvedRoot).catch(() => null);
+  const changesRoots = layout
+    ? [{ dir: layout.openSpec.changesDir, layout: layout.layout }]
+    : [
+        {
+          dir: path.join(resolvedRoot, 'docs', 'openspec', 'changes'),
+          layout: 'docs' as const,
+        },
+        {
+          dir: path.join(resolvedRoot, 'openspec', 'changes'),
+          layout: 'legacy' as const,
+        },
+      ];
 
   const [activeChanges, archivedChanges, git] = await Promise.all([
-    collectActiveChanges(changesRoot),
-    collectArchivedChanges(changesRoot),
+    collectActiveChanges(changesRoots, resolvedRoot),
+    collectArchivedChanges(changesRoots, resolvedRoot),
     collectGitSnapshot(resolvedRoot),
   ]);
 
@@ -86,40 +101,62 @@ export async function collectDashboardSnapshot(
   };
 }
 
-async function collectActiveChanges(changesRoot: string): Promise<ChangeDashboardItem[]> {
-  if (!(await fileExists(changesRoot))) return [];
-
-  const entries = await readDir(changesRoot);
+async function collectActiveChanges(
+  changesRoots: ChangeRoot[],
+  projectRoot: string,
+): Promise<ChangeDashboardItem[]> {
   const items: ChangeDashboardItem[] = [];
 
-  for (const entry of entries) {
-    if (entry === ARCHIVE_SEGMENT) continue;
+  for (const changesRoot of changesRoots) {
+    if (!(await fileExists(changesRoot.dir))) continue;
+    const entries = await readDir(changesRoot.dir);
 
-    const dir = path.join(changesRoot, entry);
-    const stat = await safeStat(dir);
-    if (!stat?.isDirectory()) continue;
+    for (const entry of entries) {
+      if (entry === ARCHIVE_SEGMENT) continue;
 
-    const item = await tryBuildChangeItem({ name: entry, dir, status: 'active' });
-    if (item) items.push(item);
+      const dir = path.join(changesRoot.dir, entry);
+      const stat = await safeStat(dir);
+      if (!stat?.isDirectory()) continue;
+
+      const item = await tryBuildChangeItem({
+        name: entry,
+        dir,
+        status: 'active',
+        layout: changesRoot.layout,
+        projectRoot,
+      });
+      if (item) items.push(item);
+    }
   }
 
   return items;
 }
 
-async function collectArchivedChanges(changesRoot: string): Promise<ChangeDashboardItem[]> {
-  const archiveRoot = path.join(changesRoot, ARCHIVE_SEGMENT);
-  if (!(await fileExists(archiveRoot))) return [];
-
-  const entries = await readDir(archiveRoot);
+async function collectArchivedChanges(
+  changesRoots: ChangeRoot[],
+  projectRoot: string,
+): Promise<ChangeDashboardItem[]> {
   const items: ChangeDashboardItem[] = [];
 
-  for (const entry of entries) {
-    const dir = path.join(archiveRoot, entry);
-    const stat = await safeStat(dir);
-    if (!stat?.isDirectory()) continue;
+  for (const changesRoot of changesRoots) {
+    const archiveRoot = path.join(changesRoot.dir, ARCHIVE_SEGMENT);
+    if (!(await fileExists(archiveRoot))) continue;
 
-    const item = await tryBuildChangeItem({ name: entry, dir, status: 'archived' });
-    if (item) items.push(item);
+    const entries = await readDir(archiveRoot);
+    for (const entry of entries) {
+      const dir = path.join(archiveRoot, entry);
+      const stat = await safeStat(dir);
+      if (!stat?.isDirectory()) continue;
+
+      const item = await tryBuildChangeItem({
+        name: entry,
+        dir,
+        status: 'archived',
+        layout: changesRoot.layout,
+        projectRoot,
+      });
+      if (item) items.push(item);
+    }
   }
 
   return items;
@@ -145,6 +182,8 @@ interface BuildChangeInput {
   name: string;
   dir: string;
   status: 'active' | 'archived';
+  layout: CometArtifactLayoutKind;
+  projectRoot: string;
 }
 
 async function buildChangeItem(input: BuildChangeInput): Promise<ChangeDashboardItem> {
@@ -156,24 +195,24 @@ async function buildChangeItem(input: BuildChangeInput): Promise<ChangeDashboard
 
   const yaml: CometYaml = (await readCometYaml(yamlPath)) ?? {};
 
-  const projectRoot = resolveProjectRoot(input.dir);
-
   // Read yaml path-pointers for Superpowers artifacts
   const yamlPlanPath = stripNullish(yaml.plan);
   const yamlVerifyPath = stripNullish(yaml.verification_report ?? yaml.verificationReport);
   const yamlDesignDocPath = stripNullish(yaml.design_doc ?? yaml.designDoc);
 
   // Resolve Superpowers artifact paths (yaml paths are relative to project root)
-  const resolvedPlanPath = yamlPlanPath ? path.resolve(projectRoot, yamlPlanPath) : localPlanPath;
+  const resolvedPlanPath = yamlPlanPath
+    ? path.resolve(input.projectRoot, yamlPlanPath)
+    : localPlanPath;
   const resolvedVerifyPath = yamlVerifyPath
-    ? path.resolve(projectRoot, yamlVerifyPath)
+    ? path.resolve(input.projectRoot, yamlVerifyPath)
     : path.join(input.dir, '.comet', 'verify-result.md');
   const resolvedDesignDocPath = yamlDesignDocPath
-    ? path.resolve(projectRoot, yamlDesignDocPath)
+    ? path.resolve(input.projectRoot, yamlDesignDocPath)
     : '';
 
   const tasks = await readTasks(tasksPath);
-  const verify = await resolveVerify({ changeDir: input.dir, yaml, projectRoot });
+  const verify = await resolveVerify({ changeDir: input.dir, yaml, projectRoot: input.projectRoot });
 
   // Detect delta specs in change directory
   const deltaSpecPath = await findDeltaSpec(input.dir);
@@ -295,6 +334,7 @@ async function buildChangeItem(input: BuildChangeInput): Promise<ChangeDashboard
     displayName,
     status: input.status,
     path: input.dir,
+    layout: input.layout,
     workflow: yaml.workflow ?? null,
     phase,
     updatedAt,
@@ -402,13 +442,9 @@ function stripNullish(raw: string | undefined): string | undefined {
   return value;
 }
 
-function resolveProjectRoot(changeDir: string): string {
-  let cursor = path.resolve(changeDir);
-  while (path.dirname(cursor) !== cursor) {
-    if (path.basename(cursor) === 'openspec') return path.dirname(cursor);
-    cursor = path.dirname(cursor);
-  }
-  throw new Error(`Dashboard change is not inside an openspec directory: ${changeDir}`);
+interface ChangeRoot {
+  dir: string;
+  layout: CometArtifactLayoutKind;
 }
 
 async function findDeltaSpec(changeDir: string): Promise<string | undefined> {

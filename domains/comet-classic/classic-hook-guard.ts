@@ -1,5 +1,10 @@
 import { existsSync, promises as fs, readFileSync } from 'fs';
 import path from 'path';
+import {
+  projectRelativePath,
+  resolveCometArtifactLayout,
+  type CometArtifactLayout,
+} from './classic-artifact-layout.js';
 import type { ClassicCommandHandler, ClassicCommandResult } from './classic-cli.js';
 import { ensureStrictClassicRuntimeRun } from './classic-runtime-run.js';
 import { readLegacyState } from './classic-store.js';
@@ -121,20 +126,53 @@ async function loadGoverningChange(changeDir: string): Promise<GoverningChange |
   }
 }
 
-async function activeChanges(projectRoot: string): Promise<GoverningChange[]> {
-  const changesDir = path.join(projectRoot, 'openspec', 'changes');
-  const governingChanges: GoverningChange[] = [];
-  if (!existsSync(changesDir)) return governingChanges;
-  for (const entry of (await fs.readdir(changesDir, { withFileTypes: true })).sort((left, right) =>
-    left.name.localeCompare(right.name),
-  )) {
-    if (!entry.isDirectory() || entry.name === 'archive') continue;
-    const changeDir = path.join(changesDir, entry.name);
-    if (!existsSync(path.join(changeDir, '.comet.yaml'))) continue;
-    const governing = await loadGoverningChange(changeDir);
-    if (!governing || governing.archived) continue;
-    governingChanges.push(governing);
+async function candidateArtifactLayouts(projectRoot: string): Promise<CometArtifactLayout[]> {
+  const layouts: CometArtifactLayout[] = [];
+  const seen = new Set<string>();
+
+  async function collect(
+    loader: () => Promise<CometArtifactLayout>,
+    allowFailure = true,
+  ): Promise<void> {
+    try {
+      const layout = await loader();
+      const key = normalized(layout.openSpec.changesDir);
+      if (seen.has(key)) return;
+      seen.add(key);
+      layouts.push(layout);
+    } catch (error) {
+      if (!allowFailure) throw error;
+    }
   }
+
+  await collect(() => resolveCometArtifactLayout(projectRoot));
+  await collect(() => resolveCometArtifactLayout(projectRoot, { explicitLayout: 'legacy' }));
+  await collect(() => resolveCometArtifactLayout(projectRoot, { explicitLayout: 'docs' }));
+
+  return layouts;
+}
+
+async function activeChanges(projectRoot: string): Promise<GoverningChange[]> {
+  const governingChanges: GoverningChange[] = [];
+  const seen = new Set<string>();
+
+  for (const layout of await candidateArtifactLayouts(projectRoot)) {
+    const changesDir = layout.openSpec.changesDir;
+    if (!existsSync(changesDir)) continue;
+    for (const entry of (await fs.readdir(changesDir, { withFileTypes: true })).sort((left, right) =>
+      left.name.localeCompare(right.name),
+    )) {
+      if (!entry.isDirectory() || entry.name === 'archive') continue;
+      const changeDir = path.join(changesDir, entry.name);
+      const key = normalized(changeDir);
+      if (seen.has(key) || !existsSync(path.join(changeDir, '.comet.yaml'))) continue;
+      seen.add(key);
+      const governing = await loadGoverningChange(changeDir);
+      if (!governing || governing.archived) continue;
+      governingChanges.push(governing);
+    }
+  }
+
   return governingChanges;
 }
 
@@ -151,6 +189,19 @@ function blocksSourceWrites(governing: GoverningChange): boolean {
 
 function isSuperpowersArtifactPath(relativePath: string): boolean {
   return relativePath.startsWith('docs/superpowers/');
+}
+
+function isOpenSpecArtifactPath(relativePath: string): boolean {
+  return relativePath.startsWith('openspec/') || relativePath.startsWith('docs/openspec/');
+}
+
+function openSpecChangePrefix(relativePath: string): { prefix: string; name: string } | null {
+  for (const prefix of ['openspec/changes/', 'docs/openspec/changes/']) {
+    if (!relativePath.startsWith(prefix)) continue;
+    const name = relativePath.slice(prefix.length).split('/')[0];
+    if (name && name !== 'archive') return { prefix, name };
+  }
+  return null;
 }
 
 function allowsSuperpowersArtifacts(governing: GoverningChange): boolean {
@@ -229,24 +280,35 @@ async function repoSourceGoverningChange(projectRoot: string): Promise<Governing
   return active.find(blocksSourceWrites) ?? active[0] ?? null;
 }
 
+async function changeDirForOpenSpecPath(
+  projectRoot: string,
+  prefix: string,
+  name: string,
+): Promise<string> {
+  const layouts = await candidateArtifactLayouts(projectRoot);
+  const matchedLayout = layouts.find((layout) => {
+    const relativeChangesDir = projectRelativePath(projectRoot, layout.openSpec.changesDir);
+    return `${normalized(relativeChangesDir)}/` === prefix;
+  });
+  if (matchedLayout) return path.join(matchedLayout.openSpec.changesDir, name);
+
+  return path.join(projectRoot, ...prefix.replace(/\/$/u, '').split('/').filter(Boolean), name);
+}
+
 async function governingChange(
   relativePath: string,
   projectRoot: string,
 ): Promise<GoverningChange | null> {
-  const prefix = 'openspec/changes/';
-  if (relativePath.startsWith(prefix)) {
-    const rest = relativePath.slice(prefix.length);
-    const [name] = rest.split('/');
-    if (name && name !== 'archive') {
-      const changeDir = path.join(projectRoot, 'openspec', 'changes', name);
-      const stateFile = path.join(changeDir, '.comet.yaml');
-      if (existsSync(stateFile)) {
-        const governing = await loadGoverningChange(changeDir);
-        if (governing) return governing;
-        return { changeDir, phase: 'open', classic: null, archived: false };
-      }
+  const changePrefix = openSpecChangePrefix(relativePath);
+  if (changePrefix) {
+    const changeDir = await changeDirForOpenSpecPath(projectRoot, changePrefix.prefix, changePrefix.name);
+    const stateFile = path.join(changeDir, '.comet.yaml');
+    if (existsSync(stateFile)) {
+      const governing = await loadGoverningChange(changeDir);
+      if (governing) return governing;
       return { changeDir, phase: 'open', classic: null, archived: false };
     }
+    return { changeDir, phase: 'open', classic: null, archived: false };
   }
   if (isSuperpowersArtifactPath(relativePath)) {
     const superpowers = await superpowersArtifactGoverningChange(relativePath, projectRoot);
@@ -270,7 +332,7 @@ function isSuperpowersWorkspace(relativePath: string): boolean {
 }
 
 function openSpecAllowed(relativePath: string, phase: ClassicPhase): string | null {
-  if (!relativePath.startsWith('openspec/')) return null;
+  if (!isOpenSpecArtifactPath(relativePath)) return null;
   const stateFile =
     relativePath.endsWith('/.comet.yaml') || relativePath.endsWith('/.openspec.yaml');
   const proposal =

@@ -46,6 +46,20 @@ async function writeChange(root: string, fixture: ChangeFixture): Promise<void> 
   }
 }
 
+async function writeDocsLayoutChange(
+  root: string,
+  name: string,
+  yaml: Record<string, string>,
+): Promise<void> {
+  const openSpecRoot = path.join(root, 'docs', 'openspec');
+  const changeDir = path.join(openSpecRoot, 'changes', name);
+  await fs.mkdir(path.join(openSpecRoot, 'specs'), { recursive: true });
+  await fs.mkdir(changeDir, { recursive: true });
+  await fs.writeFile(path.join(openSpecRoot, 'config.yaml'), 'schema: spec-driven\n');
+  const lines = Object.entries(yaml).map(([key, value]) => `${key}: ${value}`);
+  await fs.writeFile(path.join(changeDir, '.comet.yaml'), `${lines.join('\n')}\n`);
+}
+
 describe('collectDashboardSnapshot', () => {
   let root: string;
 
@@ -64,6 +78,23 @@ describe('collectDashboardSnapshot', () => {
     expect(snap.changes.archived).toEqual([]);
     expect(snap.summary.activeChanges).toBe(0);
     expect(snap.summary.archivedChanges).toBe(0);
+  });
+
+  it('collects docs layout changes without treating docs as project root', async () => {
+    await writeDocsLayoutChange(root, 'add-auth', {
+      phase: 'build',
+      plan: 'docs/superpowers/plans/add-auth.md',
+    });
+    const planPath = path.join(root, 'docs', 'superpowers', 'plans', 'add-auth.md');
+    await fs.mkdir(path.dirname(planPath), { recursive: true });
+    await fs.writeFile(planPath, '# Plan\n');
+
+    const snapshot = await collectDashboardSnapshot(root);
+
+    expect(snapshot.changes.active[0].path).toContain(
+      path.join('docs', 'openspec', 'changes', 'add-auth'),
+    );
+    expect(snapshot.changes.active[0].artifacts.plan).toBe(true);
   });
 
   it('collects active changes and ignores the archive directory entry', async () => {

@@ -11749,19 +11749,43 @@ async function loadGoverningChange(changeDir) {
     };
   }
 }
+async function candidateArtifactLayouts(projectRoot) {
+  const layouts = [];
+  const seen = /* @__PURE__ */ new Set();
+  async function collect(loader, allowFailure = true) {
+    try {
+      const layout = await loader();
+      const key = normalized(layout.openSpec.changesDir);
+      if (seen.has(key)) return;
+      seen.add(key);
+      layouts.push(layout);
+    } catch (error) {
+      if (!allowFailure) throw error;
+    }
+  }
+  await collect(() => resolveCometArtifactLayout(projectRoot));
+  await collect(() => resolveCometArtifactLayout(projectRoot, { explicitLayout: "legacy" }));
+  await collect(() => resolveCometArtifactLayout(projectRoot, { explicitLayout: "docs" }));
+  return layouts;
+}
 async function activeChanges(projectRoot) {
-  const changesDir = path16.join(projectRoot, "openspec", "changes");
   const governingChanges = [];
-  if (!existsSync2(changesDir)) return governingChanges;
-  for (const entry2 of (await fs15.readdir(changesDir, { withFileTypes: true })).sort(
-    (left, right) => left.name.localeCompare(right.name)
-  )) {
-    if (!entry2.isDirectory() || entry2.name === "archive") continue;
-    const changeDir = path16.join(changesDir, entry2.name);
-    if (!existsSync2(path16.join(changeDir, ".comet.yaml"))) continue;
-    const governing = await loadGoverningChange(changeDir);
-    if (!governing || governing.archived) continue;
-    governingChanges.push(governing);
+  const seen = /* @__PURE__ */ new Set();
+  for (const layout of await candidateArtifactLayouts(projectRoot)) {
+    const changesDir = layout.openSpec.changesDir;
+    if (!existsSync2(changesDir)) continue;
+    for (const entry2 of (await fs15.readdir(changesDir, { withFileTypes: true })).sort(
+      (left, right) => left.name.localeCompare(right.name)
+    )) {
+      if (!entry2.isDirectory() || entry2.name === "archive") continue;
+      const changeDir = path16.join(changesDir, entry2.name);
+      const key = normalized(changeDir);
+      if (seen.has(key) || !existsSync2(path16.join(changeDir, ".comet.yaml"))) continue;
+      seen.add(key);
+      const governing = await loadGoverningChange(changeDir);
+      if (!governing || governing.archived) continue;
+      governingChanges.push(governing);
+    }
   }
   return governingChanges;
 }
@@ -11773,6 +11797,17 @@ function blocksSourceWrites(governing) {
 }
 function isSuperpowersArtifactPath(relativePath2) {
   return relativePath2.startsWith("docs/superpowers/");
+}
+function isOpenSpecArtifactPath(relativePath2) {
+  return relativePath2.startsWith("openspec/") || relativePath2.startsWith("docs/openspec/");
+}
+function openSpecChangePrefix(relativePath2) {
+  for (const prefix of ["openspec/changes/", "docs/openspec/changes/"]) {
+    if (!relativePath2.startsWith(prefix)) continue;
+    const name = relativePath2.slice(prefix.length).split("/")[0];
+    if (name && name !== "archive") return { prefix, name };
+  }
+  return null;
 }
 function allowsSuperpowersArtifacts(governing) {
   return governing.phase === "design" || governing.phase === "build" || governing.phase === "verify";
@@ -11829,21 +11864,26 @@ async function repoSourceGoverningChange(projectRoot) {
   const active = await activeChanges(projectRoot);
   return active.find(blocksSourceWrites) ?? active[0] ?? null;
 }
+async function changeDirForOpenSpecPath(projectRoot, prefix, name) {
+  const layouts = await candidateArtifactLayouts(projectRoot);
+  const matchedLayout = layouts.find((layout) => {
+    const relativeChangesDir = projectRelativePath(projectRoot, layout.openSpec.changesDir);
+    return `${normalized(relativeChangesDir)}/` === prefix;
+  });
+  if (matchedLayout) return path16.join(matchedLayout.openSpec.changesDir, name);
+  return path16.join(projectRoot, ...prefix.replace(/\/$/u, "").split("/").filter(Boolean), name);
+}
 async function governingChange(relativePath2, projectRoot) {
-  const prefix = "openspec/changes/";
-  if (relativePath2.startsWith(prefix)) {
-    const rest = relativePath2.slice(prefix.length);
-    const [name] = rest.split("/");
-    if (name && name !== "archive") {
-      const changeDir = path16.join(projectRoot, "openspec", "changes", name);
-      const stateFile2 = path16.join(changeDir, ".comet.yaml");
-      if (existsSync2(stateFile2)) {
-        const governing = await loadGoverningChange(changeDir);
-        if (governing) return governing;
-        return { changeDir, phase: "open", classic: null, archived: false };
-      }
+  const changePrefix = openSpecChangePrefix(relativePath2);
+  if (changePrefix) {
+    const changeDir = await changeDirForOpenSpecPath(projectRoot, changePrefix.prefix, changePrefix.name);
+    const stateFile2 = path16.join(changeDir, ".comet.yaml");
+    if (existsSync2(stateFile2)) {
+      const governing = await loadGoverningChange(changeDir);
+      if (governing) return governing;
       return { changeDir, phase: "open", classic: null, archived: false };
     }
+    return { changeDir, phase: "open", classic: null, archived: false };
   }
   if (isSuperpowersArtifactPath(relativePath2)) {
     const superpowers = await superpowersArtifactGoverningChange(relativePath2, projectRoot);
@@ -11863,7 +11903,7 @@ function isSuperpowersWorkspace(relativePath2) {
   return relativePath2 === ".superpowers" || relativePath2.startsWith(".superpowers/");
 }
 function openSpecAllowed(relativePath2, phase) {
-  if (!relativePath2.startsWith("openspec/")) return null;
+  if (!isOpenSpecArtifactPath(relativePath2)) return null;
   const stateFile2 = relativePath2.endsWith("/.comet.yaml") || relativePath2.endsWith("/.openspec.yaml");
   const proposal = relativePath2.endsWith("/proposal.md") || relativePath2.endsWith("/design.md") || relativePath2.endsWith("/tasks.md");
   const handoff = relativePath2.includes("/.comet/");

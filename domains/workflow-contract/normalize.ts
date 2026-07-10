@@ -148,7 +148,7 @@ export function normalizeWorkflowDefinition(
       input.kind === 'comet-five-phase-overlay'
         ? {
             kind: 'comet-overlay',
-            statePath: 'openspec/changes/*/.comet.yaml',
+            statePath: '{openspec/changes/*/.comet.yaml,docs/openspec/changes/*/.comet.yaml}',
             currentNodeField: 'phase',
             completedNodesField: 'completedNodes',
             evidenceField: 'evidence',
