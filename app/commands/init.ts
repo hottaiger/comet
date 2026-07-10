@@ -68,6 +68,14 @@ type ComponentPlan = {
   cmAction: ComponentAction;
 };
 
+function validateArtifactOptions(options: InitOptions): void {
+  if (options.openSpecStore && options.artifactLayout === 'legacy') {
+    throw new Error(
+      '--openspec-store requires docs artifact layout. Remove --artifact-layout legacy or use --artifact-layout docs.',
+    );
+  }
+}
+
 const COMET_BANNER = [
   `   ██████╗ ██████╗ ███╗   ███╗███████╗████████╗`,
   `  ██╔════╝██╔═══██╗████╗ ████║██╔════╝╚══██╔══╝`,
@@ -343,6 +351,7 @@ function displaySummary(results: PlatformResult[], scope: InstallScope, lang: st
 }
 
 export async function initCommand(targetPath: string, options: InitOptions = {}): Promise<void> {
+  validateArtifactOptions(options);
   const projectPath = path.resolve(targetPath);
   const log = options.json ? () => undefined : console.log;
 

@@ -215,6 +215,21 @@ describe('comet init E2E', () => {
     INIT_E2E_TIMEOUT_MS,
   );
 
+  it('rejects OpenSpec store ids with legacy artifact layout', async () => {
+    const { initCommand } = await import('../../app/commands/init.js');
+
+    await expect(
+      initCommand(tmpDir, {
+        yes: true,
+        scope: 'project',
+        json: true,
+        artifactLayout: 'legacy',
+        openSpecStore: 'comet-demo-1234',
+      }),
+    ).rejects.toThrow(/--openspec-store requires docs artifact layout/);
+    await expect(fs.access(path.join(tmpDir, '.comet', 'config.yaml'))).rejects.toThrow();
+  });
+
   it(
     'installs Comet skills at global scope',
     async () => {
