@@ -174,6 +174,28 @@ function buildLayout(
   };
 }
 
+function canonicalOpenSpecRoot(layout: CometArtifactLayoutKind): string {
+  return layout === 'docs' ? 'docs' : '.';
+}
+
+function explicitLayoutOptions(
+  layout: CometArtifactLayoutKind,
+  configured: {
+    openspecRoot?: string;
+    openspecStore?: string;
+    superpowersRoot?: string;
+  },
+): { openspecRoot: string; openspecStore?: string; superpowersRoot?: string } {
+  const canonicalRoot = canonicalOpenSpecRoot(layout);
+  const configuredRoot = safeRelativePath(configured.openspecRoot, canonicalRoot);
+  const rootIsCompatible = configuredRoot === canonicalRoot;
+  return {
+    openspecRoot: rootIsCompatible ? configuredRoot : canonicalRoot,
+    openspecStore: layout === 'docs' && rootIsCompatible ? configured.openspecStore : undefined,
+    superpowersRoot: configured.superpowersRoot,
+  };
+}
+
 export async function resolveCometArtifactLayout(
   projectRootInput: string,
   options: ResolveCometArtifactLayoutOptions = {},
@@ -182,11 +204,7 @@ export async function resolveCometArtifactLayout(
   const configured = await configuredLayout(projectRoot);
   const explicit = options.explicitLayout ?? configured.layout;
   if (explicit) {
-    return buildLayout(projectRoot, explicit, {
-      openspecRoot: configured.openspecRoot,
-      openspecStore: configured.openspecStore,
-      superpowersRoot: configured.superpowersRoot,
-    });
+    return buildLayout(projectRoot, explicit, explicitLayoutOptions(explicit, configured));
   }
 
   const docsHealthy = await isHealthyOpenSpecRoot(projectRoot, 'docs');
@@ -262,7 +280,7 @@ function buildCompatibilityLayout(
   configuredSuperpowersRoot?: string,
 ): CometArtifactLayout {
   return buildLayout(projectRoot, layout, {
-    openspecRoot: layout === 'docs' ? 'docs' : '.',
+    openspecRoot: canonicalOpenSpecRoot(layout),
     superpowersRoot: configuredSuperpowersRoot,
   });
 }

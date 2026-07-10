@@ -25,11 +25,23 @@ async function healthyOpenSpecRoot(root: string, relativeRoot: string): Promise<
 async function writeArtifactLayoutConfig(
   root: string,
   artifactLayout: 'legacy' | 'docs',
+  options: { openspecRoot?: string; openspecStore?: string } = {},
 ): Promise<void> {
+  const openspecLines = [
+    options.openspecRoot ? `  root: ${options.openspecRoot}` : null,
+    options.openspecStore ? `  store: ${options.openspecStore}` : null,
+  ].filter((line): line is string => line !== null);
   await mkdir(path.join(root, '.comet'), { recursive: true });
   await writeFile(
     path.join(root, '.comet', 'config.yaml'),
-    `artifact_layout: ${artifactLayout}\n`,
+    [
+      `artifact_layout: ${artifactLayout}`,
+      openspecLines.length > 0 ? 'openspec:' : null,
+      ...openspecLines,
+      '',
+    ]
+      .filter((line): line is string => line !== null)
+      .join('\n'),
     'utf8',
   );
 }
@@ -171,6 +183,26 @@ describe('resolveCometArtifactLayout', () => {
     });
   });
 
+  it('uses the canonical legacy root for explicit legacy layout even when config declares docs roots', async () => {
+    const root = await tempProject();
+    await healthyOpenSpecRoot(root, '.');
+    await healthyOpenSpecRoot(root, 'docs');
+    await writeArtifactLayoutConfig(root, 'docs', {
+      openspecRoot: 'docs',
+      openspecStore: 'comet-docs-store',
+    });
+    await writeActiveChange(root, path.join('openspec', 'changes', 'legacy-only'));
+    await writeActiveChange(root, path.join('docs', 'openspec', 'changes', 'docs-active'));
+
+    await expect(
+      resolveCometChangeDirectory(root, 'legacy-only', { explicitLayout: 'legacy' }),
+    ).resolves.toMatchObject({
+      label: 'openspec/changes/legacy-only',
+      directory: path.join(root, 'openspec', 'changes', 'legacy-only'),
+      layout: 'legacy',
+    });
+  });
+
   it('returns a docs active change when legacy layout is configured but the named change exists only in docs', async () => {
     const root = await tempProject();
     await healthyOpenSpecRoot(root, '.');
@@ -181,6 +213,25 @@ describe('resolveCometArtifactLayout', () => {
     await expect(resolveCometChangeDirectory(root, 'add-auth')).resolves.toMatchObject({
       label: 'docs/openspec/changes/add-auth',
       directory: path.join(root, 'docs', 'openspec', 'changes', 'add-auth'),
+      layout: 'docs',
+    });
+  });
+
+  it('uses the canonical docs root for explicit docs layout even when config declares legacy roots', async () => {
+    const root = await tempProject();
+    await healthyOpenSpecRoot(root, '.');
+    await healthyOpenSpecRoot(root, 'docs');
+    await writeArtifactLayoutConfig(root, 'legacy', {
+      openspecRoot: '.',
+    });
+    await writeActiveChange(root, path.join('openspec', 'changes', 'legacy-active'));
+    await writeActiveChange(root, path.join('docs', 'openspec', 'changes', 'docs-only'));
+
+    await expect(
+      resolveCometChangeDirectory(root, 'docs-only', { explicitLayout: 'docs' }),
+    ).resolves.toMatchObject({
+      label: 'docs/openspec/changes/docs-only',
+      directory: path.join(root, 'docs', 'openspec', 'changes', 'docs-only'),
       layout: 'docs',
     });
   });
