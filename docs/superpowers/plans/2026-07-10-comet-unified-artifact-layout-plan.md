@@ -83,7 +83,7 @@ Modify:
   - Existing `openSpecChangeNameError()` from `classic-paths.ts`
   - YAML config files under `.comet/config.yaml` and change `.comet.yaml`
 
-- [ ] **Step 1: Write failing resolver tests**
+- [x] **Step 1: Write failing resolver tests**
 
 Add `test/domains/comet-classic/classic-artifact-layout.test.ts` with these cases:
 
@@ -189,7 +189,7 @@ describe('resolveCometArtifactLayout', () => {
 });
 ```
 
-- [ ] **Step 2: Run resolver tests to verify failure**
+- [x] **Step 2: Run resolver tests to verify failure**
 
 Run:
 
@@ -199,7 +199,7 @@ npx vitest run test/domains/comet-classic/classic-artifact-layout.test.ts
 
 Expected: FAIL because `classic-artifact-layout.ts` does not exist.
 
-- [ ] **Step 3: Implement resolver**
+- [x] **Step 3: Implement resolver**
 
 Create `domains/comet-classic/classic-artifact-layout.ts`:
 
@@ -423,7 +423,7 @@ export function projectRelativePath(projectRoot: string, absolutePath: string): 
 }
 ```
 
-- [ ] **Step 4: Wire `classic-paths.ts` to the resolver**
+- [x] **Step 4: Wire `classic-paths.ts` to the resolver**
 
 Replace `resolveClassicChangeDirectory(name)` internals with:
 
@@ -437,7 +437,7 @@ export async function resolveClassicChangeDirectory(name: string): Promise<Class
 
 Keep `openSpecChangeNameError()` unchanged.
 
-- [ ] **Step 5: Run resolver tests**
+- [x] **Step 5: Run resolver tests**
 
 Run:
 
@@ -447,7 +447,7 @@ npx vitest run test/domains/comet-classic/classic-artifact-layout.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add domains/comet-classic/classic-artifact-layout.ts domains/comet-classic/classic-paths.ts test/domains/comet-classic/classic-artifact-layout.test.ts
@@ -474,7 +474,7 @@ git commit -m "feat: add Comet artifact layout resolver"
   - `ClassicState.superpowersRoot: string | null`
   - Wire keys `artifact_layout`, `openspec_root`, `superpowers_root`
 
-- [ ] **Step 1: Write failing state tests**
+- [x] **Step 1: Write failing state tests**
 
 Add tests to `test/domains/comet-classic/classic-state.test.ts`:
 
@@ -539,7 +539,7 @@ openspec_root: docs
 superpowers_root: docs/superpowers
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 ```bash
 npx vitest run test/domains/comet-classic/classic-state.test.ts test/domains/comet-classic/comet-scripts.test.ts
@@ -547,7 +547,7 @@ npx vitest run test/domains/comet-classic/classic-state.test.ts test/domains/com
 
 Expected: FAIL because wire fields are unknown or not written.
 
-- [ ] **Step 3: Add state fields and validation**
+- [x] **Step 3: Add state fields and validation**
 
 Modify `domains/comet-classic/classic-state.ts`:
 
@@ -583,7 +583,7 @@ openspec_root: classic.openSpecRoot,
 superpowers_root: classic.superpowersRoot,
 ```
 
-- [ ] **Step 4: Update state command field rules**
+- [x] **Step 4: Update state command field rules**
 
 Modify `classic-state-command.ts`:
 
@@ -611,7 +611,7 @@ openSpecRoot: layout.layout === 'docs' ? 'docs' : null,
 superpowersRoot: 'docs/superpowers',
 ```
 
-- [ ] **Step 5: Update validate command**
+- [x] **Step 5: Update validate command**
 
 Modify `classic-validate-command.ts`:
 
@@ -630,7 +630,7 @@ for (const field of ['design_doc', 'plan', 'handoff_context', 'openspec_root', '
 
 Ensure `KNOWN_KEYS` includes the new wire keys through `CLASSIC_WIRE_KEYS`.
 
-- [ ] **Step 6: Run state tests**
+- [x] **Step 6: Run state tests**
 
 ```bash
 npx vitest run test/domains/comet-classic/classic-state.test.ts test/domains/comet-classic/comet-scripts.test.ts
@@ -638,7 +638,7 @@ npx vitest run test/domains/comet-classic/classic-state.test.ts test/domains/com
 
 Expected: PASS for new layout state tests. Existing failures must be fixed before commit.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add domains/comet-classic/classic-state.ts domains/comet-classic/classic-state-command.ts domains/comet-classic/classic-validate-command.ts domains/comet-classic/classic-store.ts test/domains/comet-classic/classic-state.test.ts test/domains/comet-classic/comet-scripts.test.ts
@@ -662,7 +662,7 @@ git commit -m "feat: snapshot artifact layout in Classic state"
   - `buildOpenSpecStoreSetupInvocation(projectPath: string, storeId: string): { command: string; args: string[] }`
   - `buildOpenSpecStoreRegisterInvocation(projectPath: string, storeId: string): { command: string; args: string[] }`
 
-- [ ] **Step 1: Write failing facade tests**
+- [x] **Step 1: Write failing facade tests**
 
 Create `test/app/openspec-command.test.ts`:
 
@@ -729,7 +729,7 @@ describe('openspecCommand', () => {
 });
 ```
 
-- [ ] **Step 2: Run facade tests to verify failure**
+- [x] **Step 2: Run facade tests to verify failure**
 
 ```bash
 npx vitest run test/app/openspec-command.test.ts
@@ -737,7 +737,7 @@ npx vitest run test/app/openspec-command.test.ts
 
 Expected: FAIL because `app/commands/openspec.ts` does not exist.
 
-- [ ] **Step 3: Implement facade command**
+- [x] **Step 3: Implement facade command**
 
 Create `app/commands/openspec.ts`:
 
@@ -776,7 +776,7 @@ export async function openspecCommand(
 }
 ```
 
-- [ ] **Step 4: Register CLI command**
+- [x] **Step 4: Register CLI command**
 
 Modify `app/cli/index.ts`:
 
@@ -792,7 +792,7 @@ program
   });
 ```
 
-- [ ] **Step 5: Add OpenSpec store helper exports**
+- [x] **Step 5: Add OpenSpec store helper exports**
 
 In `domains/integrations/openspec.ts`, export helpers:
 
@@ -818,7 +818,7 @@ export function buildOpenSpecStoreRegisterInvocation(
 }
 ```
 
-- [ ] **Step 6: Run tests**
+- [x] **Step 6: Run tests**
 
 ```bash
 npx vitest run test/app/openspec-command.test.ts test/domains/integrations/openspec.test.ts
@@ -826,7 +826,7 @@ npx vitest run test/app/openspec-command.test.ts test/domains/integrations/opens
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add app/commands/openspec.ts app/cli/index.ts domains/integrations/openspec.ts test/app/openspec-command.test.ts test/domains/integrations/openspec.test.ts
@@ -855,7 +855,7 @@ git commit -m "feat: add Comet OpenSpec facade"
   - `migrateDocsCommand(targetPath: string, options: MigrateDocsOptions): Promise<void>`
   - `createWorkingDirs(projectPath: string, language?: string, options?: { artifactLayout?: 'legacy' | 'docs'; openSpecStore?: string }): Promise<void>`
 
-- [ ] **Step 1: Write failing init tests**
+- [x] **Step 1: Write failing init tests**
 
 Extend `test/app/init.test.ts` or `test/app/init-e2e.test.ts`:
 
@@ -878,7 +878,7 @@ it('creates docs OpenSpec directories and config for docs artifact layout', asyn
 });
 ```
 
-- [ ] **Step 2: Write failing migration tests**
+- [x] **Step 2: Write failing migration tests**
 
 Create `test/app/migrate-docs.test.ts`:
 
@@ -927,7 +927,7 @@ describe('migrateDocsCommand', () => {
 });
 ```
 
-- [ ] **Step 3: Run tests to verify failure**
+- [x] **Step 3: Run tests to verify failure**
 
 ```bash
 npx vitest run test/app/init.test.ts test/app/init-e2e.test.ts test/app/migrate-docs.test.ts
@@ -935,7 +935,7 @@ npx vitest run test/app/init.test.ts test/app/init-e2e.test.ts test/app/migrate-
 
 Expected: FAIL because init options and migration command are not implemented.
 
-- [ ] **Step 4: Extend project config rendering**
+- [x] **Step 4: Extend project config rendering**
 
 Modify `domains/skill/platform-install.ts`:
 
@@ -970,7 +970,7 @@ function renderProjectConfig(
 
 Preserve all existing managed language/context/review fields.
 
-- [ ] **Step 5: Create docs layout directories**
+- [x] **Step 5: Create docs layout directories**
 
 Update `createWorkingDirs()`:
 
@@ -995,7 +995,7 @@ Write `docs/openspec/config.yaml` with:
 schema: spec-driven
 ```
 
-- [ ] **Step 6: Implement migration dry-run**
+- [x] **Step 6: Implement migration dry-run**
 
 Create `app/commands/migrate-docs.ts`:
 
@@ -1059,7 +1059,7 @@ export async function migrateDocsCommand(
 }
 ```
 
-- [ ] **Step 7: Wire CLI**
+- [x] **Step 7: Wire CLI**
 
 In `app/cli/index.ts`:
 
@@ -1081,7 +1081,7 @@ migrate
   });
 ```
 
-- [ ] **Step 8: Ignore local store metadata**
+- [x] **Step 8: Ignore local store metadata**
 
 Add to `.gitignore`:
 
@@ -1090,7 +1090,7 @@ Add to `.gitignore`:
 docs/.openspec-store/
 ```
 
-- [ ] **Step 9: Run tests**
+- [x] **Step 9: Run tests**
 
 ```bash
 npx vitest run test/app/init.test.ts test/app/init-e2e.test.ts test/app/migrate-docs.test.ts
@@ -1099,7 +1099,7 @@ git diff --check -- .gitignore app/commands/migrate-docs.ts domains/skill/platfo
 
 Expected: PASS.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add .gitignore app/cli/index.ts app/commands/init.ts app/commands/i18n.ts app/commands/migrate-docs.ts domains/skill/platform-install.ts test/app/init.test.ts test/app/init-e2e.test.ts test/app/migrate-docs.test.ts
@@ -1127,7 +1127,7 @@ git commit -m "feat: add docs layout init and migration preview"
 - Consumes: `resolveCometArtifactLayout()` and `resolveCometChangeDirectory()`.
 - Produces: runtime commands that work in legacy and docs layout.
 
-- [ ] **Step 1: Add failing resume-probe docs layout tests**
+- [x] **Step 1: Add failing resume-probe docs layout tests**
 
 Extend `test/domains/comet-classic/classic-resume-probe.test.ts`:
 
@@ -1170,7 +1170,7 @@ it('auto resumes a docs layout active change', async () => {
 });
 ```
 
-- [ ] **Step 2: Add failing archive docs layout test**
+- [x] **Step 2: Add failing archive docs layout test**
 
 Extend `test/domains/comet-classic/classic-archive.test.ts`:
 
@@ -1183,7 +1183,7 @@ it('passes --store when archiving docs layout changes', async () => {
 
 Replace the comment with local fixture helpers from the test file. The assertion must check exact command args.
 
-- [ ] **Step 3: Run runtime tests to verify failure**
+- [x] **Step 3: Run runtime tests to verify failure**
 
 ```bash
 npx vitest run test/domains/comet-classic/classic-resume-probe.test.ts test/domains/comet-classic/classic-archive.test.ts
@@ -1191,7 +1191,7 @@ npx vitest run test/domains/comet-classic/classic-resume-probe.test.ts test/doma
 
 Expected: FAIL because runtime still scans root `openspec/changes` and archive omits store args.
 
-- [ ] **Step 4: Update resume discovery**
+- [x] **Step 4: Update resume discovery**
 
 In `classic-resume-probe.ts`, replace root-only discovery:
 
@@ -1214,7 +1214,7 @@ Include layout label in evidence when auto-resuming:
 { source: 'repo', quote: `${layout.layout}: ${projectRelativePath(projectRoot, changeDir)}` }
 ```
 
-- [ ] **Step 5: Update handoff and evidence**
+- [x] **Step 5: Update handoff and evidence**
 
 In `classic-handoff.ts`, compute change dir through resolver:
 
@@ -1231,7 +1231,7 @@ const handoffMarkdown = `${label}/.comet/handoff/design-context.md`;
 
 In `classic-evidence.ts`, replace project root inference by basename `openspec` with a helper that resolves from the known current working directory or resolver project root. Path pointers remain project-root-relative.
 
-- [ ] **Step 6: Update archive**
+- [x] **Step 6: Update archive**
 
 In `classic-archive.ts`:
 
@@ -1248,7 +1248,7 @@ const archiveRun = spawnSync(openspec, ['archive', change, '--yes', ...layout.op
 
 Use `layout.openSpec.specsDir` in `verifyMainSpecsClean()`.
 
-- [ ] **Step 7: Run focused runtime tests**
+- [x] **Step 7: Run focused runtime tests**
 
 ```bash
 npx vitest run test/domains/comet-classic/classic-resume-probe.test.ts test/domains/comet-classic/classic-handoff.test.ts test/domains/comet-classic/classic-evidence.test.ts test/domains/comet-classic/classic-archive.test.ts test/domains/comet-classic/comet-scripts.test.ts
@@ -1256,7 +1256,7 @@ npx vitest run test/domains/comet-classic/classic-resume-probe.test.ts test/doma
 
 Expected: PASS.
 
-- [ ] **Step 8: Rebuild Classic runtime asset**
+- [x] **Step 8: Rebuild Classic runtime asset**
 
 ```bash
 pnpm build:classic-runtime
@@ -1270,7 +1270,7 @@ node scripts/build/build-classic-runtime.mjs
 
 Expected: `assets/skills/comet/scripts/comet-runtime.mjs` updates or remains identical.
 
-- [ ] **Step 9: Verify generated runtime freshness**
+- [x] **Step 9: Verify generated runtime freshness**
 
 ```bash
 node scripts/build/build-classic-runtime.mjs --check
@@ -1278,7 +1278,7 @@ node scripts/build/build-classic-runtime.mjs --check
 
 Expected: exit 0.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add domains/comet-classic/classic-resume-probe.ts domains/comet-classic/classic-handoff.ts domains/comet-classic/classic-evidence.ts domains/comet-classic/classic-archive.ts domains/comet-classic/classic-guard.ts assets/skills/comet/scripts/comet-runtime.mjs test/domains/comet-classic/classic-resume-probe.test.ts test/domains/comet-classic/classic-handoff.test.ts test/domains/comet-classic/classic-evidence.test.ts test/domains/comet-classic/classic-archive.test.ts test/domains/comet-classic/comet-scripts.test.ts
@@ -1307,7 +1307,7 @@ git commit -m "feat: make Classic runtime layout-aware"
   - Dashboard snapshot includes docs layout changes without project root drift.
   - Workflow contract supports both state path globs.
 
-- [ ] **Step 1: Write failing hook guard tests**
+- [x] **Step 1: Write failing hook guard tests**
 
 Extend `test/domains/comet-classic/classic-hook-guard.test.ts`:
 
@@ -1327,7 +1327,7 @@ it('does not allow unrelated docs files just because docs layout exists', async 
 });
 ```
 
-- [ ] **Step 2: Write failing dashboard tests**
+- [x] **Step 2: Write failing dashboard tests**
 
 Extend `test/domains/dashboard/collector.test.ts`:
 
@@ -1346,7 +1346,7 @@ it('collects docs layout changes without treating docs as project root', async (
 });
 ```
 
-- [ ] **Step 3: Run tests to verify failure**
+- [x] **Step 3: Run tests to verify failure**
 
 ```bash
 npx vitest run test/domains/comet-classic/classic-hook-guard.test.ts test/domains/dashboard/collector.test.ts test/domains/workflow-contract/workflow-contract.test.ts
@@ -1354,7 +1354,7 @@ npx vitest run test/domains/comet-classic/classic-hook-guard.test.ts test/domain
 
 Expected: FAIL because these modules are root `openspec` only.
 
-- [ ] **Step 4: Update hook guard**
+- [x] **Step 4: Update hook guard**
 
 In `classic-hook-guard.ts`:
 
@@ -1381,7 +1381,7 @@ function openSpecChangePrefix(relativePath: string): { prefix: string; name: str
 
 Do not broaden allowlist to `docs/`.
 
-- [ ] **Step 5: Update dashboard**
+- [x] **Step 5: Update dashboard**
 
 In `collector.ts`, replace `CHANGES_DIR` constant with resolver-derived roots. `collectDashboardSnapshot()` should:
 
@@ -1405,7 +1405,7 @@ layout?: 'legacy' | 'docs';
 
 to `ChangeDashboardItem`.
 
-- [ ] **Step 6: Update workflow contract**
+- [x] **Step 6: Update workflow contract**
 
 In `builtins.ts`, include both globs:
 
@@ -1415,7 +1415,7 @@ paths: ['openspec/changes/*/.comet.yaml', 'docs/openspec/changes/*/.comet.yaml']
 
 Repeat for delta specs and tasks where root `openspec/changes` appears.
 
-- [ ] **Step 7: Run focused tests and rebuild runtime**
+- [x] **Step 7: Run focused tests and rebuild runtime**
 
 ```bash
 npx vitest run test/domains/comet-classic/classic-hook-guard.test.ts test/domains/dashboard/collector.test.ts test/domains/workflow-contract/workflow-contract.test.ts
@@ -1425,7 +1425,7 @@ node scripts/build/build-classic-runtime.mjs --check
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add domains/comet-classic/classic-hook-guard.ts domains/dashboard/collector.ts domains/dashboard/types.ts domains/workflow-contract/builtins.ts domains/workflow-contract/normalize.ts assets/skills/comet/scripts/comet-runtime.mjs test/domains/comet-classic/classic-hook-guard.test.ts test/domains/dashboard/collector.test.ts test/domains/workflow-contract/workflow-contract.test.ts
@@ -1464,7 +1464,7 @@ git commit -m "feat: support docs layout in guard and dashboard"
 - Consumes: `comet openspec ...` facade.
 - Produces: Agent-facing guidance that no longer assumes root `openspec/changes` as the only layout.
 
-- [ ] **Step 1: Write failing Skill tests**
+- [x] **Step 1: Write failing Skill tests**
 
 Update `test/domains/skill/skills.test.ts`:
 
@@ -1487,7 +1487,7 @@ expect(zhComet).not.toContain('只来自 `openspec/changes/<name>/.comet.yaml`')
 expect(enComet).not.toContain('only from `openspec/changes/<name>/.comet.yaml`');
 ```
 
-- [ ] **Step 2: Run Skill tests to verify failure**
+- [x] **Step 2: Run Skill tests to verify failure**
 
 ```bash
 npx vitest run test/domains/skill/skills.test.ts
@@ -1495,7 +1495,7 @@ npx vitest run test/domains/skill/skills.test.ts
 
 Expected: FAIL because Skill text still contains root-only guidance.
 
-- [ ] **Step 3: Update Chinese Skills first**
+- [x] **Step 3: Update Chinese Skills first**
 
 Change Chinese Skill guidance to use:
 
@@ -1520,11 +1520,11 @@ legacy: openspec/changes/<name>
 docs: docs/openspec/changes/<name>
 ```
 
-- [ ] **Step 4: Update English Skills with the same semantics**
+- [x] **Step 4: Update English Skills with the same semantics**
 
 Mirror the Chinese content in English. Preserve meaning, not word-for-word phrasing.
 
-- [ ] **Step 5: Update eval validation**
+- [x] **Step 5: Update eval validation**
 
 In `eval/scaffold/python/validation/comet_workflow.py`, support both roots:
 
@@ -1546,7 +1546,7 @@ OPEN_SPEC_CHANGE_ROOT = r"(?:openspec/changes|docs/openspec/changes)"
 
 Use it in proposal/tasks/design/plan/archive regexes.
 
-- [ ] **Step 6: Add docs-layout eval treatment**
+- [x] **Step 6: Add docs-layout eval treatment**
 
 Add treatment under `eval/local/treatments/` with a name such as:
 
@@ -1556,7 +1556,7 @@ comet_full_040_beta_docs_layout.yaml
 
 It must configure the task setup to create/use `docs/openspec/changes` and use the current Comet Skill bundle.
 
-- [ ] **Step 7: Update changelog**
+- [x] **Step 7: Update changelog**
 
 Before editing `CHANGELOG.md`, confirm versions:
 
@@ -1577,7 +1577,7 @@ Add to the current unreleased version block:
 
 Only include the migration bullet if `comet migrate docs` was implemented beyond dry-run preview.
 
-- [ ] **Step 8: Run Skill and eval tests**
+- [x] **Step 8: Run Skill and eval tests**
 
 ```bash
 npx vitest run test/domains/skill/skills.test.ts
@@ -1586,7 +1586,7 @@ python -m pytest eval/local/tests/tasks/test_tasks.py eval/local/tests/scaffold/
 
 If local Python env is unavailable, run the available eval unit test command already used by the repo and record the blocker in the final implementation summary.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add assets/skills-zh assets/skills test/domains/skill/skills.test.ts eval/scaffold eval/local README-zh.md README.md CHANGELOG.md
@@ -1604,7 +1604,7 @@ git commit -m "docs: sync Skills for unified artifact layout"
 - Consumes all previous task outputs.
 - Produces a verified branch ready for PR or merge review.
 
-- [ ] **Step 1: Run focused command suite**
+- [x] **Step 1: Run focused command suite**
 
 ```bash
 npx vitest run test/domains/comet-classic/comet-scripts.test.ts
@@ -1617,7 +1617,7 @@ npx vitest run test/domains/workflow-contract/workflow-contract.test.ts
 
 Expected: all pass.
 
-- [ ] **Step 2: Run architecture and runtime checks**
+- [x] **Step 2: Run architecture and runtime checks**
 
 ```bash
 node scripts/build/build-classic-runtime.mjs --check
@@ -1627,7 +1627,7 @@ git diff --check
 
 Expected: all exit 0.
 
-- [ ] **Step 3: Run full build and tests**
+- [x] **Step 3: Run full build and tests**
 
 ```bash
 node build.js
@@ -1636,7 +1636,7 @@ npx vitest run
 
 Expected: both exit 0.
 
-- [ ] **Step 4: Inspect final diff**
+- [x] **Step 4: Inspect final diff**
 
 ```bash
 git status --short
@@ -1649,7 +1649,7 @@ Expected:
 - Only intended unified layout, migration, Skill, eval, docs, generated runtime, and changelog files are changed.
 - No unrelated project-registry, update, or installation-registry work is included unless that work is already part of the current branch baseline.
 
-- [ ] **Step 5: Commit verification fixes**
+- [x] **Step 5: Commit verification fixes**
 
 If verification required fixes:
 
@@ -1660,7 +1660,7 @@ git commit -m "fix: complete unified artifact layout verification"
 
 If no fixes were needed, do not create an empty commit.
 
-- [ ] **Step 6: Prepare final summary**
+- [x] **Step 6: Prepare final summary**
 
 Include:
 
