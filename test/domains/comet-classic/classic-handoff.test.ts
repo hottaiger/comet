@@ -46,6 +46,29 @@ async function seedDesignChange(dir: string, name = 'demo'): Promise<string> {
   return changeDir;
 }
 
+async function seedDocsDesignChange(dir: string, name = 'demo'): Promise<string> {
+  await fs.mkdir(path.join(dir, '.comet'), { recursive: true });
+  await fs.writeFile(
+    path.join(dir, '.comet', 'config.yaml'),
+    [
+      'artifact_layout: docs',
+      'openspec:',
+      '  root: docs',
+      'superpowers:',
+      '  root: docs/superpowers',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+  run(dir, 'state', 'init', name, 'full');
+  const changeDir = path.join(dir, 'docs', 'openspec', 'changes', name);
+  await fs.writeFile(path.join(changeDir, 'proposal.md'), 'proposal\n');
+  await fs.writeFile(path.join(changeDir, 'design.md'), 'design\n');
+  await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [x] implement handoff\n');
+  run(dir, 'state', 'transition', name, 'open-complete');
+  return changeDir;
+}
+
 describe('Classic handoff command', () => {
   it('writes a compact design handoff and records the context fields', async () => {
     const dir = await makeProject();
@@ -161,5 +184,31 @@ describe('Classic handoff command', () => {
         (event) => event.type === 'recovery_reconciled' && event.data?.kind === 'classic-handoff',
       ),
     ).toHaveLength(1);
+  });
+
+  it('writes docs layout handoff artifacts with project-root-relative labels', async () => {
+    const dir = await makeProject();
+    const changeDir = await seedDocsDesignChange(dir);
+
+    const result = run(dir, 'handoff', 'demo', 'design', '--write');
+
+    expect(result.status).toBe(0);
+    expect(result.stderr).toContain(
+      '[HANDOFF] wrote docs/openspec/changes/demo/.comet/handoff/design-context.json',
+    );
+    expect(result.stderr).toContain(
+      '[HANDOFF] wrote docs/openspec/changes/demo/.comet/handoff/design-context.md',
+    );
+    expect(run(dir, 'state', 'get', 'demo', 'handoff_context').stdout.trim()).toBe(
+      'docs/openspec/changes/demo/.comet/handoff/design-context.json',
+    );
+
+    const artifacts = JSON.parse(
+      await fs.readFile(path.join(changeDir, '.comet', 'artifacts.json'), 'utf8'),
+    ) as Record<string, string>;
+    expect(artifacts).toMatchObject({
+      handoff_context: 'docs/openspec/changes/demo/.comet/handoff/design-context.json',
+      handoff_markdown: 'docs/openspec/changes/demo/.comet/handoff/design-context.md',
+    });
   });
 });

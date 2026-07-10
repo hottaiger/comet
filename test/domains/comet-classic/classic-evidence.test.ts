@@ -135,8 +135,98 @@ describe('Classic evidence collection', () => {
     expect(evidenceSatisfied(evidence, 'run.checkpoint')).toBe(false);
   });
 
+  it('keeps docs layout evidence paths relative to the project root', async () => {
+    const docsProjectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'comet-classic-evidence-docs-'),
+    );
+    const docsChangeDir = path.join(docsProjectRoot, 'docs', 'openspec', 'changes', 'demo');
+    const docsProjection: ClassicStateProjection = {
+      classic: {
+        ...projection.classic!,
+        artifactLayout: 'docs',
+        openSpecRoot: 'docs',
+        superpowersRoot: 'docs/superpowers',
+        handoffContext: 'docs/openspec/changes/demo/.comet/handoff/context.json',
+      },
+      run: runState(),
+      unknownKeys: [],
+    };
+    await Promise.all([
+      fs.mkdir(path.join(docsChangeDir, 'specs', 'demo'), { recursive: true }),
+      writeDocsProjectFile(docsProjectRoot, 'docs/openspec/config.yaml', 'schema: spec-driven\n'),
+      writeDocsProjectFile(
+        docsProjectRoot,
+        'docs/openspec/changes/demo/proposal.md',
+        '# Proposal\n',
+      ),
+      writeDocsProjectFile(docsProjectRoot, 'docs/openspec/changes/demo/design.md', '# Design\n'),
+      writeDocsProjectFile(
+        docsProjectRoot,
+        'docs/openspec/changes/demo/tasks.md',
+        '- [x] first\n- [x] second\n',
+      ),
+      writeDocsProjectFile(
+        docsProjectRoot,
+        'docs/openspec/changes/demo/specs/demo/spec.md',
+        '# Spec\n',
+      ),
+      writeDocsProjectFile(
+        docsProjectRoot,
+        'docs/superpowers/specs/demo-design.md',
+        '# Design Doc\n',
+      ),
+      writeDocsProjectFile(docsProjectRoot, 'docs/superpowers/plans/demo-plan.md', '# Plan\n'),
+      writeDocsProjectFile(
+        docsProjectRoot,
+        'docs/superpowers/verification/demo.md',
+        '# Verified\n',
+      ),
+      writeDocsProjectFile(
+        docsProjectRoot,
+        'docs/openspec/changes/demo/.comet/handoff/context.json',
+        '{"context":true}\n',
+      ),
+      writeDocsProjectFile(
+        docsProjectRoot,
+        'docs/openspec/changes/demo/.comet/checkpoint.json',
+        '{}\n',
+      ),
+    ]);
+
+    try {
+      const evidence = await collectClassicEvidence(docsChangeDir, docsProjection);
+
+      expect(evidence.find((item) => item.code === 'openspec.proposal')?.source).toBe(
+        'docs/openspec/changes/demo/proposal.md',
+      );
+      expect(evidence.find((item) => item.code === 'design.handoff')?.source).toBe(
+        'docs/openspec/changes/demo/.comet/handoff/context.json',
+      );
+      expect(evidence.find((item) => item.code === 'run.checkpoint')?.source).toBe(
+        'docs/openspec/changes/demo/.comet/checkpoint.json',
+      );
+    } finally {
+      await fs.rm(docsProjectRoot, {
+        recursive: true,
+        force: true,
+        maxRetries: 5,
+        retryDelay: 100,
+      });
+    }
+  });
+
   async function writeProjectFile(relativePath: string, content: string): Promise<void> {
     const file = path.join(projectRoot, relativePath);
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, content);
+  }
+
+  async function writeDocsProjectFile(
+    docsRoot: string,
+    relativePath: string,
+    content: string,
+  ): Promise<void> {
+    const file = path.join(docsRoot, relativePath);
     await fs.mkdir(path.dirname(file), { recursive: true });
     await fs.writeFile(file, content);
   }

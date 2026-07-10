@@ -451,6 +451,10 @@ export async function resolveCometResumeProbe(
     return hasDecisionPoint(named)
       ? result('ask_user', named, 'low', 'active change is at a decision point')
       : result('auto_resume', named, 'high', 'request names an active change', [
+          {
+            source: 'repo',
+            quote: `${named.layout}: ${projectRelativePath(projectRoot, named.changeDir)}`,
+          },
           { source: 'user', quote: named.name },
         ]);
   }
@@ -480,7 +484,10 @@ export async function resolveCometResumeProbe(
   const evidence = relatedEvidence(utterance, change);
   if (resumeLike || evidence.length > 0) {
     return result('auto_resume', change, 'high', 'single active change and request is related', [
-      { source: 'repo', quote: `${change.layout}: ${projectRelativePath(projectRoot, change.changeDir)}` },
+      {
+        source: 'repo',
+        quote: `${change.layout}: ${projectRelativePath(projectRoot, change.changeDir)}`,
+      },
       { source: 'state', quote: `phase: ${change.phase}` },
       ...evidence,
     ]);

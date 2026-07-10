@@ -32,6 +32,35 @@ async function createChange(
   );
 }
 
+async function createDocsLayoutChange(
+  name: string,
+  yaml: string,
+  files: Record<string, string> = {},
+): Promise<void> {
+  const root = path.join(tmpDir, 'docs', 'openspec', 'changes', name);
+  await writeFile(
+    path.join(tmpDir, '.comet', 'config.yaml'),
+    [
+      'artifact_layout: docs',
+      'openspec:',
+      '  root: docs',
+      'superpowers:',
+      '  root: docs/superpowers',
+      '',
+    ].join('\n'),
+  );
+  await writeFile(path.join(tmpDir, 'docs', 'openspec', 'config.yaml'), 'schema: spec-driven\n');
+  await writeFile(path.join(root, '.comet.yaml'), yaml);
+  await writeFile(path.join(root, 'proposal.md'), files['proposal.md'] ?? 'Add auth flow\n');
+  await writeFile(path.join(root, 'design.md'), files['design.md'] ?? 'Auth flow design\n');
+  await writeFile(path.join(root, 'tasks.md'), files['tasks.md'] ?? '- [ ] Ship auth flow\n');
+  await writeFile(path.join(tmpDir, 'docs', 'superpowers', 'specs', 'add-auth.md'), '# Auth\n');
+  await writeFile(
+    path.join(tmpDir, 'docs', 'superpowers', 'plans', 'add-auth.md'),
+    '- [ ] Ship auth flow\n',
+  );
+}
+
 function git(args: string[]): void {
   const result = spawnSync('git', args, {
     cwd: tmpDir,
@@ -312,6 +341,40 @@ describe('resolveCometResumeProbe', () => {
       changeName: 'cache-ttl',
     });
     expect(result.reason).toContain('uncommitted');
+  });
+
+  it('includes docs layout repo evidence when auto-resuming a named change among multiple active changes', async () => {
+    const docsBuildYaml = [
+      ...buildYaml.trimEnd().split('\n'),
+      'artifact_layout: docs',
+      'openspec_root: docs',
+      'superpowers_root: docs/superpowers',
+      '',
+    ].join('\n');
+    await createDocsLayoutChange('add-auth', docsBuildYaml);
+    await createDocsLayoutChange(
+      'add-billing',
+      docsBuildYaml.replace('cache-ttl', 'billing').replace('Update cache ttl', 'Ship billing'),
+      {
+        'proposal.md': 'Add billing flow\n',
+        'design.md': 'Billing flow design\n',
+        'tasks.md': '- [ ] Ship billing flow\n',
+      },
+    );
+
+    const result = await resolveCometResumeProbe(tmpDir, {
+      schema_version: 'comet.resume_probe.v1',
+      utterance: '继续 add-auth',
+      locale: 'zh-CN',
+      agent_context: { non_trivial_work: true, already_in_comet_flow: false },
+    });
+
+    expect(result.action).toBe('auto_resume');
+    expect(result.changeName).toBe('add-auth');
+    expect(result.evidence).toContainEqual({
+      source: 'repo',
+      quote: 'docs: docs/openspec/changes/add-auth',
+    });
   });
 
   it('asks the user when build is waiting at plan-ready', async () => {

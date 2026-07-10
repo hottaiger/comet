@@ -12742,6 +12742,10 @@ async function resolveCometResumeProbe(projectRoot, rawInput) {
       ]);
     }
     return hasDecisionPoint(named) ? result3("ask_user", named, "low", "active change is at a decision point") : result3("auto_resume", named, "high", "request names an active change", [
+      {
+        source: "repo",
+        quote: `${named.layout}: ${projectRelativePath(projectRoot, named.changeDir)}`
+      },
       { source: "user", quote: named.name }
     ]);
   }
@@ -12767,7 +12771,10 @@ async function resolveCometResumeProbe(projectRoot, rawInput) {
   const evidence = relatedEvidence(utterance, change);
   if (resumeLike || evidence.length > 0) {
     return result3("auto_resume", change, "high", "single active change and request is related", [
-      { source: "repo", quote: `${change.layout}: ${projectRelativePath(projectRoot, change.changeDir)}` },
+      {
+        source: "repo",
+        quote: `${change.layout}: ${projectRelativePath(projectRoot, change.changeDir)}`
+      },
       { source: "state", quote: `phase: ${change.phase}` },
       ...evidence
     ]);
