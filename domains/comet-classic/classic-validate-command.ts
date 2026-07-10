@@ -38,6 +38,7 @@ const ENUMS: Record<string, readonly string[]> = {
   branch_status: ['pending', 'handled'],
   archived: ['true', 'false'],
   direct_override: ['true', 'false'],
+  artifact_layout: ['legacy', 'docs'],
   classic_profile: ['full', 'hotfix', 'tweak'],
   classic_migration: ['1'],
 };
@@ -134,6 +135,18 @@ export const classicValidateCommand: ClassicCommandHandler = async (args) => {
     const value = text(record[field]);
     if (value && !(await exists(path.resolve(value)))) {
       fail(`${field}='${value}' does not exist on disk`);
+    }
+  }
+  for (const field of [
+    'design_doc',
+    'plan',
+    'handoff_context',
+    'openspec_root',
+    'superpowers_root',
+  ] as const) {
+    const value = text(record[field]);
+    if (value && (/^(?:[A-Za-z]:|[\\/]|~)/u.test(value) || value.split(/[\\/]/u).includes('..'))) {
+      fail(`${field}='${value}' must be a relative repository path`);
     }
   }
   for (const field of ['handoff_hash'] as const) {

@@ -8045,6 +8045,7 @@ var ISOLATIONS = ["branch", "worktree"];
 var VERIFY_MODES = ["light", "full"];
 var VERIFY_RESULTS = ["pending", "pass", "fail"];
 var BRANCH_STATUSES = ["pending", "handled"];
+var ARTIFACT_LAYOUTS = ["legacy", "docs"];
 var CLASSIC_WIRE_KEYS = [
   "workflow",
   "language",
@@ -8070,6 +8071,9 @@ var CLASSIC_WIRE_KEYS = [
   "direct_override",
   "handoff_context",
   "handoff_hash",
+  "artifact_layout",
+  "openspec_root",
+  "superpowers_root",
   "classic_profile",
   "classic_migration"
 ];
@@ -8178,6 +8182,9 @@ function classicStateFromDocument(doc) {
     directOverride: booleanValue(doc, "direct_override"),
     handoffContext: relativePath(doc, "handoff_context"),
     handoffHash: sha256(doc, "handoff_hash"),
+    artifactLayout: enumValue(doc, "artifact_layout", ARTIFACT_LAYOUTS),
+    openSpecRoot: relativePath(doc, "openspec_root"),
+    superpowersRoot: relativePath(doc, "superpowers_root"),
     classicProfile: enumValue(doc, "classic_profile", CLASSIC_PROFILES),
     classicMigration: migrationVersion(doc)
   };
@@ -8241,6 +8248,9 @@ function classicStateToDocument(state) {
     direct_override: state.directOverride,
     handoff_context: state.handoffContext,
     handoff_hash: state.handoffHash,
+    artifact_layout: state.artifactLayout,
+    openspec_root: state.openSpecRoot,
+    superpowers_root: state.superpowersRoot,
     classic_profile: state.classicProfile,
     classic_migration: state.classicMigration
   };
@@ -10180,6 +10190,7 @@ var ENUMS = {
   branch_status: ["pending", "handled"],
   archived: ["true", "false"],
   direct_override: ["true", "false"],
+  artifact_layout: ["legacy", "docs"],
   classic_profile: ["full", "hotfix", "tweak"],
   classic_migration: ["1"]
 };
@@ -10269,6 +10280,18 @@ var classicValidateCommand = async (args) => {
     const value = text(record[field2]);
     if (value && !await exists3(path13.resolve(value))) {
       fail3(`${field2}='${value}' does not exist on disk`);
+    }
+  }
+  for (const field2 of [
+    "design_doc",
+    "plan",
+    "handoff_context",
+    "openspec_root",
+    "superpowers_root"
+  ]) {
+    const value = text(record[field2]);
+    if (value && (/^(?:[A-Za-z]:|[\\/]|~)/u.test(value) || value.split(/[\\/]/u).includes(".."))) {
+      fail3(`${field2}='${value}' must be a relative repository path`);
     }
   }
   for (const field2 of ["handoff_hash"]) {
@@ -12800,17 +12823,28 @@ var FIELD_ENUMS = {
   branch_status: ["pending", "handled"],
   archived: ["true", "false"],
   direct_override: ["true", "false"],
+  artifact_layout: ["legacy", "docs"],
   classic_profile: PROFILES,
   classic_migration: ["1"]
 };
-var PATH_FIELDS = /* @__PURE__ */ new Set(["design_doc", "plan", "verification_report", "handoff_context"]);
+var PATH_FIELDS = /* @__PURE__ */ new Set([
+  "design_doc",
+  "plan",
+  "verification_report",
+  "handoff_context",
+  "openspec_root",
+  "superpowers_root"
+]);
 var CLASSIC_FIELD_WIRE_NAMES2 = {
   archived: "archived",
+  artifactLayout: "artifact_layout",
   branchStatus: "branch_status",
   classicProfile: "classic_profile",
   designDoc: "design_doc",
   language: "language",
+  openSpecRoot: "openspec_root",
   phase: "phase",
+  superpowersRoot: "superpowers_root",
   verificationReport: "verification_report",
   verifiedAt: "verified_at",
   verifyResult: "verify_result",
@@ -12995,6 +13029,9 @@ function sparseClassicState(record) {
     directOverride: nullableRecordBoolean(record, "direct_override"),
     handoffContext: nullableRecordString(record, "handoff_context"),
     handoffHash: nullableRecordString(record, "handoff_hash"),
+    artifactLayout: enumRecordValue(record, "artifact_layout", ["legacy", "docs"], null),
+    openSpecRoot: nullableRecordString(record, "openspec_root"),
+    superpowersRoot: nullableRecordString(record, "superpowers_root"),
     classicProfile: enumRecordValue(record, "classic_profile", PROFILES, workflow),
     classicMigration: typeof record.classic_migration === "number" ? record.classic_migration : null
   };
@@ -13151,6 +13188,7 @@ async function init(output, name, workflow) {
   await fs18.mkdir(directory, { recursive: true });
   const preset = workflow !== "full";
   const reviewMode = preset ? "off" : await reviewModeDefault();
+  const layout = await resolveCometArtifactLayout(process.cwd());
   const document = new import_yaml7.Document({
     workflow,
     language: await projectLanguageDefault(),
@@ -13172,7 +13210,10 @@ async function init(output, name, workflow) {
     branch_status: "pending",
     created_at: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10),
     verified_at: null,
-    archived: false
+    archived: false,
+    artifact_layout: layout.layout,
+    openspec_root: layout.layout === "docs" ? "docs" : null,
+    superpowers_root: "docs/superpowers"
   });
   await atomicWrite2(file, document.toString());
   output.stdout.push(green4(`Initialized: ${label}/.comet.yaml (workflow=${workflow})`));

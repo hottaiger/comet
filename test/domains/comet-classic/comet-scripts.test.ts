@@ -327,6 +327,24 @@ describe('comet scripts', () => {
     expect(get.stdout.trim()).toBe('zh-CN');
   }, 20_000);
 
+  it('snapshots docs artifact layout roots when initializing a change', async () => {
+    await writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\nsuperpowers:\n  root: docs/superpowers\n',
+    );
+
+    const result = runNode(tmpDir, stateScript, ['init', 'docs-layout-change', 'full']);
+    const yaml = await fs.readFile(
+      path.join(tmpDir, 'docs', 'openspec', 'changes', 'docs-layout-change', '.comet.yaml'),
+      'utf-8',
+    );
+
+    expect(result.status).toBe(0);
+    expect(yaml).toContain('artifact_layout: docs');
+    expect(yaml).toContain('openspec_root: docs');
+    expect(yaml).toContain('superpowers_root: docs/superpowers');
+  }, 20_000);
+
   it('rejects zh as an invalid project language when initializing a change', async () => {
     await writeFile(path.join(tmpDir, '.comet', 'config.yaml'), 'language: zh\n');
 

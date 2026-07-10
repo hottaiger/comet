@@ -1,5 +1,6 @@
 import type { RunState } from '../../domains/engine/types.js';
 import { runStateFromDocument, type StateDocument } from '../../domains/engine/state.js';
+import type { CometArtifactLayoutKind } from './classic-artifact-layout.js';
 
 export const CLASSIC_PROFILES = ['full', 'hotfix', 'tweak'] as const;
 export const CLASSIC_MIGRATION_VERSION = 1;
@@ -16,6 +17,7 @@ const ISOLATIONS = ['branch', 'worktree'] as const;
 const VERIFY_MODES = ['light', 'full'] as const;
 const VERIFY_RESULTS = ['pending', 'pass', 'fail'] as const;
 const BRANCH_STATUSES = ['pending', 'handled'] as const;
+const ARTIFACT_LAYOUTS = ['legacy', 'docs'] as const;
 
 export type ClassicProfile = (typeof CLASSIC_PROFILES)[number];
 export type ClassicPhase = (typeof PHASES)[number];
@@ -46,6 +48,9 @@ export interface ClassicState {
   directOverride: boolean | null;
   handoffContext: string | null;
   handoffHash: string | null;
+  artifactLayout: CometArtifactLayoutKind | null;
+  openSpecRoot: string | null;
+  superpowersRoot: string | null;
   classicProfile: ClassicProfile | null;
   classicMigration: number | null;
 }
@@ -81,6 +86,9 @@ export const CLASSIC_WIRE_KEYS = [
   'direct_override',
   'handoff_context',
   'handoff_hash',
+  'artifact_layout',
+  'openspec_root',
+  'superpowers_root',
   'classic_profile',
   'classic_migration',
 ] as const;
@@ -211,6 +219,9 @@ function classicStateFromDocument(doc: StateDocument): ClassicState | null {
     directOverride: booleanValue(doc, 'direct_override'),
     handoffContext: relativePath(doc, 'handoff_context'),
     handoffHash: sha256(doc, 'handoff_hash'),
+    artifactLayout: enumValue(doc, 'artifact_layout', ARTIFACT_LAYOUTS),
+    openSpecRoot: relativePath(doc, 'openspec_root'),
+    superpowersRoot: relativePath(doc, 'superpowers_root'),
     classicProfile: enumValue(doc, 'classic_profile', CLASSIC_PROFILES),
     classicMigration: migrationVersion(doc),
   };
@@ -298,6 +309,9 @@ export function classicStateToDocument(state: ClassicState): StateDocument {
     direct_override: state.directOverride,
     handoff_context: state.handoffContext,
     handoff_hash: state.handoffHash,
+    artifact_layout: state.artifactLayout,
+    openspec_root: state.openSpecRoot,
+    superpowers_root: state.superpowersRoot,
     classic_profile: state.classicProfile,
     classic_migration: state.classicMigration,
   };

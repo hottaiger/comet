@@ -5,6 +5,7 @@ import path from 'path';
 import { Document, parseDocument } from 'yaml';
 import type { ClassicCommandHandler, ClassicCommandResult } from './classic-cli.js';
 import { collectClassicEvidence } from './classic-evidence.js';
+import { resolveCometArtifactLayout } from './classic-artifact-layout.js';
 import { openSpecChangeNameError, resolveClassicChangeDirectory } from './classic-paths.js';
 import { resolveClassicStepId } from './classic-resolver.js';
 import { transitionClassicRuntimeRun } from './classic-runtime-run.js';
@@ -57,18 +58,29 @@ const FIELD_ENUMS: Record<string, readonly string[]> = {
   branch_status: ['pending', 'handled'],
   archived: ['true', 'false'],
   direct_override: ['true', 'false'],
+  artifact_layout: ['legacy', 'docs'],
   classic_profile: PROFILES,
   classic_migration: ['1'],
 };
 
-const PATH_FIELDS = new Set(['design_doc', 'plan', 'verification_report', 'handoff_context']);
+const PATH_FIELDS = new Set([
+  'design_doc',
+  'plan',
+  'verification_report',
+  'handoff_context',
+  'openspec_root',
+  'superpowers_root',
+]);
 const CLASSIC_FIELD_WIRE_NAMES: Partial<Record<keyof ClassicState, string>> = {
   archived: 'archived',
+  artifactLayout: 'artifact_layout',
   branchStatus: 'branch_status',
   classicProfile: 'classic_profile',
   designDoc: 'design_doc',
   language: 'language',
+  openSpecRoot: 'openspec_root',
   phase: 'phase',
+  superpowersRoot: 'superpowers_root',
   verificationReport: 'verification_report',
   verifiedAt: 'verified_at',
   verifyResult: 'verify_result',
@@ -282,6 +294,9 @@ function sparseClassicState(record: Record<string, unknown>): ClassicState {
     directOverride: nullableRecordBoolean(record, 'direct_override'),
     handoffContext: nullableRecordString(record, 'handoff_context'),
     handoffHash: nullableRecordString(record, 'handoff_hash'),
+    artifactLayout: enumRecordValue(record, 'artifact_layout', ['legacy', 'docs'] as const, null),
+    openSpecRoot: nullableRecordString(record, 'openspec_root'),
+    superpowersRoot: nullableRecordString(record, 'superpowers_root'),
     classicProfile: enumRecordValue(record, 'classic_profile', PROFILES, workflow),
     classicMigration:
       typeof record.classic_migration === 'number' ? record.classic_migration : null,
@@ -469,6 +484,7 @@ async function init(output: CommandOutput, name: string, workflow: string): Prom
 
   const preset = workflow !== 'full';
   const reviewMode = preset ? 'off' : await reviewModeDefault();
+  const layout = await resolveCometArtifactLayout(process.cwd());
   const document = new Document({
     workflow,
     language: await projectLanguageDefault(),
@@ -491,6 +507,9 @@ async function init(output: CommandOutput, name: string, workflow: string): Prom
     created_at: new Date().toISOString().slice(0, 10),
     verified_at: null,
     archived: false,
+    artifact_layout: layout.layout,
+    openspec_root: layout.layout === 'docs' ? 'docs' : null,
+    superpowers_root: 'docs/superpowers',
   });
   await atomicWrite(file, document.toString());
   output.stdout.push(green(`Initialized: ${label}/.comet.yaml (workflow=${workflow})`));

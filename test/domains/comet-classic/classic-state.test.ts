@@ -6,7 +6,10 @@ import {
   readClassicState,
   writeClassicState,
 } from '../../../domains/comet-classic/classic-store.js';
-import type { ClassicState } from '../../../domains/comet-classic/classic-state.js';
+import {
+  parseClassicStateDocument,
+  type ClassicState,
+} from '../../../domains/comet-classic/classic-state.js';
 import type { RunState } from '../../../domains/engine/types.js';
 
 function classicState(): ClassicState {
@@ -35,6 +38,9 @@ function classicState(): ClassicState {
     directOverride: true,
     handoffContext: '.comet/handoff/context.json',
     handoffHash: 'b'.repeat(64),
+    artifactLayout: 'docs',
+    openSpecRoot: 'docs',
+    superpowersRoot: 'docs/superpowers',
     classicProfile: 'full',
     classicMigration: 1,
   };
@@ -104,6 +110,48 @@ describe('Classic state projection', () => {
     expect(projection.run).toEqual(runState());
   });
 
+  it('parses docs layout snapshot fields', () => {
+    const projection = parseClassicStateDocument({
+      workflow: 'full',
+      phase: 'open',
+      design_doc: null,
+      plan: null,
+      build_mode: null,
+      isolation: null,
+      verify_mode: null,
+      verify_result: 'pending',
+      verified_at: null,
+      archived: false,
+      artifact_layout: 'docs',
+      openspec_root: 'docs',
+      superpowers_root: 'docs/superpowers',
+    });
+
+    expect(projection.classic?.artifactLayout).toBe('docs');
+    expect(projection.classic?.openSpecRoot).toBe('docs');
+    expect(projection.classic?.superpowersRoot).toBe('docs/superpowers');
+  });
+
+  it('rejects invalid layout snapshot paths', () => {
+    expect(() =>
+      parseClassicStateDocument({
+        workflow: 'full',
+        phase: 'open',
+        design_doc: null,
+        plan: null,
+        build_mode: null,
+        isolation: null,
+        verify_mode: null,
+        verify_result: 'pending',
+        verified_at: null,
+        archived: false,
+        artifact_layout: 'docs',
+        openspec_root: '../docs',
+        superpowers_root: 'docs/superpowers',
+      }),
+    ).toThrow(/openspec_root must be a relative repository path/);
+  });
+
   it('preserves comments and unknown top-level fields across atomic writes', async () => {
     await fs.writeFile(
       stateFile,
@@ -148,6 +196,7 @@ describe('Classic state projection', () => {
     ['verify_mode', 'medium'],
     ['verify_result', 'maybe'],
     ['branch_status', 'open'],
+    ['artifact_layout', 'future'],
     ['classic_profile', 'other'],
   ])('rejects invalid %s values', async (field, value) => {
     await writeClassicState(changeDir, { classic: classicState(), run: runState() });
