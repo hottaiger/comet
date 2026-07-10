@@ -1792,8 +1792,12 @@ describe('skills', () => {
       const start = content.indexOf(heading);
       expect(start, `missing heading ${heading}`).toBeGreaterThanOrEqual(0);
 
+      const headingLevelMatch = heading.match(/^(#+)\s/u);
+      expect(headingLevelMatch, `invalid heading ${heading}`).not.toBeNull();
+      const headingLevel = headingLevelMatch?.[1].length ?? 1;
       const rest = content.slice(start + heading.length);
-      const nextHeadingOffset = rest.search(/\n##?\s+/);
+      const nextHeadingPattern = new RegExp(`\\n#{1,${headingLevel}}\\s+`, 'u');
+      const nextHeadingOffset = rest.search(nextHeadingPattern);
       if (nextHeadingOffset === -1) {
         return rest;
       }
@@ -1839,6 +1843,8 @@ describe('skills', () => {
       const zhCommands = executableBlock(zhStep2);
       const enCommands = executableBlock(enStep2);
 
+      expect(zhStep2).not.toContain('### 3. 生命周期闭环');
+      expect(enStep2).not.toContain('### 3. Lifecycle Closed Loop');
       expect(zhCommands.trim()).toBe('node "$COMET_ARCHIVE" "<change-name>"');
       expect(enCommands.trim()).toBe('node "$COMET_ARCHIVE" "<change-name>"');
       expect(zhStep2).toContain('不要单独再执行一次');
