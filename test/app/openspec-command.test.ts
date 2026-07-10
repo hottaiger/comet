@@ -9,6 +9,7 @@ vi.mock('child_process', () => ({
 
 import { spawnSync } from 'child_process';
 import { openspecCommand } from '../../app/commands/openspec.js';
+import { quoteArgsForShell } from '../../platform/process/shell-quote.js';
 
 const roots: string[] = [];
 let stdoutWrite: ReturnType<typeof vi.spyOn>;
@@ -72,6 +73,27 @@ describe('openspecCommand', () => {
       'openspec',
       ['list'],
       expect.objectContaining({ cwd: path.join(root, 'docs'), encoding: 'utf8' }),
+    );
+  });
+
+  it('quotes spaced args on Windows when using shell execution', async () => {
+    const root = await tempProject();
+    const platformSpy = vi.spyOn(process, 'platform', 'get').mockReturnValue('win32');
+
+    try {
+      await openspecCommand(root, ['status', '--change', 'add auth'], {});
+    } finally {
+      platformSpy.mockRestore();
+    }
+
+    expect(spawnSync).toHaveBeenCalledWith(
+      'openspec',
+      quoteArgsForShell(['status', '--change', 'add auth']),
+      expect.objectContaining({
+        cwd: root,
+        encoding: 'utf8',
+        shell: true,
+      }),
     );
   });
 

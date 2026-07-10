@@ -1,6 +1,7 @@
 import { spawnSync } from 'child_process';
 import path from 'path';
 import { resolveCometArtifactLayout } from '../../domains/comet-classic/classic-artifact-layout.js';
+import { quoteArgsForShell } from '../../platform/process/shell-quote.js';
 
 interface OpenSpecFacadeOptions {
   json?: boolean;
@@ -13,11 +14,13 @@ export async function openspecCommand(
 ): Promise<void> {
   const projectRoot = path.resolve(targetPath);
   const layout = await resolveCometArtifactLayout(projectRoot);
+  const useShell = process.platform === 'win32';
   const commandArgs = [...args, ...layout.openSpec.commandArgs];
-  const result = spawnSync(process.env.COMET_OPENSPEC || 'openspec', commandArgs, {
+  const shellArgs = useShell ? quoteArgsForShell(commandArgs) : commandArgs;
+  const result = spawnSync(process.env.COMET_OPENSPEC || 'openspec', shellArgs, {
     cwd: layout.openSpec.commandCwd,
     encoding: 'utf8',
-    shell: process.platform === 'win32',
+    shell: useShell,
   });
 
   if (!options.json && layout.layout === 'docs') {
