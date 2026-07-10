@@ -7592,11 +7592,15 @@ function nestedString(record, key, nested) {
   const nestedValue = value[nested];
   return typeof nestedValue === "string" && nestedValue.trim() ? nestedValue.trim() : void 0;
 }
-function safeRelativePath(value, fallback) {
+function relativeRepositoryPath(value, fallback, field2) {
   if (!value) return fallback;
-  if (/^(?:[A-Za-z]:|[\\/]|~)/u.test(value)) return fallback;
-  if (value.split(/[\\/]/u).includes("..")) return fallback;
-  return value.replaceAll("\\", "/").replace(/^\/+/u, "").replace(/\/+$/u, "");
+  if (/^(?:[A-Za-z]:|[\\/]|~)/u.test(value)) {
+    throw new Error(`${field2} must be a relative repository path: ${value}`);
+  }
+  if (value.split(/[\\/]/u).includes("..")) {
+    throw new Error(`${field2} must be a relative repository path: ${value}`);
+  }
+  return value.replaceAll("\\", "/").replace(/^\/+/u, "").replace(/\/+$/u, "") || fallback;
 }
 async function isHealthyOpenSpecRoot(projectRoot, storeRootRelative) {
   const storeRoot = path.join(projectRoot, ...storeRootRelative.split("/").filter(Boolean));
@@ -7624,22 +7628,32 @@ async function configuredLayout(projectRoot) {
   const layout = rawLayout === "docs" || rawLayout === "legacy" ? rawLayout : void 0;
   return {
     layout,
-    openspecRoot: safeRelativePath(
+    openspecRoot: relativeRepositoryPath(
       nestedString(config, "openspec", "root"),
-      layout === "docs" ? "docs" : "."
+      layout === "docs" ? "docs" : ".",
+      "openspec.root"
     ),
     openspecStore: nestedString(config, "openspec", "store"),
-    superpowersRoot: safeRelativePath(
+    superpowersRoot: relativeRepositoryPath(
       nestedString(config, "superpowers", "root"),
-      "docs/superpowers"
+      "docs/superpowers",
+      "superpowers.root"
     )
   };
 }
 function buildLayout(projectRoot, layout, options = {}) {
-  const openspecRoot = safeRelativePath(options.openspecRoot, layout === "docs" ? "docs" : ".");
+  const openspecRoot = relativeRepositoryPath(
+    options.openspecRoot,
+    layout === "docs" ? "docs" : ".",
+    "openspec.root"
+  );
   const storeRoot = openspecRoot === "." ? projectRoot : path.join(projectRoot, ...openspecRoot.split("/").filter(Boolean));
   const artifactRoot = path.join(storeRoot, "openspec");
-  const superpowersRootRelative = safeRelativePath(options.superpowersRoot, "docs/superpowers");
+  const superpowersRootRelative = relativeRepositoryPath(
+    options.superpowersRoot,
+    "docs/superpowers",
+    "superpowers.root"
+  );
   const superpowersRoot = path.join(
     projectRoot,
     ...superpowersRootRelative.split("/").filter(Boolean)
@@ -7670,7 +7684,11 @@ function canonicalOpenSpecRoot(layout) {
 }
 function explicitLayoutOptions(layout, configured) {
   const canonicalRoot = canonicalOpenSpecRoot(layout);
-  const configuredRoot = safeRelativePath(configured.openspecRoot, canonicalRoot);
+  const configuredRoot = relativeRepositoryPath(
+    configured.openspecRoot,
+    canonicalRoot,
+    "openspec.root"
+  );
   const rootIsCompatible = configuredRoot === canonicalRoot;
   return {
     openspecRoot: rootIsCompatible ? configuredRoot : canonicalRoot,

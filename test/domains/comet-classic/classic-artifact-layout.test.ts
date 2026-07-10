@@ -93,6 +93,34 @@ describe('resolveCometArtifactLayout', () => {
     });
   });
 
+  it('rejects path traversal in configured artifact roots', async () => {
+    const root = await tempProject();
+    await mkdir(path.join(root, '.comet'), { recursive: true });
+    await writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: ../docs\nsuperpowers:\n  root: docs/superpowers\n',
+      'utf8',
+    );
+
+    await expect(resolveCometArtifactLayout(root)).rejects.toThrow(
+      /openspec\.root must be a relative repository path/i,
+    );
+  });
+
+  it('rejects absolute configured Superpowers roots', async () => {
+    const root = await tempProject();
+    await mkdir(path.join(root, '.comet'), { recursive: true });
+    await writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\nsuperpowers:\n  root: /tmp/superpowers\n',
+      'utf8',
+    );
+
+    await expect(resolveCometArtifactLayout(root)).rejects.toThrow(
+      /superpowers\.root must be a relative repository path/i,
+    );
+  });
+
   it('detects docs layout from healthy docs/openspec when local config is absent', async () => {
     const root = await tempProject();
     await healthyOpenSpecRoot(root, 'docs');
