@@ -35,7 +35,7 @@ Design 阶段                                    Build 阶段
 
 ### 压缩产物
 
-handoff context 是一个 JSON 文件，存储在 `openspec/changes/<name>/.comet/handoff/design-context.json`，包含：
+handoff context 是一个 JSON 文件，存储在 `<openspec-change-dir>/.comet/handoff/design-context.json`。先通过 `comet openspec status --change "<name>" --json` 读取 `changeRoot`；它可能位于 legacy 或 docs layout。该文件包含：
 
 - Design Doc 的完整内容
 - Spec 内容（off 模式为全文，beta 模式为 hash 引用）

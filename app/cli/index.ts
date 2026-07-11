@@ -145,6 +145,9 @@ program
   .option('--project <dir>', 'Project root used for layout resolution', '.')
   .action(async (args: string[] = [], options) => {
     const forwardedArgs = args.filter((arg) => arg !== '--');
+    if (options.json && !forwardedArgs.includes('--json')) {
+      forwardedArgs.push('--json');
+    }
     await openspecCommand(options.project, forwardedArgs, options);
   });
 
@@ -153,7 +156,7 @@ const migrate = program.command('migrate').description('Migrate Comet project ar
 migrate
   .command('docs [path]')
   .description('Migrate legacy OpenSpec artifacts into docs layout')
-  .option('--dry-run', 'Preview migration without changing files', true)
+  .option('--dry-run', 'Preview migration without changing files')
   .option('--apply', 'Apply the migration')
   .option('--repair-store', 'Repair or register the OpenSpec store for docs layout')
   .option('--include-active', 'Allow active changes to be migrated after review')

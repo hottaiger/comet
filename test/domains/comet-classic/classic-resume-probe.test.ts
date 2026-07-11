@@ -140,6 +140,8 @@ describe('resolveCometResumeProbe', () => {
       'schema: spec-driven\n',
       'utf8',
     );
+    await fs.mkdir(path.join(root, '.comet', 'handoff'), { recursive: true });
+    await fs.writeFile(path.join(root, '.comet', 'handoff', 'design-context.json'), '{}\n', 'utf8');
     await fs.writeFile(
       path.join(root, '.comet.yaml'),
       [
@@ -156,6 +158,8 @@ describe('resolveCometResumeProbe', () => {
         'artifact_layout: docs',
         'openspec_root: docs',
         'superpowers_root: docs/superpowers',
+        'handoff_context: docs/openspec/changes/add-auth/.comet/handoff/design-context.json',
+        `handoff_hash: "${'0'.repeat(64)}"`,
         '',
       ].join('\n'),
       'utf8',
@@ -170,6 +174,44 @@ describe('resolveCometResumeProbe', () => {
 
     expect(result.action).toBe('auto_resume');
     expect(result.changeName).toBe('add-auth');
+  });
+
+  it('does not auto-resume a migrated docs change until its handoff is rebuilt', async () => {
+    const docsState = [
+      ...buildYaml.trimEnd().split('\n'),
+      'artifact_layout: docs',
+      'openspec_root: docs',
+      'superpowers_root: docs/superpowers',
+      '',
+    ].join('\n');
+    await createDocsLayoutChange('migrated-change', docsState);
+
+    const result = await resolveCometResumeProbe(tmpDir, {
+      schema_version: 'comet.resume_probe.v1',
+      utterance: '继续 migrated-change',
+      agent_context: { non_trivial_work: true, already_in_comet_flow: false },
+    });
+
+    expect(result).toMatchObject({
+      action: 'ask_user',
+      changeName: 'migrated-change',
+    });
+  });
+
+  it('asks the user when explicit docs config still has an active legacy change', async () => {
+    await createDocsLayoutChange('docs-change', buildYaml);
+    await createChange('legacy-change', buildYaml);
+
+    const result = await resolveCometResumeProbe(tmpDir, {
+      schema_version: 'comet.resume_probe.v1',
+      utterance: '继续',
+      agent_context: { non_trivial_work: true, already_in_comet_flow: false },
+    });
+
+    expect(result).toMatchObject({
+      action: 'ask_user',
+      reason: 'multiple artifact layouts contain active changes',
+    });
   });
 
   it('does not rewrite legacy command fields while probing', async () => {
@@ -344,22 +386,53 @@ describe('resolveCometResumeProbe', () => {
   });
 
   it('includes docs layout repo evidence when auto-resuming a named change among multiple active changes', async () => {
-    const docsBuildYaml = [
-      ...buildYaml.trimEnd().split('\n'),
-      'artifact_layout: docs',
-      'openspec_root: docs',
-      'superpowers_root: docs/superpowers',
-      '',
-    ].join('\n');
-    await createDocsLayoutChange('add-auth', docsBuildYaml);
+    const docsBuildYaml = (name: string) =>
+      [
+        ...buildYaml.trimEnd().split('\n'),
+        'artifact_layout: docs',
+        'openspec_root: docs',
+        'superpowers_root: docs/superpowers',
+        `handoff_context: docs/openspec/changes/${name}/.comet/handoff/design-context.json`,
+        `handoff_hash: "${'0'.repeat(64)}"`,
+        '',
+      ].join('\n');
+    await createDocsLayoutChange('add-auth', docsBuildYaml('add-auth'));
     await createDocsLayoutChange(
       'add-billing',
-      docsBuildYaml.replace('cache-ttl', 'billing').replace('Update cache ttl', 'Ship billing'),
+      docsBuildYaml('add-billing')
+        .replace('cache-ttl', 'billing')
+        .replace('Update cache ttl', 'Ship billing'),
       {
         'proposal.md': 'Add billing flow\n',
         'design.md': 'Billing flow design\n',
         'tasks.md': '- [ ] Ship billing flow\n',
       },
+    );
+    await writeFile(
+      path.join(
+        tmpDir,
+        'docs',
+        'openspec',
+        'changes',
+        'add-auth',
+        '.comet',
+        'handoff',
+        'design-context.json',
+      ),
+      '{}\n',
+    );
+    await writeFile(
+      path.join(
+        tmpDir,
+        'docs',
+        'openspec',
+        'changes',
+        'add-billing',
+        '.comet',
+        'handoff',
+        'design-context.json',
+      ),
+      '{}\n',
     );
 
     const result = await resolveCometResumeProbe(tmpDir, {

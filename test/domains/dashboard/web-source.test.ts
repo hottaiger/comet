@@ -35,4 +35,11 @@ describe('dashboard web source contracts', () => {
       "const nextPhase = change.phase === 'verify' ? '归档' : 'Verify';",
     );
   });
+
+  it('renders the layout-aware path supplied by the collector', async () => {
+    const source = await readDashboardSource();
+
+    expect(source).toContain('function relativeChangePath(change) {\n  return change.path;\n}');
+    expect(source).not.toContain('`openspec/changes/archive/${change.name}`');
+  });
 });

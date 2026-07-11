@@ -1,4 +1,5 @@
 import { execFileSync } from 'child_process';
+import { createHash } from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -42,16 +43,6 @@ function buildOpenSpecInitInvocation(
   return { command: 'openspec', args };
 }
 
-function buildOpenSpecStoreSetupInvocation(
-  projectPath: string,
-  storeId: string,
-): { command: string; args: string[] } {
-  return {
-    command: 'openspec',
-    args: ['store', 'setup', storeId, '--path', path.join(projectPath, 'docs'), '--no-init-git'],
-  };
-}
-
 function buildOpenSpecStoreRegisterInvocation(
   projectPath: string,
   storeId: string,
@@ -62,27 +53,216 @@ function buildOpenSpecStoreRegisterInvocation(
   };
 }
 
-function runOpenSpecInvocation(invocation: { command: string; args: string[] }, cwd: string): void {
+function runOpenSpecInvocation(
+  invocation: { command: string; args: string[] },
+  cwd: string,
+  options: { json?: boolean } = {},
+): void {
   const useShell = process.platform === 'win32';
-  execFileSync(
-    invocation.command,
-    useShell ? quoteArgsForShell(invocation.args) : invocation.args,
-    {
-      cwd,
-      stdio: ['inherit', 'inherit', 'pipe'],
-      timeout: 120_000,
-      shell: useShell,
-    },
-  );
+  const args = options.json ? [...invocation.args, '--json'] : invocation.args;
+  execFileSync(invocation.command, useShell ? quoteArgsForShell(args) : args, {
+    cwd,
+    stdio: options.json ? ['ignore', 'pipe', 'pipe'] : ['inherit', 'inherit', 'pipe'],
+    timeout: 120_000,
+    shell: useShell,
+  });
 }
 
-function configureOpenSpecStore(projectPath: string, storeId: string): 'installed' | 'failed' {
+function configureOpenSpecStore(
+  projectPath: string,
+  storeId: string,
+  options: { json?: boolean; command?: string } = {},
+): 'installed' | 'failed' {
   try {
-    runOpenSpecInvocation(buildOpenSpecStoreSetupInvocation(projectPath, storeId), projectPath);
-    runOpenSpecInvocation(buildOpenSpecStoreRegisterInvocation(projectPath, storeId), projectPath);
+    const invocation = buildOpenSpecStoreRegisterInvocation(projectPath, storeId);
+    invocation.command = options.command ?? process.env.COMET_OPENSPEC ?? invocation.command;
+    runOpenSpecInvocation(invocation, projectPath, options);
     return 'installed';
   } catch (error) {
     console.error(`    OpenSpec store configuration failed: ${(error as Error).message}`);
+    printCommandErrorDetails(error);
+    return 'failed';
+  }
+}
+
+function relocateGeneratedOpenSpecRoot(projectPath: string): void {
+  const legacyRoot = path.join(projectPath, 'openspec');
+  if (!fs.existsSync(legacyRoot)) return;
+
+  const docsRoot = path.join(projectPath, 'docs', 'openspec');
+  if (fs.existsSync(docsRoot)) {
+    fs.rmSync(legacyRoot, { recursive: true, force: true });
+    return;
+  }
+  fs.mkdirSync(path.dirname(docsRoot), { recursive: true });
+  fs.renameSync(legacyRoot, docsRoot);
+}
+
+interface OpenSpecStoreListOutput {
+  stores?: Array<{
+    id?: unknown;
+    root?: unknown;
+  }>;
+}
+
+function normalizeStorePath(targetPath: string): string {
+  const resolved = path.resolve(targetPath);
+  try {
+    return fs.realpathSync.native?.(resolved) ?? fs.realpathSync(resolved);
+  } catch {
+    return resolved;
+  }
+}
+
+function isOpenSpecStoreRoot(projectPath: string, registeredRoot: string): boolean {
+  const expectedRoot = normalizeStorePath(path.join(projectPath, 'docs'));
+  const actualRoot = normalizeStorePath(registeredRoot);
+  return process.platform === 'win32'
+    ? actualRoot.toLowerCase() === expectedRoot.toLowerCase()
+    : actualRoot === expectedRoot;
+}
+
+function createOpenSpecStoreId(projectPath: string): string {
+  const canonicalProjectPath = normalizeStorePath(projectPath);
+  const projectSlug = path
+    .basename(canonicalProjectPath)
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const shortHash = createHash('sha256').update(canonicalProjectPath).digest('hex').slice(0, 8);
+  return `comet-${projectSlug || 'project'}-${shortHash}`;
+}
+
+function readOpenSpecStoreList(projectPath: string, command: string): OpenSpecStoreListOutput {
+  const invocation = { command, args: ['store', 'list', '--json'] };
+  const useShell = process.platform === 'win32';
+  const output = execFileSync(
+    invocation.command,
+    useShell ? quoteArgsForShell(invocation.args) : invocation.args,
+    {
+      cwd: projectPath,
+      env: { ...process.env, OPENSPEC_TELEMETRY: '0' },
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 30_000,
+      shell: useShell,
+    },
+  );
+
+  try {
+    const parsed = JSON.parse(String(output)) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('expected a JSON object');
+    }
+    return parsed as OpenSpecStoreListOutput;
+  } catch (error) {
+    throw new Error(
+      `Unable to verify the configured OpenSpec store: openspec store list --json returned invalid JSON (${(error as Error).message}).`,
+      { cause: error },
+    );
+  }
+}
+
+function assertOpenSpecStoreRegistration(
+  projectPath: string,
+  storeId: string,
+  command = process.env.COMET_OPENSPEC || 'openspec',
+): void {
+  const store = readOpenSpecStoreList(projectPath, command).stores?.find(
+    (entry) => entry.id === storeId,
+  );
+  if (typeof store?.root !== 'string' || store.root.trim().length === 0) {
+    throw new Error(
+      `Configured OpenSpec store '${storeId}' is not registered. Run comet init --artifact-layout docs --openspec-store ${storeId} to register this project.`,
+    );
+  }
+
+  const expectedRoot = normalizeStorePath(path.join(projectPath, 'docs'));
+  const registeredRoot = normalizeStorePath(store.root);
+  if (!isOpenSpecStoreRoot(projectPath, store.root)) {
+    throw new Error(
+      `Configured OpenSpec store '${storeId}' registry path does not match this project's docs directory: expected ${expectedRoot}, got ${registeredRoot}.`,
+    );
+  }
+}
+
+interface OpenSpecDoctorOutput {
+  root?: { path?: unknown; healthy?: unknown };
+  store?: { id?: unknown; metadata?: { present?: unknown; valid?: unknown } };
+  status?: Array<{ severity?: unknown; message?: unknown }>;
+}
+
+function assertOpenSpecStoreHealth(
+  projectPath: string,
+  storeId: string,
+  command = process.env.COMET_OPENSPEC || 'openspec',
+): void {
+  assertOpenSpecStoreRegistration(projectPath, storeId, command);
+  const useShell = process.platform === 'win32';
+  let parsed: OpenSpecDoctorOutput;
+  try {
+    const args = ['doctor', '--store', storeId, '--json'];
+    const output = execFileSync(command, useShell ? quoteArgsForShell(args) : args, {
+      cwd: projectPath,
+      env: { ...process.env, OPENSPEC_TELEMETRY: '0' },
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 30_000,
+      shell: useShell,
+    });
+    parsed = JSON.parse(String(output)) as OpenSpecDoctorOutput;
+  } catch (error) {
+    throw new Error(
+      `Configured OpenSpec store '${storeId}' failed OpenSpec health validation: ${(error as Error).message}`,
+      { cause: error },
+    );
+  }
+  const errors = (parsed.status ?? []).filter((entry) => entry.severity === 'error');
+  if (
+    parsed.root?.healthy !== true ||
+    typeof parsed.root.path !== 'string' ||
+    !isOpenSpecStoreRoot(projectPath, parsed.root.path) ||
+    parsed.store?.id !== storeId ||
+    parsed.store.metadata?.present !== true ||
+    parsed.store.metadata.valid !== true ||
+    errors.length > 0
+  ) {
+    const details = errors
+      .map((entry) => (typeof entry.message === 'string' ? entry.message : 'unknown error'))
+      .join('; ');
+    throw new Error(
+      `Configured OpenSpec store '${storeId}' is unhealthy${details ? `: ${details}` : '.'}`,
+    );
+  }
+}
+
+function getOpenSpecStoreRoot(
+  projectPath: string,
+  storeId: string,
+  command = process.env.COMET_OPENSPEC || 'openspec',
+): string | undefined {
+  const store = readOpenSpecStoreList(projectPath, command).stores?.find(
+    (entry) => entry.id === storeId,
+  );
+  return typeof store?.root === 'string' && store.root.trim() ? store.root : undefined;
+}
+
+function unregisterOpenSpecStore(
+  projectPath: string,
+  storeId: string,
+): 'unregistered' | 'skipped' | 'failed' {
+  try {
+    const command = process.env.COMET_OPENSPEC || 'openspec';
+    const registeredRoot = getOpenSpecStoreRoot(projectPath, storeId, command);
+    const expectedRoot = normalizeStorePath(path.join(projectPath, 'docs'));
+    if (!registeredRoot || normalizeStorePath(registeredRoot) !== expectedRoot) {
+      return 'skipped';
+    }
+    runOpenSpecInvocation({ command, args: ['store', 'unregister', storeId] }, projectPath);
+    return 'unregistered';
+  } catch (error) {
+    console.error(`    OpenSpec store rollback failed: ${(error as Error).message}`);
     printCommandErrorDetails(error);
     return 'failed';
   }
@@ -206,9 +386,13 @@ async function ensureOpenSpecCli(
   _scope: InstallScope,
   projectPath: string,
   shouldInstall = true,
+  requireStoreSupport = false,
+  quiet = false,
 ): Promise<'ready' | 'missing' | 'failed'> {
   const alreadyInstalled = isCommandAvailable('openspec');
-  if (!shouldInstall) {
+  const supportsStores = !requireStoreSupport || (alreadyInstalled && openSpecStoreCliSupported());
+  const mustInstall = shouldInstall || (requireStoreSupport && !supportsStores);
+  if (!mustInstall) {
     return alreadyInstalled ? 'ready' : 'missing';
   }
   const label = alreadyInstalled ? 'Upgrading' : 'Installing';
@@ -217,13 +401,14 @@ async function ensureOpenSpecCli(
     const npmArgs = ['install', '-g', '@fission-ai/openspec@latest'];
     execFileSync(getNpmExecutable(), npmArgs, {
       cwd: os.homedir() || projectPath,
-      stdio: 'inherit',
+      stdio: quiet ? ['ignore', 'ignore', 'pipe'] : 'inherit',
       timeout: 120_000,
       shell: process.platform === 'win32',
     });
-    return isCommandAvailable('openspec') ? 'ready' : 'failed';
+    if (!isCommandAvailable('openspec')) return 'failed';
+    return !requireStoreSupport || openSpecStoreCliSupported() ? 'ready' : 'failed';
   } catch (error) {
-    if (alreadyInstalled) {
+    if (alreadyInstalled && (!requireStoreSupport || supportsStores)) {
       console.warn(
         `    OpenSpec upgrade failed, using existing version: ${(error as Error).message}`,
       );
@@ -232,6 +417,29 @@ async function ensureOpenSpecCli(
     console.error(`    Failed to install OpenSpec CLI: ${(error as Error).message}`);
     printCommandErrorDetails(error);
     return 'failed';
+  }
+}
+
+function openSpecStoreCliSupported(command = process.env.COMET_OPENSPEC || 'openspec'): boolean {
+  try {
+    const useShell = process.platform === 'win32';
+    const args = ['store', '--help'];
+    execFileSync(command, useShell ? quoteArgsForShell(args) : args, {
+      stdio: 'ignore',
+      timeout: 10_000,
+      shell: useShell,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function assertOpenSpecStoreCliSupport(command = process.env.COMET_OPENSPEC || 'openspec'): void {
+  if (!openSpecStoreCliSupported(command)) {
+    throw new Error(
+      'Docs artifact layout requires OpenSpec 1.5 or newer with store support. Upgrade with: npm install -g @fission-ai/openspec@latest',
+    );
   }
 }
 
@@ -357,8 +565,16 @@ async function installOpenSpec(
   scope: InstallScope,
   shouldInstallCli = true,
   mirrorOpenCodePlatformIds: string[] = [],
+  relocateProjectRootToDocs = false,
+  quiet = false,
 ): Promise<'installed' | 'failed' | 'skipped'> {
-  const cliStatus = await ensureOpenSpecCli(scope, projectPath, shouldInstallCli);
+  const cliStatus = await ensureOpenSpecCli(
+    scope,
+    projectPath,
+    shouldInstallCli,
+    relocateProjectRootToDocs,
+    quiet,
+  );
   if (cliStatus === 'failed') {
     console.error(
       `    OpenSpec CLI not available. Install manually: npm install -g @fission-ai/openspec@latest`,
@@ -376,6 +592,9 @@ async function installOpenSpec(
 
   let configHome: string | undefined;
   let configBackup: ConfigBackup | null = null;
+  const generatedLegacyRoot = path.join(projectPath, 'openspec');
+  const shouldRelocateGeneratedRoot =
+    relocateProjectRootToDocs && !fs.existsSync(generatedLegacyRoot);
   try {
     const openspecEnv = createOpenSpecAllWorkflowsEnv();
     configHome = openspecEnv.configHome;
@@ -394,7 +613,7 @@ async function installOpenSpec(
       execFileSync(invocation.command, initArgs, {
         cwd: projectPath,
         env: openspecEnv.env,
-        stdio: ['inherit', 'inherit', 'pipe'],
+        stdio: quiet ? ['ignore', 'ignore', 'pipe'] : ['inherit', 'inherit', 'pipe'],
         timeout: 120_000,
         shell: useShell,
       });
@@ -415,13 +634,17 @@ async function installOpenSpec(
         execFileSync(fallbackInvocation.command, fallbackArgs, {
           cwd: projectPath,
           env: openspecEnv.env,
-          stdio: 'inherit',
+          stdio: quiet ? ['ignore', 'ignore', 'pipe'] : 'inherit',
           timeout: 120_000,
           shell: useShell,
         });
       } else {
         throw firstError;
       }
+    }
+
+    if (shouldRelocateGeneratedRoot) {
+      relocateGeneratedOpenSpecRoot(projectPath);
     }
 
     const openspecWritesGlobal = scope === 'global';
@@ -454,8 +677,15 @@ export {
   installOpenSpec,
   isCommandAvailable,
   configureOpenSpecStore,
+  assertOpenSpecStoreRegistration,
+  assertOpenSpecStoreHealth,
+  assertOpenSpecStoreCliSupport,
+  openSpecStoreCliSupported,
+  getOpenSpecStoreRoot,
+  isOpenSpecStoreRoot,
+  createOpenSpecStoreId,
+  unregisterOpenSpecStore,
   buildOpenSpecInitInvocation,
-  buildOpenSpecStoreSetupInvocation,
   buildOpenSpecStoreRegisterInvocation,
   getNpmExecutable,
   migrateOpenCodeOpenSpecPaths,

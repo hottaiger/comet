@@ -56,6 +56,29 @@ describe('status command', () => {
     expect(output).toContain('run_step: full.build.plan');
   });
 
+  it('finds active changes in the configured docs OpenSpec root', async () => {
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      ['artifact_layout: docs', 'openspec:', '  root: docs', ''].join('\n'),
+    );
+    const changeDir = path.join(tmpDir, 'docs', 'openspec', 'changes', 'docs-change');
+    state(tmpDir, 'init', 'docs-change', 'full');
+    await fs.writeFile(path.join(changeDir, 'proposal.md'), '# Proposal\n');
+    await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [ ] build\n');
+
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let json = '';
+    try {
+      await statusCommand(tmpDir, { json: true });
+      json = log.mock.calls.map((call) => call.join(' ')).join('\n');
+    } finally {
+      log.mockRestore();
+    }
+
+    expect(JSON.parse(json).changes).toEqual([expect.objectContaining({ name: 'docs-change' })]);
+  });
+
   it('silently migrates legacy state and includes the Run step in JSON output', async () => {
     const changeDir = path.join(tmpDir, 'openspec', 'changes', 'next-verify');
     state(tmpDir, 'init', 'next-verify', 'full');

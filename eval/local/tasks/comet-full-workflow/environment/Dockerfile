@@ -16,8 +16,18 @@ RUN pip install --no-cache-dir pyyaml
 # OpenSpec CLI (comet drives openspec new/list/status/archive).
 # Use npmmirror for reproducible builds behind GFW.
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install -g @fission-ai/openspec@1.3.1 && \
+    npm install -g @fission-ai/openspec@1.5.0 && \
     npm config delete registry
+
+# The live docs-layout treatment exercises Comet's OpenSpec command boundary.
+# Frozen 039/040 Skills continue to call openspec directly and are unaffected.
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'if [ "$1" != "openspec" ]; then echo "eval comet wrapper only supports: comet openspec" >&2; exit 2; fi' \
+    'shift' \
+    'cd /workspace/docs' \
+    'exec openspec "$@"' \
+    > /usr/local/bin/comet && chmod +x /usr/local/bin/comet
 
 # Claude Code CLI (the agent runtime; version overridable via BENCH_CC_VERSION).
 ARG CLAUDE_CODE_VERSION=latest
@@ -35,6 +45,10 @@ COPY test_wordcount.py /workspace/test_wordcount.py
 
 # OpenSpec working tree (comet-open writes under openspec/changes/)
 RUN mkdir -p openspec/changes
+
+# Parallel docs-layout root used only by COMET_FULL_040_BETA_DOCS_LAYOUT.
+RUN mkdir -p docs/openspec/changes/archive docs/openspec/specs && \
+    printf 'schema: spec-driven\n' > docs/openspec/config.yaml
 
 # Create a non-root user: claude --dangerously-skip-permissions refuses to run
 # as root, and most comet scripts also expect a normal HOME for git config etc.

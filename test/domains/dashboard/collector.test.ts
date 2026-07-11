@@ -91,10 +91,28 @@ describe('collectDashboardSnapshot', () => {
 
     const snapshot = await collectDashboardSnapshot(root);
 
-    expect(snapshot.changes.active[0].path).toContain(
-      path.join('docs', 'openspec', 'changes', 'add-auth'),
-    );
+    expect(snapshot.changes.active[0].path).toBe('docs/openspec/changes/add-auth');
     expect(snapshot.changes.active[0].artifacts.plan).toBe(true);
+  });
+
+  it('shows changes from both layouts when a configured docs project still has legacy artifacts', async () => {
+    await writeDocsLayoutChange(root, 'docs-change', { phase: 'build' });
+    await fs.mkdir(path.join(root, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n',
+    );
+    await writeChange(root, {
+      name: 'legacy-change',
+      yaml: { phase: 'design', workflow: 'full' },
+    });
+
+    const snapshot = await collectDashboardSnapshot(root);
+
+    expect(snapshot.changes.active.map((change) => change.path).sort()).toEqual([
+      'docs/openspec/changes/docs-change',
+      'openspec/changes/legacy-change',
+    ]);
   });
 
   it('collects active changes and ignores the archive directory entry', async () => {
@@ -171,6 +189,7 @@ describe('collectDashboardSnapshot', () => {
       archiveName: '2026-06-20-context-graph-notes',
       originalName: 'context-graph-notes',
       archivedAt: '2026-06-20',
+      archivePath: 'openspec/changes/archive/2026-06-20-context-graph-notes',
     });
     expect(archived.next).toBeUndefined();
     expect(archived.verify.result).toBe('pass');

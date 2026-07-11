@@ -73,7 +73,7 @@ Must not create proposal.md, design.md, or tasks.md before the user confirms req
 
 ### 1c. Change Name Confirmation (Blocking Point)
 
-Before creating the change directory (`openspec new change`), must follow the `comet/reference/decision-point.md` protocol to pause and let the user decide the change name. Must not auto-generate or silently infer the change name.
+Before creating the change directory (`comet openspec new change`), must follow the `comet/reference/decision-point.md` protocol to pause and let the user decide the change name. Must not auto-generate or silently infer the change name.
 
 OpenSpec change names must be **kebab-case English** (lowercase letters, digits, hyphens; e.g. `refine-requirements-doc`). Chinese or other non-conforming names are invalid.
 
@@ -86,7 +86,7 @@ The decision options must include:
 - Pick one of the recommended names
 - "Enter a custom name" — accept the user's input; if it is already valid kebab-case English, use it directly; if it is Chinese or otherwise non-conforming, convert it to compliant kebab-case English and show the converted name for confirmation before continuing
 
-Must not run `openspec new change` or create `.comet.yaml` before the user confirms the final change name. If the chosen/converted name collides with an existing change, report the collision and ask the user to choose another name.
+Must not run `comet openspec new change` or create `.comet.yaml` before the user confirms the final change name. If the chosen/converted name collides with an existing change, report the collision and ask the user to choose another name.
 
 ### 2. Create Change Structure + Initialize State
 
@@ -95,6 +95,8 @@ Must not run `openspec new change` or create `.comet.yaml` before the user confi
 Full `/comet` workflow must not use the Skill tool to load the `openspec-propose` skill by default; only load it when the user explicitly requests generating the proposal and artifacts in one pass.
 
 After the skill loads, follow its guidance to create the change skeleton, but override its "STOP and wait for user direction" behavior when a confirmed clarification summary from Step 1b is already available in the conversation context.
+
+For every OpenSpec CLI command suggested by the loaded Skill, use the equivalent `comet openspec ...` invocation. Do not run raw `openspec` commands or `openspec init`, because the Comet facade owns layout and store resolution.
 
 If the user has already confirmed a clarification summary (Step 1b), use that summary directly to populate artifact content. If no clarification summary exists (edge case), fall back to the skill's default behavior of asking the user.
 
@@ -120,7 +122,7 @@ After the change skeleton is created, generate `proposal`, `design`, and `tasks`
    - Verify the output file exists and is non-empty
 4. After creating each artifact, re-run `comet openspec status --change "<name>" --json` to confirm status before continuing to the next artifact
 
-**Failure handling**: If `openspec instructions` fails, returns invalid JSON, reports unmet `dependencies`, or does not provide a usable `resolvedOutputPath`, must immediately stop artifact creation and report the OpenSpec error. Must not fall back to hard-coded artifact prose because that would silently bypass project rules.
+**Failure handling**: If `comet openspec instructions` fails, returns invalid JSON, reports unmet `dependencies`, or does not provide a usable `resolvedOutputPath`, must immediately stop artifact creation and report the OpenSpec error. Must not fall back to hard-coded artifact prose because that would silently bypass project rules.
 
 **Naming and scope guard**: Change name must be the kebab-case English name confirmed by the user in Step 1c — must not auto-generate, infer, or use a non-kebab-case (e.g. Chinese) name. Change scope must match the user's description — must not expand or narrow it independently.
 

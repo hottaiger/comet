@@ -133,6 +133,25 @@ describe('resolveCometArtifactLayout', () => {
     });
   });
 
+  it('detects docs layout from an active change snapshot when local config and planning config are absent', async () => {
+    const root = await tempProject();
+    const changeDir = path.join(root, 'docs', 'openspec', 'changes', 'snapshot-change');
+    await mkdir(changeDir, { recursive: true });
+    await writeFile(
+      path.join(changeDir, '.comet.yaml'),
+      'phase: build\nartifact_layout: docs\nopenspec_root: docs\n',
+      'utf8',
+    );
+
+    await expect(resolveCometArtifactLayout(root)).resolves.toMatchObject({
+      layout: 'docs',
+      openSpec: {
+        changesDir: path.join(root, 'docs', 'openspec', 'changes'),
+        commandCwd: path.join(root, 'docs'),
+      },
+    });
+  });
+
   it('fails closed when docs and legacy both have active changes without config', async () => {
     const root = await tempProject();
     await healthyOpenSpecRoot(root, '.');

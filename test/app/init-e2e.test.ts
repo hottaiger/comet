@@ -33,6 +33,11 @@ vi.mock('../../platform/version/version.js', () => ({
   }),
 }));
 
+vi.mock('../../app/commands/migrate-docs.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../app/commands/migrate-docs.js')>()),
+  migrateDocsCommand: vi.fn(),
+}));
+
 const manifestPath = path.resolve('assets', 'manifest.json');
 const INIT_E2E_TIMEOUT_MS = 60_000;
 
@@ -99,6 +104,25 @@ async function captureTextOutput(fn: () => Promise<void>): Promise<string> {
   return [...lines, ...errors].join('\n');
 }
 
+async function createLegacyOpenSpecRoot(activeChange?: string): Promise<void> {
+  await fs.mkdir(path.join(tmpDirForLegacyRoot, 'openspec', 'changes', 'archive'), {
+    recursive: true,
+  });
+  await fs.mkdir(path.join(tmpDirForLegacyRoot, 'openspec', 'specs'), { recursive: true });
+  await fs.writeFile(
+    path.join(tmpDirForLegacyRoot, 'openspec', 'config.yaml'),
+    'schema: spec-driven\n',
+    'utf8',
+  );
+  if (activeChange) {
+    await fs.mkdir(path.join(tmpDirForLegacyRoot, 'openspec', 'changes', activeChange), {
+      recursive: true,
+    });
+  }
+}
+
+let tmpDirForLegacyRoot = '';
+
 describe('comet init E2E', () => {
   let tmpDir: string;
 
@@ -108,6 +132,7 @@ describe('comet init E2E', () => {
       `comet-init-e2e-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     );
     await fs.mkdir(tmpDir, { recursive: true });
+    tmpDirForLegacyRoot = tmpDir;
     vi.resetAllMocks();
     vi.resetModules();
     vi.spyOn(os, 'homedir').mockReturnValue(path.join(tmpDir, 'fake-home'));
@@ -181,13 +206,6 @@ describe('comet init E2E', () => {
       const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
       expect(config).toContain('artifact_layout: docs');
       expect(config).toContain('store: comet-demo-1234');
-      const storeSetupCall = mockedExecFileSync.mock.calls.find(
-        ([command, args]) =>
-          command === 'openspec' &&
-          Array.isArray(args) &&
-          args[0] === 'store' &&
-          args[1] === 'setup',
-      );
       const storeRegisterCall = mockedExecFileSync.mock.calls.find(
         ([command, args]) =>
           command === 'openspec' &&
@@ -195,14 +213,6 @@ describe('comet init E2E', () => {
           args[0] === 'store' &&
           args[1] === 'register',
       );
-      expect(storeSetupCall?.[1]).toEqual([
-        'store',
-        'setup',
-        'comet-demo-1234',
-        '--path',
-        path.join(tmpDir, 'docs'),
-        '--no-init-git',
-      ]);
       expect(storeRegisterCall?.[1]).toEqual([
         'store',
         'register',
@@ -210,10 +220,336 @@ describe('comet init E2E', () => {
         '--id',
         'comet-demo-1234',
         '--yes',
+        '--json',
       ]);
+      expect(
+        mockedExecFileSync.mock.calls.some(
+          ([command, args]) =>
+            command === 'openspec' &&
+            Array.isArray(args) &&
+            args[0] === 'store' &&
+            args[1] === 'setup',
+        ),
+      ).toBe(false);
     },
     INIT_E2E_TIMEOUT_MS,
   );
+
+  it('passes an explicit store when interactive docs init migrates an inactive legacy root', async () => {
+    mockExternalSuccess();
+    await createLegacyOpenSpecRoot();
+    await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+    const { select, checkbox } = await import('@inquirer/prompts');
+    const { platformSelectPrompt } = await import('../../app/commands/platform-select-prompt.js');
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    vi.mocked(select).mockResolvedValueOnce(true);
+    vi.mocked(checkbox).mockResolvedValue([]);
+    vi.mocked(platformSelectPrompt).mockResolvedValue(['claude']);
+    vi.mocked(migrateDocsCommand).mockImplementationOnce(async () => {
+      await fs.mkdir(path.join(tmpDir, 'docs'), { recursive: true });
+      await fs.rename(path.join(tmpDir, 'openspec'), path.join(tmpDir, 'docs', 'openspec'));
+    });
+
+    const { initCommand } = await import('../../app/commands/init.js');
+    await initCommand(tmpDir, {
+      scope: 'project',
+      language: 'en',
+      installMode: 'copy',
+      openSpecStore: 'comet-demo',
+    });
+
+    expect(migrateDocsCommand).toHaveBeenCalledWith(tmpDir, {
+      apply: true,
+      openSpecStore: 'comet-demo',
+    });
+  });
+
+  it('keeps legacy layout when active migration is deferred at the second confirmation', async () => {
+    mockExternalSuccess();
+    await createLegacyOpenSpecRoot('active-change');
+    await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+    const { select, checkbox } = await import('@inquirer/prompts');
+    const { platformSelectPrompt } = await import('../../app/commands/platform-select-prompt.js');
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    vi.mocked(select).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+    vi.mocked(checkbox).mockResolvedValue([]);
+    vi.mocked(platformSelectPrompt).mockResolvedValue(['claude']);
+
+    const { initCommand } = await import('../../app/commands/init.js');
+    const output = await captureTextOutput(() =>
+      initCommand(tmpDir, {
+        scope: 'project',
+        language: 'en',
+        installMode: 'copy',
+        artifactLayout: 'docs',
+      }),
+    );
+
+    expect(migrateDocsCommand).not.toHaveBeenCalled();
+    expect(output).toContain('comet migrate docs --apply --include-active');
+    await expect(fs.access(path.join(tmpDir, 'docs', 'openspec'))).rejects.toThrow();
+    const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
+    expect(config).not.toContain('artifact_layout: docs');
+  });
+
+  it('preserves include-active while passing an explicit store for active migration', async () => {
+    mockExternalSuccess();
+    await createLegacyOpenSpecRoot('active-change');
+    await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+    const { select, checkbox } = await import('@inquirer/prompts');
+    const { platformSelectPrompt } = await import('../../app/commands/platform-select-prompt.js');
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    vi.mocked(select).mockResolvedValueOnce(true).mockResolvedValueOnce(true);
+    vi.mocked(checkbox).mockResolvedValue([]);
+    vi.mocked(platformSelectPrompt).mockResolvedValue(['claude']);
+    vi.mocked(migrateDocsCommand).mockImplementationOnce(async () => {
+      await fs.mkdir(path.join(tmpDir, 'docs'), { recursive: true });
+      await fs.rename(path.join(tmpDir, 'openspec'), path.join(tmpDir, 'docs', 'openspec'));
+    });
+
+    const { initCommand } = await import('../../app/commands/init.js');
+    await initCommand(tmpDir, {
+      scope: 'project',
+      language: 'en',
+      installMode: 'copy',
+      openSpecStore: 'comet-demo',
+    });
+
+    expect(migrateDocsCommand).toHaveBeenCalledWith(tmpDir, {
+      apply: true,
+      includeActive: true,
+      openSpecStore: 'comet-demo',
+    });
+  });
+
+  it.each([
+    ['--yes', { yes: true }],
+    ['--json', { json: true }],
+  ])('fails closed for docs init with legacy artifacts in %s mode', async (_mode, modeOptions) => {
+    await createLegacyOpenSpecRoot();
+    const { select } = await import('@inquirer/prompts');
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    const { initCommand } = await import('../../app/commands/init.js');
+
+    await expect(
+      initCommand(tmpDir, {
+        ...modeOptions,
+        scope: 'project',
+        language: 'en',
+        installMode: 'copy',
+        artifactLayout: 'docs',
+      }),
+    ).rejects.toThrow('comet migrate docs --apply');
+
+    expect(select).not.toHaveBeenCalled();
+    expect(migrateDocsCommand).not.toHaveBeenCalled();
+    await expect(fs.access(path.join(tmpDir, 'docs', 'openspec'))).rejects.toThrow();
+    await expect(fs.access(path.join(tmpDir, '.comet', 'config.yaml'))).rejects.toThrow();
+  });
+
+  it('fails safely when deferring cannot preserve an explicit OpenSpec store request', async () => {
+    await createLegacyOpenSpecRoot();
+    const { select } = await import('@inquirer/prompts');
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    vi.mocked(select).mockResolvedValueOnce(false);
+    const { initCommand } = await import('../../app/commands/init.js');
+
+    await expect(
+      initCommand(tmpDir, {
+        scope: 'project',
+        language: 'en',
+        installMode: 'copy',
+        openSpecStore: 'comet-demo',
+      }),
+    ).rejects.toThrow('comet migrate docs --apply');
+
+    expect(migrateDocsCommand).not.toHaveBeenCalled();
+    await expect(fs.access(path.join(tmpDir, 'docs', 'openspec'))).rejects.toThrow();
+    await expect(fs.access(path.join(tmpDir, '.comet', 'config.yaml'))).rejects.toThrow();
+  });
+
+  it(
+    'registers a deterministic project-specific store for docs layout when no id is supplied',
+    async () => {
+      mockExternalSuccess();
+      await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+
+      const { initCommand } = await import('../../app/commands/init.js');
+      await captureJsonOutput(() =>
+        initCommand(tmpDir, {
+          yes: true,
+          scope: 'project',
+          json: true,
+          language: 'en',
+          artifactLayout: 'docs',
+        }),
+      );
+
+      const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
+      const storeId = config.match(/^  store: (.+)$/m)?.[1];
+      expect(storeId).toMatch(/^comet-[a-z0-9-]+-[a-f0-9]{8}$/);
+      expect(
+        mockedExecFileSync.mock.calls.some(
+          ([command, args]) =>
+            command === 'openspec' &&
+            Array.isArray(args) &&
+            args[0] === 'store' &&
+            args[1] === 'register' &&
+            args[4] === storeId,
+        ),
+      ).toBe(true);
+    },
+    INIT_E2E_TIMEOUT_MS,
+  );
+
+  it(
+    'moves the OpenSpec root generated during docs initialization under docs',
+    async () => {
+      mockExternalSuccess();
+      await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+      const fallback = mockedExecFileSync.getMockImplementation();
+      mockedExecFileSync.mockImplementation((command: unknown, args?: unknown, opts?: unknown) => {
+        const cmdArgs = Array.isArray(args) ? args.map((arg) => String(arg)) : [];
+        if (String(command) === 'openspec' && cmdArgs[0] === 'init') {
+          mkdirSync(path.join(tmpDir, 'openspec', 'changes', 'archive'), { recursive: true });
+          mkdirSync(path.join(tmpDir, 'openspec', 'specs'), { recursive: true });
+          writeFileSync(path.join(tmpDir, 'openspec', 'config.yaml'), 'schema: spec-driven\n');
+        }
+        return fallback?.(command, args, opts);
+      });
+
+      const { initCommand } = await import('../../app/commands/init.js');
+      await captureJsonOutput(() =>
+        initCommand(tmpDir, {
+          yes: true,
+          scope: 'project',
+          json: true,
+          language: 'en',
+          artifactLayout: 'docs',
+        }),
+      );
+
+      await expect(fs.access(path.join(tmpDir, 'openspec'))).rejects.toThrow();
+      await expect(
+        fs.access(path.join(tmpDir, 'docs', 'openspec', 'config.yaml')),
+      ).resolves.toBeUndefined();
+    },
+    INIT_E2E_TIMEOUT_MS,
+  );
+
+  it('does not persist the store id when OpenSpec registration fails', async () => {
+    mockExternalSuccess();
+    await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+    mockedExecFileSync.mockImplementation((command: unknown, args?: unknown, opts?: unknown) => {
+      const cmd = String(command);
+      const cmdArgs = Array.isArray(args) ? args.map((arg) => String(arg)) : [];
+      if ((cmd === 'which' || cmd === 'where') && cmdArgs[0] === 'openspec') {
+        return Buffer.from('/usr/bin/openspec');
+      }
+      if (cmd === 'openspec' && cmdArgs[0] === 'store' && cmdArgs[1] === 'register') {
+        throw new Error('register failed');
+      }
+      if (cmd === 'openspec' && cmdArgs[0] === 'init') {
+        return Buffer.from('ok');
+      }
+      if ((cmd === 'npx' || cmd === 'npx.cmd') && cmdArgs[0] === 'skills') {
+        return Buffer.from('installed');
+      }
+      return Buffer.from('');
+    });
+
+    const { initCommand } = await import('../../app/commands/init.js');
+    await expect(
+      initCommand(tmpDir, {
+        yes: true,
+        scope: 'project',
+        json: true,
+        language: 'en',
+        artifactLayout: 'docs',
+        openSpecStore: 'comet-demo-1234',
+      }),
+    ).rejects.toThrow(/OpenSpec store configuration failed/);
+
+    const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
+    expect(config).toContain('artifact_layout: docs');
+    expect(config).not.toContain('store: comet-demo-1234');
+  });
+
+  it('preserves an existing store id when replacement registration fails', async () => {
+    mockExternalSuccess();
+    await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-old-1234\n',
+      'utf8',
+    );
+    mockedExecFileSync.mockImplementation((command: unknown, args?: unknown) => {
+      const cmd = String(command);
+      const cmdArgs = Array.isArray(args) ? args.map((arg) => String(arg)) : [];
+      if ((cmd === 'which' || cmd === 'where') && cmdArgs[0] === 'openspec') {
+        return Buffer.from('/usr/bin/openspec');
+      }
+      if (cmd === 'openspec' && cmdArgs[0] === 'store' && cmdArgs[1] === 'register') {
+        throw new Error('register failed');
+      }
+      return Buffer.from('ok');
+    });
+
+    const { initCommand } = await import('../../app/commands/init.js');
+    await expect(
+      initCommand(tmpDir, {
+        yes: true,
+        scope: 'project',
+        json: true,
+        language: 'en',
+        artifactLayout: 'docs',
+        openSpecStore: 'comet-new-1234',
+      }),
+    ).rejects.toThrow(/OpenSpec store configuration failed/);
+
+    const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
+    expect(config).toContain('store: comet-old-1234');
+    expect(config).not.toContain('store: comet-new-1234');
+  });
+
+  it('preserves an existing docs store id when init is run again without an override', async () => {
+    mockExternalSuccess();
+    await fs.mkdir(path.join(tmpDir, '.claude'), { recursive: true });
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-existing-1234\n',
+      'utf8',
+    );
+
+    const { initCommand } = await import('../../app/commands/init.js');
+    await captureJsonOutput(() =>
+      initCommand(tmpDir, {
+        yes: true,
+        scope: 'project',
+        json: true,
+        language: 'en',
+        artifactLayout: 'docs',
+      }),
+    );
+
+    const config = await fs.readFile(path.join(tmpDir, '.comet', 'config.yaml'), 'utf8');
+    expect(config).toContain('store: comet-existing-1234');
+    expect(mockedExecFileSync).toHaveBeenCalledWith(
+      'openspec',
+      [
+        'store',
+        'register',
+        path.join(tmpDir, 'docs'),
+        '--id',
+        'comet-existing-1234',
+        '--yes',
+        '--json',
+      ],
+      expect.any(Object),
+    );
+  });
 
   it('rejects OpenSpec store ids with legacy artifact layout', async () => {
     const { initCommand } = await import('../../app/commands/init.js');

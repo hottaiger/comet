@@ -116,6 +116,17 @@ describe('skills', () => {
       await expect(createWorkingDirs(tmpDir)).resolves.not.toThrow();
     });
 
+    it('anchors empty docs OpenSpec directories so layout survives a clone', async () => {
+      await createWorkingDirs(tmpDir, 'en', { artifactLayout: 'docs' });
+
+      await expect(
+        fs.stat(path.join(tmpDir, 'docs', 'openspec', 'specs', '.gitkeep')),
+      ).resolves.toBeDefined();
+      await expect(
+        fs.stat(path.join(tmpDir, 'docs', 'openspec', 'changes', 'archive', '.gitkeep')),
+      ).resolves.toBeDefined();
+    });
+
     it('installs ambient resume instructions while preserving user content', async () => {
       await fs.writeFile(path.join(tmpDir, 'AGENTS.md'), '# User\n\nKeep this.\n', 'utf-8');
 
@@ -1817,6 +1828,12 @@ describe('skills', () => {
 
       expect(zhComet).toContain('comet openspec status --change "<name>" --json');
       expect(enComet).toContain('comet openspec status --change "<name>" --json');
+      expect(zhComet).toContain('### OpenSpec 命令边界');
+      expect(enComet).toContain('### OpenSpec Command Boundary');
+      expect(zhComet).toContain('`comet openspec list --json`');
+      expect(enComet).toContain('`comet openspec list --json`');
+      expect(zhComet).not.toContain('2. 运行 `openspec list --json`');
+      expect(enComet).not.toContain('2. Run `openspec list --json`');
       expect(zhComet).toContain('<openspec-change-dir>');
       expect(enComet).toContain('<openspec-change-dir>');
       expect(zhComet).not.toContain('只来自 `openspec/changes/<name>/.comet.yaml`');
@@ -1837,6 +1854,43 @@ describe('skills', () => {
         expect(content, file).not.toContain('只来自 `openspec/changes/<name>/.comet.yaml`');
         expect(content, file).not.toContain('only from `openspec/changes/<name>/.comet.yaml`');
       }
+
+      const zhOpen = await fs.readFile(
+        path.resolve('assets', 'skills-zh', 'comet-open', 'SKILL.md'),
+        'utf-8',
+      );
+      const enOpen = await fs.readFile(
+        path.resolve('assets', 'skills', 'comet-open', 'SKILL.md'),
+        'utf-8',
+      );
+      expect(zhOpen).toContain('必须使用等价的 `comet openspec ...` 调用');
+      expect(enOpen).toContain('use the equivalent `comet openspec ...` invocation');
+
+      for (const skill of ['comet-hotfix', 'comet-tweak', 'comet-verify']) {
+        const zhEntry = await fs.readFile(
+          path.resolve('assets', 'skills-zh', skill, 'SKILL.md'),
+          'utf-8',
+        );
+        const enEntry = await fs.readFile(
+          path.resolve('assets', 'skills', skill, 'SKILL.md'),
+          'utf-8',
+        );
+        expect(zhEntry, skill).toContain('必须改用 `comet openspec ...`');
+        expect(enEntry, skill).toContain('must use `comet openspec ...`');
+      }
+
+      const zhStructure = await fs.readFile(
+        path.resolve('assets', 'skills-zh', 'comet', 'reference', 'file-structure.md'),
+        'utf-8',
+      );
+      const enStructure = await fs.readFile(
+        path.resolve('assets', 'skills', 'comet', 'reference', 'file-structure.md'),
+        'utf-8',
+      );
+      expect(zhStructure).toContain('<openspec-root>/openspec/');
+      expect(enStructure).toContain('<openspec-root>/openspec/');
+      expect(zhStructure).toContain('docs layout');
+      expect(enStructure).toContain('docs layout');
     });
 
     it('keeps archive step 2 on a single authoritative command path in both languages', async () => {

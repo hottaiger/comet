@@ -24,12 +24,16 @@ Agents need only read this section for decision-making. Refer to the Reference A
 
 Use the configured Comet artifact language as the output language for every OpenSpec and Superpowers artifact. The configured value is a normalized language id, `en` or `zh-CN`. For an existing change, first run `comet openspec status --change "<name>" --json` to resolve `<openspec-change-dir>`, then use `"$COMET_BASH" "$COMET_STATE" get <name> language` or read `language` from `<openspec-change-dir>/.comet.yaml`. `<openspec-change-dir>` may be `openspec/changes/<name>` (legacy) or `docs/openspec/changes/<name>` (docs). Before `.comet.yaml` exists, read `language` from `.comet/config.yaml`; if neither exists, fall back to the current user request language. Include the resolved language explicitly in every prompt or ARGUMENTS passed to external OpenSpec/Superpowers skills.
 
+### OpenSpec Command Boundary
+
+All OpenSpec CLI operations for this project MUST use `comet openspec <args>`, including commands suggested by a loaded `openspec-*` Skill. Replace a suggested `openspec ...` command with the equivalent `comet openspec ...` command; never run raw `openspec` or `openspec init`. The Comet facade resolves the active artifact layout, store id, and working directory.
+
 ### Automatic Phase Detection
 
 **Step 0: Active Change Discovery and Intent Resolution**
 
 1. First load script locations through `comet/reference/scripts.md` and ensure `$COMET_INTENT` is available.
-2. Run `openspec list --json` to collect active changes.
+2. Run `comet openspec list --json` to collect active changes.
 3. Fill a `CometIntentFrame` from the user request, active change list, and necessary repository state.
 4. Prefer `node "$COMET_INTENT" route --stdin` to pass the frame JSON and get the runtime-normalized route. `CometIntentFrame + runtime scorer` is the source of truth; this prose is only for intent recognition slot extraction.
 5. Handle the runtime route:
@@ -160,7 +164,7 @@ See the "Upgrade Assessment" section of each `comet-hotfix` / `comet-tweak` for 
 
 | Scenario | Handling |
 |----------|----------|
-| `openspec list --json` fails | Check if openspec is installed, prompt user to run `openspec init` |
+| `comet openspec list --json` fails | Check whether OpenSpec is installed, then run `comet init` to repair this project's setup |
 | Sub-skill unavailable | Stop workflow, prompt to install or enable the corresponding skill |
 | `.comet.yaml` malformed or missing | Use file state as source of truth, correct with `node "$COMET_STATE" set` then continue |
 | Build/test fails | Return to build phase for fixes, do not enter verify |

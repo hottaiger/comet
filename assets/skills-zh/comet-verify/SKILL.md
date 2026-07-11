@@ -16,6 +16,8 @@ description: "Use when Comet change 已完成 build 阶段，需要验证实现�
 
 验证报告和分支处理说明必须使用 `"$COMET_BASH" "$COMET_STATE" get <name> language` 读取到的 Comet 配置产物语言。
 
+加载外部 OpenSpec Skill 后，其中任何 raw `openspec ...` 命令都必须改用 `comet openspec ...`，不得绕过 Comet 的 artifact layout resolver。
+
 ### 0b. 入口状态验证（Entry Check）
 
 按 `comet/reference/scripts.md` 定位脚本（定位 `comet-env.mjs`），然后执行入口验证；从任意入口恢复时先按 `comet/reference/context-recovery.md` 运行恢复检查：

@@ -5,9 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('child_process', () => ({
   spawnSync: vi.fn(() => ({ status: 0, stdout: '{"ok":true}\n', stderr: '' })),
+  execFileSync: vi.fn(() => Buffer.from(JSON.stringify({ stores: [] }))),
 }));
 
-import { spawnSync } from 'child_process';
+import { execFileSync, spawnSync } from 'child_process';
 import { openspecCommand } from '../../app/commands/openspec.js';
 import { quoteArgsForShell } from '../../platform/process/shell-quote.js';
 
@@ -27,6 +28,7 @@ beforeEach(() => {
   process.exitCode = undefined;
   stdoutWrite = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
   stderrWrite = vi.spyOn(process.stderr, 'write').mockReturnValue(true);
+  vi.mocked(execFileSync).mockReturnValue(Buffer.from(JSON.stringify({ stores: [] })));
 });
 
 afterEach(async () => {
@@ -36,6 +38,7 @@ afterEach(async () => {
   stdoutWrite.mockRestore();
   stderrWrite.mockRestore();
   vi.clearAllMocks();
+  vi.unstubAllEnvs();
 });
 
 describe('openspecCommand', () => {
@@ -47,6 +50,11 @@ describe('openspecCommand', () => {
       'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-demo-1234\n',
       'utf8',
     );
+    vi.mocked(execFileSync).mockReturnValue(
+      Buffer.from(
+        JSON.stringify({ stores: [{ id: 'comet-demo-1234', root: path.join(root, 'docs') }] }),
+      ),
+    );
 
     await openspecCommand(root, ['status', '--change', 'add-auth', '--json'], { json: true });
 
@@ -54,6 +62,105 @@ describe('openspecCommand', () => {
       'openspec',
       ['status', '--change', 'add-auth', '--json', '--store', 'comet-demo-1234'],
       expect.objectContaining({ cwd: root, encoding: 'utf8' }),
+    );
+  });
+
+  it('rejects a configured store whose registered root is not this project docs directory', async () => {
+    const root = await tempProject();
+    await mkdir(path.join(root, '.comet'), { recursive: true });
+    await writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-demo-1234\n',
+      'utf8',
+    );
+    vi.mocked(execFileSync).mockReturnValue(
+      Buffer.from(
+        JSON.stringify({
+          stores: [{ id: 'comet-demo-1234', root: path.join(root, 'other-docs') }],
+        }),
+      ),
+    );
+
+    await expect(openspecCommand(root, ['status'], {})).rejects.toThrow(
+      /does not match this project's docs directory/,
+    );
+    expect(spawnSync).not.toHaveBeenCalled();
+  });
+
+  it('forwards store management commands without validating or selecting the configured store', async () => {
+    const root = await tempProject();
+    await mkdir(path.join(root, '.comet'), { recursive: true });
+    await writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-demo-1234\n',
+      'utf8',
+    );
+    vi.mocked(execFileSync).mockImplementation(() => {
+      throw new Error('configured store is unavailable');
+    });
+
+    await expect(
+      openspecCommand(root, ['store', 'list', '--json'], { json: true }),
+    ).resolves.toBeUndefined();
+
+    expect(execFileSync).not.toHaveBeenCalled();
+    expect(spawnSync).toHaveBeenCalledWith(
+      'openspec',
+      ['store', 'list', '--json'],
+      expect.objectContaining({ cwd: root, encoding: 'utf8' }),
+    );
+  });
+
+  it('recognizes store management commands after global OpenSpec flags', async () => {
+    const root = await tempProject();
+    await mkdir(path.join(root, '.comet'), { recursive: true });
+    await writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-demo-1234\n',
+      'utf8',
+    );
+    vi.mocked(execFileSync).mockImplementation(() => {
+      throw new Error('configured store is unavailable');
+    });
+
+    await expect(
+      openspecCommand(root, ['--no-color', 'store', 'list', '--json'], { json: true }),
+    ).resolves.toBeUndefined();
+
+    expect(execFileSync).not.toHaveBeenCalled();
+    expect(spawnSync).toHaveBeenCalledWith(
+      'openspec',
+      ['--no-color', 'store', 'list', '--json'],
+      expect.objectContaining({ cwd: root, encoding: 'utf8' }),
+    );
+  });
+
+  it('uses COMET_OPENSPEC for both registry validation and the forwarded command', async () => {
+    const root = await tempProject();
+    await mkdir(path.join(root, '.comet'), { recursive: true });
+    await writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-demo-1234\n',
+      'utf8',
+    );
+    vi.stubEnv('COMET_OPENSPEC', 'custom-openspec');
+    vi.mocked(execFileSync).mockReturnValue(
+      Buffer.from(
+        JSON.stringify({ stores: [{ id: 'comet-demo-1234', root: path.join(root, 'docs') }] }),
+      ),
+    );
+
+    await openspecCommand(root, ['status'], {});
+
+    expect(execFileSync).toHaveBeenCalledWith(
+      'custom-openspec',
+      ['store', 'list', '--json'],
+      expect.objectContaining({ cwd: root }),
+    );
+    expect(spawnSync).toHaveBeenCalledWith(
+      'custom-openspec',
+      ['status', '--store', 'comet-demo-1234'],
+      expect.objectContaining({ cwd: root }),
     );
   });
 
@@ -72,6 +179,29 @@ describe('openspecCommand', () => {
     expect(spawnSync).toHaveBeenCalledWith(
       'openspec',
       ['list'],
+      expect.objectContaining({ cwd: path.join(root, 'docs'), encoding: 'utf8' }),
+    );
+  });
+
+  it('does not append --store to OpenSpec commands that do not support it', async () => {
+    const root = await tempProject();
+    await mkdir(path.join(root, '.comet'), { recursive: true });
+    await writeFile(
+      path.join(root, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-demo-1234\n',
+      'utf8',
+    );
+    vi.mocked(execFileSync).mockReturnValue(
+      Buffer.from(
+        JSON.stringify({ stores: [{ id: 'comet-demo-1234', root: path.join(root, 'docs') }] }),
+      ),
+    );
+
+    await openspecCommand(root, ['update'], {});
+
+    expect(spawnSync).toHaveBeenCalledWith(
+      'openspec',
+      ['update'],
       expect.objectContaining({ cwd: path.join(root, 'docs'), encoding: 'utf8' }),
     );
   });

@@ -5,6 +5,7 @@ import path from 'path';
 import type { ClassicCommandHandler, ClassicCommandResult } from './classic-cli.js';
 import { projectRelativePath, resolveCometArtifactLayout } from './classic-artifact-layout.js';
 import { openSpecChangeNameError } from './classic-paths.js';
+import { assertOpenSpecStoreRegistration } from '../integrations/openspec.js';
 import { ensureClassicRuntimeRun, transitionClassicRuntimeRun } from './classic-runtime-run.js';
 import { appendClassicStateEvent } from './classic-state-events.js';
 import { readClassicState, writeClassicState } from './classic-store.js';
@@ -97,7 +98,7 @@ async function findArchiveDir(
 ): Promise<string | null> {
   if (await exists(preferred)) return preferred;
   if (!(await exists(archiveRoot))) return null;
-  for (const entry of (await fs.readdir(archiveRoot)).sort()) {
+  for (const entry of (await fs.readdir(archiveRoot)).sort().reverse()) {
     if (!entry.endsWith(`-${change}`)) continue;
     const candidate = `${archiveRoot}/${entry}`;
     if ((await fs.stat(candidate)).isDirectory()) return candidate;
@@ -220,6 +221,9 @@ export const classicArchiveCommand: ClassicCommandHandler = async (args) => {
     let archiveName = `${today}-${change}`;
     let archiveDir = path.join(layout.openSpec.archiveDir, archiveName);
     const openspec = process.env.COMET_OPENSPEC || 'openspec';
+    if (layout.openSpec.storeId) {
+      assertOpenSpecStoreRegistration(layout.projectRoot, layout.openSpec.storeId, openspec);
+    }
 
     output.stderr.push(`=== Comet Archive: ${change} ===`);
 

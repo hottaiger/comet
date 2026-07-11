@@ -102,8 +102,8 @@ function artifactsHash(artifacts: Record<string, string>): string {
   );
 }
 
-// Forward-slash paths so hash inputs + markdown Source/SHA256 references match
-// the frozen shell byte-for-byte. changeDir is relative (openspec/changes/<name>).
+// Forward-slash paths keep hash inputs and markdown Source/SHA256 references
+// stable across platforms. changeDir is the resolver's relative layout path.
 async function handoffSourceFiles(changeDir: string): Promise<string[]> {
   const files = [`${changeDir}/proposal.md`, `${changeDir}/design.md`, `${changeDir}/tasks.md`];
   const specs = `${changeDir}/specs`;

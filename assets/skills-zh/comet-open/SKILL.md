@@ -73,7 +73,7 @@ description: "Use when Comet 需要创建新的 OpenSpec change，或 active cha
 
 ### 1c. Change 名称确认（阻塞点）
 
-创建 change 目录（`openspec new change`）前，必须按 `comet/reference/decision-point.md` 的协议暂停，让用户决定 change 名称。不得自动生成或静默推断 change 名称。
+创建 change 目录（`comet openspec new change`）前，必须按 `comet/reference/decision-point.md` 的协议暂停，让用户决定 change 名称。不得自动生成或静默推断 change 名称。
 
 OpenSpec change 名称必须是 **kebab-case 英文**（小写字母、数字、连字符；如 `refine-requirements-doc`）。中文或其他不合规名称无效。
 
@@ -86,7 +86,7 @@ OpenSpec change 名称必须是 **kebab-case 英文**（小写字母、数字、
 - 选择某个推荐名称
 - 「自行输入名称」——接收用户输入；若已是合规 kebab-case 英文则直接使用；若为中文或其他不合规形式，则转换为合规 kebab-case 英文并回显转换后的名称，确认后再继续
 
-不得在用户确认最终 change 名称前运行 `openspec new change` 或创建 `.comet.yaml`。若选定/转换后的名称与已有 change 冲突，必须报告冲突并请用户另选名称。
+不得在用户确认最终 change 名称前运行 `comet openspec new change` 或创建 `.comet.yaml`。若选定/转换后的名称与已有 change 冲突，必须报告冲突并请用户另选名称。
 
 ### 2. 创建 Change 结构 + 初始化状态
 
@@ -95,6 +95,8 @@ OpenSpec change 名称必须是 **kebab-case 英文**（小写字母、数字、
 完整 `/comet` 流程默认不得使用 Skill 工具加载 `openspec-propose` 技能；只有用户明确要求一次性生成提案和 artifacts 时才允许加载。
 
 技能加载后，按其指引创建 change 骨架，但当 Step 1b 的已确认澄清摘要已存在于对话上下文时，覆盖其"STOP and wait for user direction"行为。
+
+对于已加载 Skill 建议的每一条 OpenSpec CLI 命令，都必须使用等价的 `comet openspec ...` 调用。不得直接运行 `openspec` 命令或 `openspec init`，因为 artifact layout 与 store 解析由 Comet facade 统一负责。
 
 如果用户已确认澄清摘要（Step 1b），直接使用该摘要填充产物内容。如果不存在澄清摘要（边缘情况），回退到技能的默认行为，询问用户。
 
@@ -120,7 +122,7 @@ change 骨架创建后，按以下标准产物循环逐个生成 `proposal`、`d
    - 验证输出文件存在且非空
 4. 每创建一个 artifact 后，重新运行 `comet openspec status --change "<name>" --json` 确认状态，然后继续下一个 artifact
 
-**失败处理**：如果 `openspec instructions` 失败、返回无效 JSON、报告未满足的 `dependencies`、或未提供可用的 `resolvedOutputPath`，必须立即停止 artifact 创建并报告 OpenSpec 错误。不得回退为硬编码文档结构，因为那样会绕过项目规则。
+**失败处理**：如果 `comet openspec instructions` 失败、返回无效 JSON、报告未满足的 `dependencies`、或未提供可用的 `resolvedOutputPath`，必须立即停止 artifact 创建并报告 OpenSpec 错误。不得回退为硬编码文档结构，因为那样会绕过项目规则。
 
 **命名与范围守卫**：change name 必须使用 Step 1c 中用户确认的 kebab-case 英文名，不得自动生成、推断或使用非 kebab-case（如中文）名称。变更范围必须与用户描述一致，不得自行扩大或缩小。
 

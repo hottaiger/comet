@@ -24,12 +24,16 @@ agent 做决策只需读本节，参考附录按需查阅。
 
 所有 OpenSpec 和 Superpowers 产物都必须使用 Comet 配置的产物语言。配置值是规范化语言 ID，`en` 或 `zh-CN`。已有 change 时，先运行 `comet openspec status --change "<name>" --json` 解析 `<openspec-change-dir>`，再通过 `"$COMET_BASH" "$COMET_STATE" get <name> language` 或读取 `<openspec-change-dir>/.comet.yaml` 中的 `language` 获取产物语言。`<openspec-change-dir>` 可能是 `openspec/changes/<name>`（legacy）或 `docs/openspec/changes/<name>`（docs）。`.comet.yaml` 尚不存在时读取 `.comet/config.yaml` 的 `language`；两者都不存在时才回退到当前用户请求语言。调用外部 OpenSpec/Superpowers skill 时，必须把解析后的语言显式写入 prompt 或 ARGUMENTS。
 
+### OpenSpec 命令边界
+
+本项目的所有 OpenSpec CLI 操作都必须使用 `comet openspec <args>`，包括已加载的 `openspec-*` Skill 建议的命令。遇到 `openspec ...` 时必须改为等价的 `comet openspec ...`；不得直接运行 `openspec` 或 `openspec init`。Comet facade 会统一解析当前 artifact layout、store id 和工作目录。
+
 ### 阶段自动检测
 
 **Step 0: 活跃 Change 发现与意图判定**
 
 1. 先按 `comet/reference/scripts.md` 完成脚本定位，确保 `$COMET_INTENT` 可用。
-2. 运行 `openspec list --json` 获取所有活跃 change。
+2. 运行 `comet openspec list --json` 获取所有活跃 change。
 3. 根据用户请求、active change 列表和必要仓库状态填写 `CometIntentFrame`。
 4. 优先用 `node "$COMET_INTENT" route --stdin` 传入 frame JSON，获取 runtime 规范化路由。`CometIntentFrame + runtime scorer` 是事实源；本节自然语言规则只用于意图识别槽位提取。
 5. 按 runtime route 处理：
@@ -160,7 +164,7 @@ hotfix/tweak 的范围判定采用三层分工，避免「用纯文件数当硬�
 
 | 场景 | 处理方式 |
 |------|---------|
-| `openspec list --json` 失败 | 检查 openspec 是否已安装，提示 `openspec init` |
+| `comet openspec list --json` 失败 | 检查 OpenSpec 是否已安装，再运行 `comet init` 修复当前项目配置 |
 | 子 skill 不可用 | 停止流程，提示安装或启用对应 skill |
 | `.comet.yaml` 格式异常或缺失 | 以文件状态为准，用 `node "$COMET_STATE" set` 修正后继续 |
 | 构建/测试失败 | 返回 build 阶段修复，不进入 verify |

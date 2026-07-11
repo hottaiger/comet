@@ -1,7 +1,7 @@
 # Comet Dashboard
 
 本目录包含 `comet dashboard` 的只读本地仪表盘：后端采集当前仓库的
-`openspec/changes`、Git 与验证状态，前端是位于 `web/` 的 React + Tailwind CSS
+legacy 或 docs layout 下的 OpenSpec changes、Git 与验证状态，前端是位于 `web/` 的 React + Tailwind CSS
 应用。
 
 ## 启动

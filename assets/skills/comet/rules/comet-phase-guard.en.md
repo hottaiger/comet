@@ -20,7 +20,7 @@ When there is an active comet change, first run `comet openspec status --change 
 | `verify` | Verification, branch handling | Skip failure handling |
 | `archive` | Confirm archive, run archive script | Write source code |
 
-The hook hard interception allowlist includes workflow and platform workspaces such as `openspec/*`, `docs/superpowers/*`, `.superpowers/*`, `.claude/*`, and `.comet/*`; write access to these paths does not allow skipping the current phase's artifacts or confirmation requirements.
+The hook hard interception allowlist includes workflow and platform workspaces such as `openspec/*`, `docs/openspec/*`, `docs/superpowers/*`, `.superpowers/*`, `.claude/*`, and `.comet/*`; write access to these paths does not allow skipping the current phase's artifacts or confirmation requirements.
 
 ### Phase-Entry Self-Consistency Check (Before Writing Source Code)
 

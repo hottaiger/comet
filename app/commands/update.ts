@@ -29,10 +29,14 @@ import {
   hasCodegraphProjectIndex,
   installCodegraph,
 } from '../../domains/integrations/codegraph.js';
+import { assertOpenSpecStoreHealth } from '../../domains/integrations/openspec.js';
+import { resolveCometArtifactLayout } from '../../domains/comet-classic/classic-artifact-layout.js';
 import type { InstallScope, InstallMode } from '../../platform/install/types.js';
 import { printVersionInfo } from '../../platform/version/version.js';
 import { t, type TranslationKey } from './i18n.js';
 import { assertProjectScopeOptions, resolveProjectScopeMode } from './project-scope-selection.js';
+import { inspectLegacyOpenSpecMigration } from './legacy-openspec-migration-prompt.js';
+import { migrateDocsCommand } from './migrate-docs.js';
 
 const PACKAGE_NAME = '@rpamis/comet';
 const OFFICIAL_REGISTRY = 'https://registry.npmjs.org';
@@ -83,6 +87,7 @@ interface SingleProjectUpdateResult {
   rules: { totalCopied: number };
   hooks: { totalInstalled: number };
   projectInstructions: { updated: number };
+  openspecStore?: { status: 'pass' | 'warn'; message: string };
   codegraph: CodegraphStatus;
 }
 
@@ -353,8 +358,30 @@ function currentProjectJson(result: SingleProjectUpdateResult): Record<string, u
     rules: result.rules,
     hooks: result.hooks,
     projectInstructions: result.projectInstructions,
+    ...(result.openspecStore ? { openspecStore: result.openspecStore } : {}),
     codegraph: result.codegraph,
   };
+}
+
+async function checkConfiguredOpenSpecStore(
+  projectPath: string,
+): Promise<SingleProjectUpdateResult['openspecStore']> {
+  const layout = await resolveCometArtifactLayout(projectPath);
+  if (layout.layout !== 'docs' || !layout.openSpec.storeId) return undefined;
+
+  try {
+    assertOpenSpecStoreHealth(
+      projectPath,
+      layout.openSpec.storeId,
+      process.env.COMET_OPENSPEC || 'openspec',
+    );
+    return { status: 'pass', message: `${layout.openSpec.storeId} -> docs` };
+  } catch (error) {
+    return {
+      status: 'warn',
+      message: `invalid registration (${(error as Error).message}) — run: comet migrate docs --apply --repair-store --openspec-store ${layout.openSpec.storeId}`,
+    };
+  }
 }
 
 function summarizeTargets(targets: InstalledCometTarget[]): AllProjectsUpdateResult['targets'] {
@@ -432,6 +459,10 @@ async function updateSingleProject(
   const targets = await detectInstalledCometTargets(projectPath, {
     scopes: options.targetScopes ?? (options.scope ? [options.scope] : undefined),
   });
+  const openspecStore = await checkConfiguredOpenSpecStore(projectPath);
+  if (openspecStore?.status === 'warn') {
+    log(`  OpenSpec store: ${openspecStore.message}`);
+  }
 
   if (targets.length === 0) {
     return {
@@ -446,6 +477,7 @@ async function updateSingleProject(
       rules: { totalCopied: 0 },
       hooks: { totalInstalled: 0 },
       projectInstructions: { updated: 0 },
+      ...(openspecStore ? { openspecStore } : {}),
       codegraph: 'skipped',
     };
   }
@@ -544,6 +576,39 @@ async function updateSingleProject(
 
   const hasProjectTargets = targets.some((target) => target.scope === 'project');
   if (hasProjectTargets) {
+    if (!options.json && !options.allProjects) {
+      const legacyMigration = await inspectLegacyOpenSpecMigration(projectPath);
+      if (legacyMigration.present) {
+        const migrateNow = await select({
+          message: t(lang, 'legacyOpenSpecMigrationPrompt'),
+          choices: [
+            { name: t(lang, 'legacyOpenSpecMigrationNow'), value: true },
+            { name: t(lang, 'legacyOpenSpecMigrationLater'), value: false },
+          ],
+        });
+        const includeActive =
+          migrateNow && legacyMigration.hasActiveChanges
+            ? await select({
+                message: t(lang, 'legacyOpenSpecMigrationActivePrompt'),
+                choices: [
+                  { name: t(lang, 'legacyOpenSpecMigrationActiveConfirm'), value: true },
+                  { name: t(lang, 'legacyOpenSpecMigrationLater'), value: false },
+                ],
+              })
+            : false;
+
+        if (migrateNow && (!legacyMigration.hasActiveChanges || includeActive)) {
+          await migrateDocsCommand(
+            projectPath,
+            legacyMigration.hasActiveChanges
+              ? { apply: true, includeActive: true }
+              : { apply: true },
+          );
+        } else {
+          log(`  ${t(lang, 'legacyOpenSpecMigrationDeferred')} ${legacyMigration.command}`);
+        }
+      }
+    }
     await mergeProjectConfig(projectPath);
     const projectTarget = targets.find((target) => target.scope === 'project');
     const projectLanguageId = resolveTargetLanguage(
@@ -597,6 +662,7 @@ async function updateSingleProject(
     rules: { totalCopied: totalRulesCopied },
     hooks: { totalInstalled: totalHooksInstalled },
     projectInstructions: { updated: projectInstructionsUpdated },
+    ...(openspecStore ? { openspecStore } : {}),
     codegraph: codegraphStatus,
   };
 }
@@ -683,7 +749,7 @@ async function updateAllIndexedProjects(
     scope: undefined,
     targetScopes: ['project'],
     currentProject: true,
-    allProjects: false,
+    allProjects: true,
   };
   if (!options.json && !runOptions.installMode) {
     runOptions.installMode = await selectInstallMode(options, lang);

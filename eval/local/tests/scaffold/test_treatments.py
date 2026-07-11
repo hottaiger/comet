@@ -13,6 +13,7 @@ from scaffold.python.treatments import (
 )
 from scaffold.python.paths import get_skills_dir
 
+EVAL_ROOT = Path(__file__).resolve().parents[3]
 
 BASIC_TREATMENT_YAML = """
 _common_section: &common |
@@ -143,6 +144,16 @@ def test_comet_full_040_beta_docs_layout_uses_live_skill_bundle_and_dependencies
     assert "assets/skills/comet" in comet_skill["path"].replace("\\", "/")
     assert names.issuperset(_benchmark_child_names("dependency", "openspec"))
     assert names.issuperset(_benchmark_child_names("dependency", "superpowers"))
+
+    dockerfile = (
+        EVAL_ROOT / "local/tasks/comet-full-workflow/environment/Dockerfile"
+    ).read_text(encoding="utf-8")
+    validator = (
+        EVAL_ROOT / "local/tasks/comet-full-workflow/validation/test_full_workflow.py"
+    ).read_text(encoding="utf-8")
+    assert "@fission-ai/openspec@1.5.0" in dockerfile
+    assert "/usr/local/bin/comet" in dockerfile
+    assert "docs/openspec/changes" in validator
 
 
 def test_comet_full_039_includes_same_dependency_snapshot():

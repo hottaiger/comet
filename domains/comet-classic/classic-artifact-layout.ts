@@ -120,6 +120,36 @@ async function hasActiveChange(projectRoot: string, storeRootRelative: string): 
   return false;
 }
 
+async function activeSnapshotLayout(
+  projectRoot: string,
+  storeRootRelative: string,
+  expectedLayout: CometArtifactLayoutKind,
+): Promise<CometArtifactLayoutKind | undefined> {
+  const changesDir = path.join(
+    projectRoot,
+    ...storeRootRelative.split('/').filter(Boolean),
+    'openspec',
+    'changes',
+  );
+  if (!(await exists(changesDir))) return undefined;
+  let snapshot: CometArtifactLayoutKind | undefined;
+  for (const entry of await fs.readdir(changesDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === 'archive') continue;
+    const statePath = path.join(changesDir, entry.name, '.comet.yaml');
+    if (!(await exists(statePath))) continue;
+    const state = await readYamlRecord(statePath);
+    const value = state.artifact_layout;
+    if (value !== 'legacy' && value !== 'docs') continue;
+    if (value !== expectedLayout) {
+      throw new Error(
+        `Active change '${entry.name}' records ${value} layout but is stored in ${expectedLayout} layout. Repair or migrate the project before continuing.`,
+      );
+    }
+    snapshot = value;
+  }
+  return snapshot;
+}
+
 async function configuredLayout(projectRoot: string): Promise<{
   layout?: CometArtifactLayoutKind;
   openspecRoot?: string;
@@ -229,16 +259,29 @@ export async function resolveCometArtifactLayout(
     return buildLayout(projectRoot, explicit, explicitLayoutOptions(explicit, configured));
   }
 
+  const [docsActive, legacyActive] = await Promise.all([
+    hasActiveChange(projectRoot, 'docs'),
+    hasActiveChange(projectRoot, '.'),
+  ]);
+  if (docsActive && legacyActive) {
+    throw new Error(
+      'Multiple artifact layouts contain active Comet changes. Configure artifact_layout or repair the project layout.',
+    );
+  }
+  const [docsSnapshot, legacySnapshot] = await Promise.all([
+    activeSnapshotLayout(projectRoot, 'docs', 'docs'),
+    activeSnapshotLayout(projectRoot, '.', 'legacy'),
+  ]);
+  const snapshotLayout = docsSnapshot ?? legacySnapshot;
+  if (snapshotLayout) {
+    return buildLayout(projectRoot, snapshotLayout, {
+      superpowersRoot: configured.superpowersRoot,
+    });
+  }
+
   const docsHealthy = await isHealthyOpenSpecRoot(projectRoot, 'docs');
   const legacyHealthy = await isHealthyOpenSpecRoot(projectRoot, '.');
   if (docsHealthy && legacyHealthy) {
-    const docsActive = await hasActiveChange(projectRoot, 'docs');
-    const legacyActive = await hasActiveChange(projectRoot, '.');
-    if (docsActive && legacyActive) {
-      throw new Error(
-        'Multiple artifact layouts contain active Comet changes. Configure artifact_layout or repair the project layout.',
-      );
-    }
     if (docsActive) {
       return buildLayout(projectRoot, 'docs', {
         superpowersRoot: configured.superpowersRoot,

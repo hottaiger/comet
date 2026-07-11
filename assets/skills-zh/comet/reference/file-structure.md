@@ -5,7 +5,7 @@
 本文件是 Comet 项目文件结构参考。按需查阅，不随 skill 一次性加载。
 
 ```text
-openspec/                              # OpenSpec — WHAT
+<openspec-root>/openspec/              # OpenSpec — WHAT；root 为 .（legacy）或 docs（docs layout）
 ├── config.yaml
 ├── changes/
 │   ├── <name>/                        # 活跃 change

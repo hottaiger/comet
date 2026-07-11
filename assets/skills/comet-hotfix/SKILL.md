@@ -22,6 +22,8 @@ Quick bug fix workflow: open → build → verify → archive. Skip brainstormin
 
 Streamlined OpenSpec artifacts must use the configured Comet artifact language. Read `language` from `.comet/config.yaml` before `.comet.yaml` exists, then use `"$COMET_BASH" "$COMET_STATE" get <name> language` after initialization.
 
+After loading an external OpenSpec Skill, every raw `openspec ...` command must use `comet openspec ...` instead and must not bypass Comet's artifact layout resolver.
+
 Execution chain: open → build → root cause check → verify → archive. Hotfix provides default decisions for each phase: streamlined open, direct build, root cause confirmation, scale-based verification, and final archive confirmation after verification passes.
 
 Before starting, locate Comet scripts via `comet/reference/scripts.md`. When resuming from any entry point, first use `comet/reference/context-recovery.md` to confirm phase/workflow.

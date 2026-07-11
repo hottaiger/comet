@@ -50,6 +50,7 @@ interface ActiveProbeChange {
   buildPause: string | null;
   hasClassicProjection: boolean;
   verifyResult: 'pending' | 'pass' | 'fail' | null;
+  handoffReady: boolean;
   text: string;
   missingCometState: boolean;
 }
@@ -194,7 +195,23 @@ async function hasOpenSpecChangeFiles(changeDir: string): Promise<boolean> {
   );
 }
 
+async function hasActiveCometChange(changesDir: string): Promise<boolean> {
+  if (!(await fileExists(changesDir))) return false;
+  for (const entry of await readDir(changesDir)) {
+    if (entry === 'archive') continue;
+    if (await fileExists(path.join(changesDir, entry, '.comet.yaml'))) return true;
+  }
+  return false;
+}
+
 async function discoverActiveChanges(projectRoot: string): Promise<ActiveChangeDiscovery> {
+  const [docsActive, legacyActive] = await Promise.all([
+    hasActiveCometChange(path.join(projectRoot, 'docs', 'openspec', 'changes')),
+    hasActiveCometChange(path.join(projectRoot, 'openspec', 'changes')),
+  ]);
+  if (docsActive && legacyActive) {
+    return { changes: [], layoutConflict: true };
+  }
   let layout;
   try {
     layout = await resolveCometArtifactLayout(projectRoot);
@@ -241,6 +258,7 @@ async function discoverActiveChanges(projectRoot: string): Promise<ActiveChangeD
         buildPause: null,
         hasClassicProjection: false,
         verifyResult: null,
+        handoffReady: false,
         text: '',
         missingCometState: true,
       };
@@ -257,6 +275,14 @@ async function discoverActiveChanges(projectRoot: string): Promise<ActiveChangeD
     const workflow = classic?.workflow ?? diagnostic.workflow;
     if (phase === 'archive' || classic?.archived) continue;
 
+    const requiresDocsHandoff =
+      layout.layout === 'docs' && workflow === 'full' && (phase === 'build' || phase === 'verify');
+    const handoffReady =
+      !requiresDocsHandoff ||
+      (Boolean(classic?.handoffContext) &&
+        /^[a-f0-9]{64}$/u.test(classic?.handoffHash ?? '') &&
+        (await fileExists(path.resolve(projectRoot, classic!.handoffContext!))));
+
     const change: ActiveProbeChange = {
       name: entry,
       changeDir,
@@ -268,6 +294,7 @@ async function discoverActiveChanges(projectRoot: string): Promise<ActiveChangeD
       buildPause: classic?.buildPause ?? null,
       hasClassicProjection,
       verifyResult: classic?.verifyResult ?? null,
+      handoffReady,
       text: '',
       missingCometState: false,
     };
@@ -358,6 +385,7 @@ function hasDecisionPoint(change: ActiveProbeChange): boolean {
   if (change.missingCometState) return true;
   if (!change.hasClassicProjection) return true;
   if (!change.diagnostic.valid) return true;
+  if (!change.handoffReady) return true;
   if (change.phase === 'archive') return true;
   if (change.verifyResult === 'fail') return true;
   if (change.diagnostic.runtimeEval && !change.diagnostic.runtimeEval.passed) return true;

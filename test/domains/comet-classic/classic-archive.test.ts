@@ -70,6 +70,7 @@ async function fakeOpenSpec(
   dir: string,
   mode: 'success' | 'fail' | 'move-fail',
   changeRoot = 'openspec/changes',
+  storeRoot = 'docs',
 ): Promise<{ command: string; log: string }> {
   const script = path.join(dir, 'fake-openspec.mjs');
   const log = path.join(dir, 'fake-openspec.log');
@@ -80,13 +81,18 @@ async function fakeOpenSpec(
       "import path from 'path';",
       `const mode = ${JSON.stringify(mode)};`,
       `const changeRoot = ${JSON.stringify(changeRoot)};`,
+      `const storeRoot = ${JSON.stringify(path.join(dir, storeRoot))};`,
       `const log = ${JSON.stringify(log)};`,
+      "if (process.argv[2] === 'store' && process.argv[3] === 'list') {",
+      "  process.stdout.write(JSON.stringify({ stores: [{ id: 'comet-demo-1234', root: storeRoot }] }));",
+      '  process.exit(0);',
+      '}',
       "await fs.appendFile(log, process.argv.slice(2).join(' ') + '\\n');",
       'const change = process.argv[3];',
       "if (mode === 'fail') process.exit(9);",
-      'const source = path.join(...changeRoot.split(\'/\'), change);',
+      "const source = path.join(...changeRoot.split('/'), change);",
       'const name = `${new Date().toISOString().slice(0, 10)}-${change}`;',
-      'const target = path.join(...changeRoot.split(\'/\'), \'archive\', name);',
+      "const target = path.join(...changeRoot.split('/'), 'archive', name);",
       'await fs.mkdir(path.dirname(target), { recursive: true });',
       'await fs.rename(source, target);',
       "if (mode === 'move-fail') process.exit(9);",
@@ -202,6 +208,19 @@ describe('Classic archive command', () => {
     await expect(fs.access(path.join(archiveDir, '.comet.yaml'))).resolves.toBeUndefined();
   });
 
+  it('fails closed when a docs store id is registered to another project', async () => {
+    const dir = await makeProject();
+    const changeDir = await seedDocsArchiveChange(dir);
+    const fake = await fakeOpenSpec(dir, 'success', 'docs/openspec/changes', 'other-project/docs');
+
+    const result = run(dir, ['archive', 'add-auth'], { COMET_OPENSPEC: fake.command });
+
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("registry path does not match this project's docs directory");
+    await expect(fs.access(changeDir)).resolves.toBeUndefined();
+    await expect(fs.access(fake.log)).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it('treats a completed archive retry as an idempotent no-op', async () => {
     const dir = await makeProject();
     await seedArchiveChange(dir);
@@ -278,5 +297,28 @@ describe('Classic archive command', () => {
         (event) => event.type === 'recovery_reconciled' && event.data?.kind === 'classic-archive',
       ),
     ).toHaveLength(1);
+  });
+
+  it('recovers the newest matching archive when more than one historical archive exists', async () => {
+    const dir = await makeProject();
+    const active = await seedArchiveChange(dir);
+    const archiveRoot = path.join(dir, 'openspec', 'changes', 'archive');
+    const oldest = path.join(archiveRoot, '2026-06-01-demo');
+    const newest = path.join(archiveRoot, '2026-07-09-demo');
+    await fs.mkdir(archiveRoot, { recursive: true });
+    await fs.cp(active, oldest, { recursive: true });
+    await fs.cp(active, newest, { recursive: true });
+    await fs.rm(active, { recursive: true, force: true });
+    const fake = await fakeOpenSpec(dir, 'success');
+
+    const result = run(dir, ['archive', 'demo'], { COMET_OPENSPEC: fake.command });
+
+    expect(result.status).toBe(0);
+    expect(parse(await fs.readFile(path.join(newest, '.comet.yaml'), 'utf8'))).toMatchObject({
+      archived: true,
+    });
+    expect(parse(await fs.readFile(path.join(oldest, '.comet.yaml'), 'utf8'))).toMatchObject({
+      archived: false,
+    });
   });
 });

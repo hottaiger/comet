@@ -25,6 +25,8 @@ import type { ArtifactLayoutOption } from '../../domains/skill/platform-install.
 import { LANGUAGES, type LanguageConfig } from '../../domains/skill/languages.js';
 import {
   configureOpenSpecStore,
+  createOpenSpecStoreId,
+  assertOpenSpecStoreCliSupport,
   installOpenSpec,
   isCommandAvailable,
 } from '../../domains/integrations/openspec.js';
@@ -37,6 +39,9 @@ import {
 import { printVersionInfo } from '../../platform/version/version.js';
 import { t, type TranslationKey } from './i18n.js';
 import { detectInstalledCometTargets } from './update.js';
+import { resolveCometArtifactLayout } from '../../domains/comet-classic/classic-artifact-layout.js';
+import { inspectLegacyOpenSpecMigration } from './legacy-openspec-migration-prompt.js';
+import { migrateDocsCommand } from './migrate-docs.js';
 
 type InitOptions = {
   yes?: boolean;
@@ -368,6 +373,60 @@ export async function initCommand(targetPath: string, options: InitOptions = {})
   const detected = await detectPlatforms(projectPath);
   const scope = await selectScope(options, lang);
   const installMode = await selectInstallMode(options, lang);
+  const resolvedLayout = await resolveCometArtifactLayout(projectPath, {
+    explicitLayout: options.openSpecStore ? 'docs' : options.artifactLayout,
+  });
+  let artifactLayout = resolvedLayout.layout;
+  if (scope === 'project' && artifactLayout === 'docs') {
+    const legacyMigration = await inspectLegacyOpenSpecMigration(projectPath);
+    if (legacyMigration.present) {
+      if (options.yes || options.json) {
+        throw new Error(`${t(lang, 'legacyOpenSpecMigrationRequired')} ${legacyMigration.command}`);
+      }
+
+      const migrateNow = await select({
+        message: t(lang, 'legacyOpenSpecMigrationPrompt'),
+        choices: [
+          { name: t(lang, 'legacyOpenSpecMigrationNow'), value: true },
+          { name: t(lang, 'legacyOpenSpecMigrationLater'), value: false },
+        ],
+      });
+      const includeActive =
+        migrateNow && legacyMigration.hasActiveChanges
+          ? await select({
+              message: t(lang, 'legacyOpenSpecMigrationActivePrompt'),
+              choices: [
+                { name: t(lang, 'legacyOpenSpecMigrationActiveConfirm'), value: true },
+                { name: t(lang, 'legacyOpenSpecMigrationLater'), value: false },
+              ],
+            })
+          : false;
+
+      if (migrateNow && (!legacyMigration.hasActiveChanges || includeActive)) {
+        await migrateDocsCommand(
+          projectPath,
+          legacyMigration.hasActiveChanges
+            ? {
+                apply: true,
+                includeActive: true,
+                ...(options.openSpecStore ? { openSpecStore: options.openSpecStore } : {}),
+              }
+            : {
+                apply: true,
+                ...(options.openSpecStore ? { openSpecStore: options.openSpecStore } : {}),
+              },
+        );
+      } else {
+        if (options.openSpecStore) {
+          throw new Error(
+            `${t(lang, 'legacyOpenSpecMigrationRequired')} ${legacyMigration.command}`,
+          );
+        }
+        log(`  ${t(lang, 'legacyOpenSpecMigrationDeferred')} ${legacyMigration.command}`);
+        artifactLayout = 'legacy';
+      }
+    }
+  }
 
   const selectedPlatformIds = await selectPlatforms(detected, options, lang);
   if (selectedPlatformIds.length === 0) {
@@ -473,6 +532,8 @@ export async function initCommand(targetPath: string, options: InitOptions = {})
       scope,
       shouldInstallOpenSpecCli,
       mirrorOpenCodePlatformIds,
+      scope === 'project' && artifactLayout === 'docs',
+      options.json === true,
     );
     if (osGlobalStatus === 'skipped' && !shouldInstallOpenSpecCli) {
       log(`  OpenSpec: ${t(lang, 'osSkippedNoCli')}`);
@@ -481,6 +542,9 @@ export async function initCommand(targetPath: string, options: InitOptions = {})
     }
   } else {
     log(`\n  OpenSpec: ${t(lang, 'allSkipped')}`);
+  }
+  if (scope === 'project' && artifactLayout === 'docs') {
+    assertOpenSpecStoreCliSupport();
   }
 
   let spGlobalStatus: InstallStatus = 'skipped';
@@ -585,15 +649,28 @@ export async function initCommand(targetPath: string, options: InitOptions = {})
   }
 
   if (scope === 'project') {
+    const openSpecStore =
+      artifactLayout === 'docs'
+        ? (options.openSpecStore ??
+          resolvedLayout.openSpec.storeId ??
+          createOpenSpecStoreId(projectPath))
+        : undefined;
     await createWorkingDirs(projectPath, language.artifactLanguage, {
-      artifactLayout: options.artifactLayout,
-      openSpecStore: options.openSpecStore,
+      artifactLayout,
     });
-    if (options.openSpecStore) {
-      const storeStatus = configureOpenSpecStore(projectPath, options.openSpecStore);
+    if (openSpecStore) {
+      const storeStatus = configureOpenSpecStore(projectPath, openSpecStore, {
+        json: options.json === true,
+      });
       if (storeStatus === 'failed') {
-        throw new Error(`OpenSpec store configuration failed for ${options.openSpecStore}`);
+        throw new Error(
+          `OpenSpec store configuration failed for ${openSpecStore}. Choose another id with --openspec-store <id> or repair the existing registration.`,
+        );
       }
+      await createWorkingDirs(projectPath, language.artifactLanguage, {
+        artifactLayout,
+        openSpecStore,
+      });
     }
     const projectTargets = await detectInstalledCometTargets(projectPath, { scopes: ['project'] });
     if (projectTargets.length > 0) {

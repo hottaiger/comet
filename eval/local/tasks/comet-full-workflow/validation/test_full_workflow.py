@@ -25,29 +25,26 @@ def failed(name: str, reason: str):
 def check_openspec_artifacts():
     """Check that OpenSpec artifacts were created (proposal, design, tasks).
 
-    Looks for a change directory either directly under openspec/changes/ (active)
-    or under openspec/changes/archive/ (archived). Accepts the first change dir
-    that actually contains proposal.md + tasks.md.
+    Looks in both the frozen legacy root and the docs-layout treatment root.
+    Accepts the first active or archived change containing proposal.md + tasks.md.
     """
-    changes_dir = WORKSPACE / "openspec" / "changes"
-    if not changes_dir.exists():
-        return failed("openspec_artifacts", "openspec/changes/ directory not found")
-
-    # Candidate change dirs: direct children of openspec/changes/ (excluding the
-    # archive/ container itself) plus children of openspec/changes/archive/.
     candidates = []
-    for d in changes_dir.iterdir():
-        if not d.is_dir():
+    for relative_root in ("openspec/changes", "docs/openspec/changes"):
+        changes_dir = WORKSPACE / relative_root
+        if not changes_dir.exists():
             continue
-        if d.name == "archive":
-            for sub in d.iterdir():
-                if sub.is_dir():
-                    candidates.append(sub)
-        else:
-            candidates.append(d)
+        for d in changes_dir.iterdir():
+            if not d.is_dir():
+                continue
+            if d.name == "archive":
+                for sub in d.iterdir():
+                    if sub.is_dir():
+                        candidates.append(sub)
+            else:
+                candidates.append(d)
 
     if not candidates:
-        return failed("openspec_artifacts", "No change directories found in openspec/changes/")
+        return failed("openspec_artifacts", "No change directories found in legacy or docs layout")
 
     for change_dir in candidates:
         if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():

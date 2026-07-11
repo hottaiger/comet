@@ -38,8 +38,23 @@ describe('openspec', () => {
     });
   });
 
+  describe('createOpenSpecStoreId', () => {
+    it('uses one canonical id strategy for camel-case project names', async () => {
+      const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'comet-store-id-'));
+      const root = path.join(parent, 'CometStoreIdProject');
+      try {
+        fs.mkdirSync(root);
+        const { createOpenSpecStoreId } = await import('../../../domains/integrations/openspec.js');
+
+        expect(createOpenSpecStoreId(root)).toMatch(/^comet-comet-store-id-project-[a-f0-9]{8}$/);
+      } finally {
+        fs.rmSync(parent, { recursive: true, force: true });
+      }
+    });
+  });
+
   describe('installOpenSpec', () => {
-    it('configures an OpenSpec store with setup and register commands', async () => {
+    it('registers the pre-created docs root without running store setup', async () => {
       mockedExecFileSync.mockReturnValue(Buffer.from('ok'));
 
       const { configureOpenSpecStore } = await import('../../../domains/integrations/openspec.js');
@@ -51,19 +66,6 @@ describe('openspec', () => {
         'openspec',
         [
           'store',
-          'setup',
-          'comet-demo-1234',
-          '--path',
-          path.join('/tmp/project', 'docs'),
-          '--no-init-git',
-        ],
-        expect.objectContaining({ cwd: '/tmp/project' }),
-      );
-      expect(mockedExecFileSync).toHaveBeenNthCalledWith(
-        2,
-        'openspec',
-        [
-          'store',
           'register',
           path.join('/tmp/project', 'docs'),
           '--id',
@@ -71,6 +73,21 @@ describe('openspec', () => {
           '--yes',
         ],
         expect.objectContaining({ cwd: '/tmp/project' }),
+      );
+      expect(mockedExecFileSync).toHaveBeenCalledTimes(1);
+    });
+
+    it('suppresses store registration output in JSON mode', async () => {
+      mockedExecFileSync.mockReturnValue(Buffer.from('{"status":[]}'));
+
+      const { configureOpenSpecStore } = await import('../../../domains/integrations/openspec.js');
+      const result = configureOpenSpecStore('/tmp/project', 'comet-demo-1234', { json: true });
+
+      expect(result).toBe('installed');
+      expect(mockedExecFileSync).toHaveBeenCalledWith(
+        'openspec',
+        expect.arrayContaining(['store', 'register', '--json']),
+        expect.objectContaining({ stdio: ['ignore', 'pipe', 'pipe'] }),
       );
     });
 
@@ -717,24 +734,34 @@ describe('openspec', () => {
     });
   });
 
-  describe('OpenSpec store helpers', () => {
-    it('builds docs layout store setup invocation', async () => {
-      const { buildOpenSpecStoreSetupInvocation } =
+  describe('assertOpenSpecStoreHealth', () => {
+    it('rejects a registered store whose OpenSpec metadata is invalid', async () => {
+      mockedExecFileSync.mockImplementation((_command, args) => {
+        const values = Array.isArray(args) ? args.map(String) : [];
+        if (values[0] === 'store') {
+          return Buffer.from(
+            JSON.stringify({ stores: [{ id: 'comet-demo', root: '/tmp/project/docs' }] }),
+          );
+        }
+        return Buffer.from(
+          JSON.stringify({
+            root: { path: '/tmp/project/docs', healthy: true },
+            store: { id: 'comet-demo', metadata: { present: true, valid: false } },
+            status: [{ severity: 'error', message: 'invalid store metadata' }],
+          }),
+        );
+      });
+
+      const { assertOpenSpecStoreHealth } =
         await import('../../../domains/integrations/openspec.js');
 
-      expect(buildOpenSpecStoreSetupInvocation('/tmp/project', 'comet-demo-1234')).toEqual({
-        command: 'openspec',
-        args: [
-          'store',
-          'setup',
-          'comet-demo-1234',
-          '--path',
-          path.join('/tmp/project', 'docs'),
-          '--no-init-git',
-        ],
-      });
+      expect(() => assertOpenSpecStoreHealth('/tmp/project', 'comet-demo')).toThrow(
+        /unhealthy|metadata/i,
+      );
     });
+  });
 
+  describe('OpenSpec store helpers', () => {
     it('builds docs layout store register invocation', async () => {
       const { buildOpenSpecStoreRegisterInvocation } =
         await import('../../../domains/integrations/openspec.js');

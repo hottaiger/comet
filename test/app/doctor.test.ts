@@ -4,6 +4,14 @@ import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
 import { doctorCommand } from '../../app/commands/doctor.js';
+import { assertOpenSpecStoreHealth } from '../../domains/integrations/openspec.js';
+
+vi.mock('../../domains/integrations/openspec.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../domains/integrations/openspec.js')>()),
+  assertOpenSpecStoreHealth: vi.fn(),
+}));
+
+const mockedAssertOpenSpecStoreRegistration = vi.mocked(assertOpenSpecStoreHealth);
 
 const stateScript = path.resolve('assets', 'skills', 'comet', 'scripts', 'comet-state.mjs');
 
@@ -40,6 +48,7 @@ describe('doctor command', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
+    mockedAssertOpenSpecStoreRegistration.mockReset();
     tmpDir = path.join(
       os.tmpdir(),
       `comet-doctor-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -66,12 +75,175 @@ describe('doctor command', () => {
       log.mockRestore();
     }
 
-    const results = JSON.parse(json).results as Array<{ check: string; status: string }>;
+    const results = JSON.parse(json).results as Array<{
+      check: string;
+      status: string;
+      message?: string;
+    }>;
     expect(results.find((result) => result.check === '.comet.yaml: current-state')).toMatchObject({
       status: 'pass',
       message: expect.stringContaining('full.verify.run'),
     });
     expect(await fs.readFile(path.join(changeDir, '.comet.yaml'), 'utf8')).not.toBe(before);
+  });
+
+  it('diagnoses active changes stored in the docs OpenSpec layout', async () => {
+    const legacyChangeDir = path.join(tmpDir, 'openspec', 'changes', 'docs-change');
+    state(tmpDir, 'init', 'docs-change', 'full');
+    const docsChangeDir = path.join(tmpDir, 'docs', 'openspec', 'changes', 'docs-change');
+    await fs.mkdir(path.dirname(docsChangeDir), { recursive: true });
+    await fs.rename(legacyChangeDir, docsChangeDir);
+    await fs.rm(path.join(tmpDir, 'openspec'), { recursive: true, force: true });
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n',
+      'utf8',
+    );
+
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let json = '';
+    try {
+      await doctorCommand(tmpDir, { json: true });
+      json = log.mock.calls.map((call) => call.join(' ')).join('\n');
+    } finally {
+      log.mockRestore();
+    }
+
+    const results = JSON.parse(json).results as Array<{ check: string; status: string }>;
+    expect(
+      results.find((result) => result.check === '.comet.yaml: docs/docs-change'),
+    ).toMatchObject({
+      status: 'pass',
+    });
+    expect(results.find((result) => result.check === 'OpenSpec store')).toMatchObject({
+      status: 'warn',
+      message: expect.stringContaining(
+        'comet migrate docs --apply --repair-store --openspec-store <id>',
+      ),
+    });
+  });
+
+  it('warns when docs layout is configured with a non-canonical OpenSpec root', async () => {
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: .\n  store: foreign-store\n',
+      'utf8',
+    );
+
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let json = '';
+    try {
+      await doctorCommand(tmpDir, { json: true });
+      json = log.mock.calls.map((call) => call.join(' ')).join('\n');
+    } finally {
+      log.mockRestore();
+    }
+
+    const results = JSON.parse(json).results as Array<{
+      check: string;
+      status: string;
+      message: string;
+    }>;
+    expect(results.find((result) => result.check === 'Artifact layout')).toMatchObject({
+      status: 'warn',
+      message: expect.stringContaining('openspec.root: docs'),
+    });
+  });
+
+  it('warns when docs layout is configured but legacy OpenSpec artifacts remain', async () => {
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.mkdir(path.join(tmpDir, 'openspec', 'changes'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n',
+      'utf8',
+    );
+
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let json = '';
+    try {
+      await doctorCommand(tmpDir, { json: true });
+      json = log.mock.calls.map((call) => call.join(' ')).join('\n');
+    } finally {
+      log.mockRestore();
+    }
+
+    const results = JSON.parse(json).results as Array<{
+      check: string;
+      status: string;
+      message: string;
+    }>;
+    expect(results.find((result) => result.check === 'Artifact layout')).toMatchObject({
+      status: 'warn',
+      message: expect.stringContaining('legacy OpenSpec artifacts'),
+    });
+  });
+
+  it('reports a corrupt project config instead of silently using fallback layout detection', async () => {
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: [docs\n',
+      'utf8',
+    );
+
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let json = '';
+    try {
+      await doctorCommand(tmpDir, { json: true });
+      json = log.mock.calls.map((call) => call.join(' ')).join('\n');
+    } finally {
+      log.mockRestore();
+    }
+
+    const results = JSON.parse(json).results as Array<{
+      check: string;
+      status: string;
+      message: string;
+    }>;
+    expect(results.find((result) => result.check === '.comet/config.yaml')).toMatchObject({
+      status: 'fail',
+      message: expect.stringContaining('invalid'),
+    });
+  });
+
+  it('warns when the docs store metadata id differs from the configured store id', async () => {
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.mkdir(path.join(tmpDir, 'docs', '.openspec-store'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-configured\n',
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(tmpDir, 'docs', '.openspec-store', 'store.yaml'),
+      'version: 1\nid: comet-metadata\n',
+      'utf8',
+    );
+
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let json = '';
+    try {
+      await doctorCommand(tmpDir, { json: true });
+      json = log.mock.calls.map((call) => call.join(' ')).join('\n');
+    } finally {
+      log.mockRestore();
+    }
+
+    const results = JSON.parse(json).results as Array<{
+      check: string;
+      status: string;
+      message: string;
+    }>;
+    expect(results.find((result) => result.check === 'OpenSpec store')).toMatchObject({
+      status: 'warn',
+      message: expect.stringContaining(
+        "metadata id 'comet-metadata' does not match configured id 'comet-configured'",
+      ),
+    });
+    expect(mockedAssertOpenSpecStoreRegistration).not.toHaveBeenCalled();
   });
 
   it('prints the current Comet version in text output', async () => {

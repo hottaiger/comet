@@ -20,7 +20,7 @@
 | `verify` | 验证、branch handling | 跳过失败处理 |
 | `archive` | 确认归档、运行归档脚本 | 写源代码 |
 
-Hook 硬拦截白名单包括 `openspec/*`、`docs/superpowers/*`、`.superpowers/*`、`.claude/*` 和 `.comet/*` 等流程/平台工作区；这些路径可写不代表可以跳过当前阶段的产物和确认要求。
+Hook 硬拦截白名单包括 `openspec/*`、`docs/openspec/*`、`docs/superpowers/*`、`.superpowers/*`、`.claude/*` 和 `.comet/*` 等流程/平台工作区；这些路径可写不代表可以跳过当前阶段的产物和确认要求。
 
 ### 阶段进入自洽性校验（写源代码前必查）
 

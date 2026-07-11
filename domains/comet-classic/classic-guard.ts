@@ -111,10 +111,8 @@ function validateChangeName(name: string): void {
   if (error) throw new GuardFailure(red(`ERROR: ${error}`));
 }
 
-// Resolve the change directory the way the frozen guard does: prefer the active
-// `openspec/changes/<name>` path, fall back to the archive copy. Returns the
-// RELATIVE path (cwd is the project root) so handoff-hash inputs and check
-// output match the frozen `openspec/changes/...` form byte-for-byte.
+// Return the resolver's project-relative label so handoff hashes and check
+// output stay stable across platforms and layouts.
 async function resolveChangeDir(name: string): Promise<string> {
   return (await resolveClassicChangeDirectory(name)).label;
 }
@@ -231,8 +229,8 @@ function hashFile(file: string): string {
 async function handoffSourceFiles(changeDir: string): Promise<string[]> {
   // Use forward-slash concatenation (not path.join, which uses the OS separator)
   // so the handoff-hash input and markdown `Source:` references match the frozen
-  // shell + comet-handoff provenance byte-for-byte. changeDir is a relative forward-slash
-  // path (openspec/changes/<name>); forward slashes are readable on Windows too.
+  // shell + comet-handoff provenance byte-for-byte. changeDir is the resolver's
+  // relative forward-slash path, which is also readable on Windows.
   const files = [`${changeDir}/proposal.md`, `${changeDir}/design.md`, `${changeDir}/tasks.md`];
   const specs = `${changeDir}/specs`;
   if (await exists(specs)) {
@@ -789,6 +787,13 @@ async function guardBuildChecks(
   change: string,
 ): Promise<boolean> {
   return runChecks(output, [
+    check('docs layout design handoff is current', async () => {
+      const layout = await readField(changeDir, 'artifact_layout');
+      const workflow = await readField(changeDir, 'workflow');
+      return layout === 'docs' && workflow === 'full'
+        ? designHandoffContextValid(changeDir, change)
+        : pass();
+    }),
     check('isolation selected', () => isolationSelected(changeDir, change)),
     check('build_mode selected', () => buildModeSelected(changeDir, change)),
     check('build_mode allowed for workflow', () => buildModeAllowedForWorkflow(changeDir)),
@@ -817,8 +822,19 @@ async function guardBuildChecks(
   ]);
 }
 
-async function guardVerifyChecks(output: GuardOutput, changeDir: string): Promise<boolean> {
+async function guardVerifyChecks(
+  output: GuardOutput,
+  changeDir: string,
+  change: string,
+): Promise<boolean> {
   return runChecks(output, [
+    check('docs layout design handoff is current', async () => {
+      const layout = await readField(changeDir, 'artifact_layout');
+      const workflow = await readField(changeDir, 'workflow');
+      return layout === 'docs' && workflow === 'full'
+        ? designHandoffContextValid(changeDir, change)
+        : pass();
+    }),
     check('tasks.md all tasks checked', () => tasksAllDone(changeDir)),
     // Verification command runs after tasks check — no point running tests
     // if tasks.md is incomplete.
@@ -916,7 +932,7 @@ export const classicGuardCommand: ClassicCommandHandler = async (args, options) 
     if (phase === 'open') blocked = await guardOpenChecks(output, changeDir);
     else if (phase === 'design') blocked = await guardDesignChecks(output, changeDir, change);
     else if (phase === 'build') blocked = await guardBuildChecks(output, changeDir, change);
-    else if (phase === 'verify') blocked = await guardVerifyChecks(output, changeDir);
+    else if (phase === 'verify') blocked = await guardVerifyChecks(output, changeDir, change);
     else blocked = await guardArchiveChecks(output, changeDir);
 
     if (blocked) {

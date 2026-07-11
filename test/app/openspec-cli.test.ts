@@ -18,7 +18,11 @@ async function writeFakeOpenSpec(binDir: string): Promise<void> {
       '  argv: process.argv.slice(2),',
       '  cwd: process.cwd(),',
       '}, null, 2));',
-      "process.stdout.write('fake openspec stdout\\n');",
+      "if (process.argv.slice(2).join(' ') === 'store list --json') {",
+      "  process.stdout.write(JSON.stringify({ stores: [{ id: 'comet-demo-1234', root: process.cwd() + '/docs' }] }));",
+      '} else {',
+      "  process.stdout.write('fake openspec stdout\\n');",
+      '}',
       "process.stderr.write('fake openspec stderr\\n');",
     ].join('\n'),
     'utf8',
@@ -84,7 +88,7 @@ describe('CLI openspec forwarding', () => {
     });
   });
 
-  it('keeps --project and facade --json for Comet while forwarding explicit OpenSpec args', async () => {
+  it('forwards Commander-consumed --json to OpenSpec', async () => {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), 'comet-openspec-cli-'));
     const binDir = path.join(root, 'bin');
     const captureFile = path.join(root, 'capture.json');
@@ -117,12 +121,12 @@ describe('CLI openspec forwarding', () => {
     expect(result.stderr).toContain('fake openspec stderr');
     expect(result.stderr).not.toContain('Using OpenSpec root:');
     expect(JSON.parse(await fs.readFile(captureFile, 'utf8'))).toMatchObject({
-      argv: ['status', '--change', 'add-auth', '--store', 'comet-demo-1234'],
+      argv: ['status', '--change', 'add-auth', '--json', '--store', 'comet-demo-1234'],
       cwd: projectRoot,
     });
   });
 
-  it('allows explicit forwarded --json via -- separator', async () => {
+  it('does not duplicate explicit forwarded --json via -- separator', async () => {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), 'comet-openspec-cli-'));
     const binDir = path.join(root, 'bin');
     const captureFile = path.join(root, 'capture.json');
@@ -132,7 +136,7 @@ describe('CLI openspec forwarding', () => {
 
     const result = spawnSync(
       process.execPath,
-      [cli, 'openspec', 'status', '--change', 'add-auth', '--', '--json'],
+      [cli, 'openspec', '--json', 'status', '--change', 'add-auth', '--', '--json'],
       {
         cwd: repositoryRoot,
         encoding: 'utf8',

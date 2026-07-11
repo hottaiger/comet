@@ -19,6 +19,7 @@ import {
   getProjectRegistryPath,
   upsertProjectInstallation,
 } from '../../platform/install/project-registry.js';
+import { assertOpenSpecStoreHealth } from '../../domains/integrations/openspec.js';
 
 // Mock the interactive select prompt so tests don't hang on CI (no TTY).
 vi.mock('@inquirer/prompts', () => ({
@@ -33,8 +34,40 @@ vi.mock('child_process', () => ({
   }),
 }));
 
+vi.mock('../../domains/integrations/openspec.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../domains/integrations/openspec.js')>()),
+  assertOpenSpecStoreHealth: vi.fn(),
+}));
+
+vi.mock('../../app/commands/migrate-docs.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../app/commands/migrate-docs.js')>()),
+  migrateDocsCommand: vi.fn(),
+}));
+
 const mockedSelect = vi.mocked(select);
 const mockedSpawn = vi.mocked(spawn);
+const mockedAssertOpenSpecStoreRegistration = vi.mocked(assertOpenSpecStoreHealth);
+
+async function createProjectTarget(projectPath: string): Promise<void> {
+  await fs.mkdir(path.join(projectPath, '.claude', 'skills', 'comet'), { recursive: true });
+  await fs.writeFile(
+    path.join(projectPath, '.claude', 'skills', 'comet', 'SKILL.md'),
+    '# Comet\n\nUse this skill.',
+    'utf8',
+  );
+}
+
+async function createLegacyOpenSpecRoot(projectPath: string, activeChange?: string): Promise<void> {
+  const root = path.join(projectPath, 'openspec');
+  await fs.mkdir(path.join(root, 'changes', 'archive'), { recursive: true });
+  await fs.mkdir(path.join(root, 'specs'), { recursive: true });
+  await fs.writeFile(path.join(root, 'config.yaml'), 'schema: spec-driven\n', 'utf8');
+  if (activeChange) {
+    await fs.mkdir(path.join(projectPath, 'openspec', 'changes', activeChange), {
+      recursive: true,
+    });
+  }
+}
 
 const claudePlatform: Platform = {
   id: 'claude',
@@ -49,6 +82,9 @@ describe('update command helpers', () => {
   beforeEach(async () => {
     mockedSelect.mockClear();
     mockedSpawn.mockClear();
+    mockedAssertOpenSpecStoreRegistration.mockReset();
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    vi.mocked(migrateDocsCommand).mockClear();
     mockedSpawn.mockImplementation(() => {
       const child = new EventEmitter();
       queueMicrotask(() => child.emit('exit', 0));
@@ -59,9 +95,11 @@ describe('update command helpers', () => {
       `comet-update-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     );
     await fs.mkdir(tmpDir, { recursive: true });
+    vi.spyOn(os, 'homedir').mockReturnValue(path.join(tmpDir, 'fake-home'));
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     await fs.rm(tmpDir, { recursive: true, force: true });
   });
 
@@ -257,6 +295,99 @@ describe('update command helpers', () => {
     expect(output).toContain('$ copy assets/skills-zh -> .claude/skills/ (project)');
   });
 
+  it('migrates an inactive legacy OpenSpec root during interactive project update', async () => {
+    await createProjectTarget(tmpDir);
+    await createLegacyOpenSpecRoot(tmpDir);
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    mockedSelect.mockResolvedValueOnce(true);
+
+    await updateCommand(tmpDir, { skipNpm: true, installMode: 'copy' });
+
+    expect(migrateDocsCommand).toHaveBeenCalledWith(tmpDir, { apply: true });
+  });
+
+  it('prints the exact active migration command when interactive project update defers', async () => {
+    await createProjectTarget(tmpDir);
+    await createLegacyOpenSpecRoot(tmpDir, 'active-change');
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    mockedSelect.mockResolvedValueOnce(false);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let output = '';
+
+    try {
+      await updateCommand(tmpDir, { skipNpm: true, installMode: 'copy' });
+      output = log.mock.calls.flat().join('\n');
+    } finally {
+      log.mockRestore();
+    }
+
+    expect(migrateDocsCommand).not.toHaveBeenCalled();
+    expect(output).toContain('comet migrate docs --apply --include-active');
+    await expect(fs.access(path.join(tmpDir, 'docs', 'openspec'))).rejects.toThrow();
+  });
+
+  it('migrates active legacy changes during update only after the second confirmation', async () => {
+    await createProjectTarget(tmpDir);
+    await createLegacyOpenSpecRoot(tmpDir, 'active-change');
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    mockedSelect.mockResolvedValueOnce(true).mockResolvedValueOnce(true);
+
+    await updateCommand(tmpDir, { skipNpm: true, installMode: 'copy' });
+
+    expect(migrateDocsCommand).toHaveBeenCalledWith(tmpDir, {
+      apply: true,
+      includeActive: true,
+    });
+  });
+
+  it('does not prompt or migrate legacy artifacts during JSON update', async () => {
+    await createProjectTarget(tmpDir);
+    await createLegacyOpenSpecRoot(tmpDir);
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    try {
+      await updateCommand(tmpDir, { json: true, skipNpm: true });
+    } finally {
+      log.mockRestore();
+    }
+
+    expect(mockedSelect).not.toHaveBeenCalled();
+    expect(migrateDocsCommand).not.toHaveBeenCalled();
+  });
+
+  it('does not show a migration prompt or migrate during all-projects update', async () => {
+    const fakeHome = path.join(tmpDir, 'fake-home-all-legacy');
+    const project = path.join(tmpDir, 'project-all-legacy');
+    await createProjectTarget(project);
+    await createLegacyOpenSpecRoot(project);
+    await upsertProjectInstallation(project, [{ platform: 'claude', language: 'en' }], 'init', {
+      homeDir: fakeHome,
+    });
+    const homedirSpy = vi.spyOn(os, 'homedir').mockReturnValue(fakeHome);
+    const { migrateDocsCommand } = await import('../../app/commands/migrate-docs.js');
+    mockedSelect.mockResolvedValueOnce(true);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    try {
+      await updateCommand(project, {
+        allProjects: true,
+        skipNpm: true,
+        installMode: 'copy',
+      });
+    } finally {
+      log.mockRestore();
+      homedirSpy.mockRestore();
+    }
+
+    expect(migrateDocsCommand).not.toHaveBeenCalled();
+    expect(
+      mockedSelect.mock.calls.some(([prompt]) =>
+        String((prompt as { message?: string }).message).includes('Legacy OpenSpec'),
+      ),
+    ).toBe(false);
+  });
+
   it('prints structured JSON when requested', async () => {
     await fs.mkdir(path.join(tmpDir, '.claude', 'skills', 'comet'), { recursive: true });
     await fs.writeFile(
@@ -285,6 +416,45 @@ describe('update command helpers', () => {
       platform: 'claude',
       language: 'en',
       source: 'skills',
+    });
+  });
+
+  it('reports a repair command when a configured docs store is not registered for this project', async () => {
+    await fs.mkdir(path.join(tmpDir, '.comet'), { recursive: true });
+    await fs.writeFile(
+      path.join(tmpDir, '.comet', 'config.yaml'),
+      'artifact_layout: docs\nopenspec:\n  root: docs\n  store: comet-demo\n',
+      'utf-8',
+    );
+    mockedAssertOpenSpecStoreRegistration.mockImplementation(() => {
+      throw new Error('registry path does not match this project');
+    });
+
+    const fakeHome = path.join(tmpDir, 'fake-home-store-health');
+    const homedirSpy = vi.spyOn(os, 'homedir').mockReturnValue(fakeHome);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    let json = '';
+    try {
+      await updateCommand(tmpDir, { json: true, skipNpm: true });
+      json = log.mock.calls.map((call) => call.join(' ')).join('\n');
+    } finally {
+      log.mockRestore();
+      homedirSpy.mockRestore();
+    }
+
+    const result = JSON.parse(json) as {
+      openspecStore?: { status: string; message: string };
+    };
+    expect(mockedAssertOpenSpecStoreRegistration).toHaveBeenCalledWith(
+      tmpDir,
+      'comet-demo',
+      'openspec',
+    );
+    expect(result.openspecStore).toMatchObject({
+      status: 'warn',
+      message: expect.stringContaining(
+        'comet migrate docs --apply --repair-store --openspec-store comet-demo',
+      ),
     });
   });
 

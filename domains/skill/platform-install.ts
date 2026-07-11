@@ -1143,7 +1143,7 @@ type ArtifactLayoutOption = 'legacy' | 'docs';
 
 interface WorkingDirOptions {
   artifactLayout?: ArtifactLayoutOption;
-  openSpecStore?: string;
+  openSpecStore?: string | null;
 }
 
 function parseWorkingDirOptions(content: string): WorkingDirOptions {
@@ -1175,6 +1175,9 @@ function resolveWorkingDirOptions(
   options: WorkingDirOptions = {},
 ): WorkingDirOptions {
   const merged: WorkingDirOptions = { ...existingOptions, ...options };
+  if (options.openSpecStore === null) {
+    delete merged.openSpecStore;
+  }
   if (merged.openSpecStore && !merged.artifactLayout) {
     merged.artifactLayout = 'docs';
   }
@@ -1266,9 +1269,19 @@ async function createWorkingDirs(
     if (!(await fileExists(openSpecConfigPath))) {
       await writeFile(openSpecConfigPath, 'schema: spec-driven\n', 'utf-8');
     }
+    for (const anchor of [
+      path.join(projectPath, 'docs', 'openspec', 'changes', 'archive', '.gitkeep'),
+      path.join(projectPath, 'docs', 'openspec', 'specs', '.gitkeep'),
+    ]) {
+      if (!(await fileExists(anchor))) await writeFile(anchor, '', 'utf-8');
+    }
   }
 
-  await mergeProjectConfig(projectPath, language, resolvedOptions);
+  await mergeProjectConfig(
+    projectPath,
+    language,
+    options.openSpecStore === null ? { ...resolvedOptions, openSpecStore: null } : resolvedOptions,
+  );
   await installCometProjectInstructions(projectPath, language === 'zh-CN' ? 'zh' : 'en');
 }
 

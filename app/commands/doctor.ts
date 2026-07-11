@@ -1,8 +1,13 @@
 import path from 'path';
 import os from 'os';
 import { execSync } from 'child_process';
+import { promises as fs } from 'fs';
+import { parseDocument } from 'yaml';
 import { fileExists, readDir } from '../../platform/fs/file-system.js';
-import { isCommandAvailable } from '../../domains/integrations/openspec.js';
+import {
+  assertOpenSpecStoreHealth,
+  isCommandAvailable,
+} from '../../domains/integrations/openspec.js';
 import {
   hasCodegraphProjectIndex,
   resolveCodegraphCommand,
@@ -26,6 +31,17 @@ interface CheckResult {
 type DoctorScope = InstallScope | 'auto';
 interface DoctorContext {
   homeDir: string;
+}
+
+interface ArtifactLayoutConfig {
+  layout?: 'legacy' | 'docs';
+  openSpecRoot?: string;
+  openSpecStore?: string;
+}
+
+interface ArtifactLayoutConfigReadResult {
+  config: ArtifactLayoutConfig;
+  error?: string;
 }
 
 const SUPERPOWERS_SENTINELS = [
@@ -109,6 +125,187 @@ async function checkWorkingDirs(projectPath: string): Promise<CheckResult> {
     status: 'warn',
     message: `partial (missing: ${missing.join(', ')})`,
   };
+}
+
+async function readArtifactLayoutConfig(
+  projectPath: string,
+): Promise<ArtifactLayoutConfigReadResult> {
+  try {
+    const document = parseDocument(
+      await fs.readFile(path.join(projectPath, '.comet', 'config.yaml'), 'utf8'),
+    );
+    if (document.errors.length > 0) {
+      return {
+        config: {},
+        error: document.errors.map((error) => error.message).join('; '),
+      };
+    }
+    const value = document.toJS();
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return { config: {}, error: 'expected a YAML object' };
+    }
+    const config = value as Record<string, unknown>;
+    const openSpec =
+      config.openspec && typeof config.openspec === 'object' && !Array.isArray(config.openspec)
+        ? (config.openspec as Record<string, unknown>)
+        : undefined;
+    return {
+      config: {
+        layout:
+          config.artifact_layout === 'legacy' || config.artifact_layout === 'docs'
+            ? config.artifact_layout
+            : undefined,
+        openSpecRoot: typeof openSpec?.root === 'string' ? openSpec.root : undefined,
+        openSpecStore:
+          typeof openSpec?.store === 'string' ? openSpec.store.trim() || undefined : undefined,
+      },
+    };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { config: {} };
+    return { config: {}, error: (error as Error).message };
+  }
+}
+
+function checkArtifactLayoutConfig(
+  configResult: ArtifactLayoutConfigReadResult,
+): CheckResult | null {
+  if (!configResult.error) return null;
+  return {
+    check: '.comet/config.yaml',
+    status: 'fail',
+    message: `invalid (${configResult.error}) — repair the project configuration before running Comet commands`,
+  };
+}
+
+async function checkArtifactLayoutConsistency(
+  projectPath: string,
+  config: ArtifactLayoutConfig,
+): Promise<CheckResult | null> {
+  if (config.layout === 'docs' && config.openSpecRoot && config.openSpecRoot !== 'docs') {
+    return {
+      check: 'Artifact layout',
+      status: 'warn',
+      message: `docs layout requires openspec.root: docs (found ${config.openSpecRoot}) — run: comet migrate docs --apply`,
+    };
+  }
+  if (
+    config.layout === 'legacy' &&
+    (await fileExists(path.join(projectPath, 'docs', 'openspec', 'changes')))
+  ) {
+    return {
+      check: 'Artifact layout',
+      status: 'warn',
+      message:
+        'legacy config conflicts with docs OpenSpec artifacts — run: comet migrate docs --apply',
+    };
+  }
+  if (
+    config.layout === 'docs' &&
+    (await fileExists(path.join(projectPath, 'openspec', 'changes')))
+  ) {
+    return {
+      check: 'Artifact layout',
+      status: 'warn',
+      message:
+        'docs config conflicts with legacy OpenSpec artifacts — run: comet migrate docs --apply',
+    };
+  }
+  return null;
+}
+
+interface OpenSpecStoreMetadata {
+  status: 'missing' | 'valid' | 'invalid';
+  id?: string;
+  error?: string;
+}
+
+async function readOpenSpecStoreMetadata(projectPath: string): Promise<OpenSpecStoreMetadata> {
+  const metadataPath = path.join(projectPath, 'docs', '.openspec-store', 'store.yaml');
+  try {
+    const document = parseDocument(await fs.readFile(metadataPath, 'utf8'));
+    if (document.errors.length > 0) {
+      return { status: 'invalid', error: document.errors.map((error) => error.message).join('; ') };
+    }
+    const value = document.toJS();
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return { status: 'invalid', error: 'expected a YAML object' };
+    }
+    const id = (value as Record<string, unknown>).id;
+    if (typeof id !== 'string' || !id.trim()) {
+      return { status: 'invalid', error: 'missing a non-empty id' };
+    }
+    return { status: 'valid', id: id.trim() };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { status: 'missing' };
+    return { status: 'invalid', error: (error as Error).message };
+  }
+}
+
+function repairStoreCommand(storeId?: string): string {
+  return `comet migrate docs --apply --repair-store --openspec-store ${storeId ?? '<id>'}`;
+}
+
+async function checkOpenSpecStore(
+  projectPath: string,
+  config: ArtifactLayoutConfig,
+): Promise<CheckResult | null> {
+  if (config.layout !== 'docs') return null;
+  if (config.openSpecRoot && config.openSpecRoot !== 'docs') {
+    return {
+      check: 'OpenSpec store',
+      status: 'warn',
+      message: `cannot validate store until openspec.root is docs — run: comet migrate docs --apply`,
+    };
+  }
+  if (!config.openSpecStore) {
+    return {
+      check: 'OpenSpec store',
+      status: 'warn',
+      message: `not registered; docs layout uses the project docs directory directly — run: ${repairStoreCommand()}`,
+    };
+  }
+
+  const metadata = await readOpenSpecStoreMetadata(projectPath);
+  if (metadata.status === 'missing') {
+    return {
+      check: 'OpenSpec store',
+      status: 'warn',
+      message: `missing docs/.openspec-store/store.yaml — run: ${repairStoreCommand(config.openSpecStore)}`,
+    };
+  }
+  if (metadata.status === 'invalid') {
+    return {
+      check: 'OpenSpec store',
+      status: 'warn',
+      message: `invalid docs/.openspec-store/store.yaml (${metadata.error}) — run: ${repairStoreCommand(config.openSpecStore)}`,
+    };
+  }
+  if (metadata.id !== config.openSpecStore) {
+    return {
+      check: 'OpenSpec store',
+      status: 'warn',
+      message: `metadata id '${metadata.id}' does not match configured id '${config.openSpecStore}' — run: ${repairStoreCommand(config.openSpecStore)}`,
+    };
+  }
+
+  try {
+    assertOpenSpecStoreHealth(
+      projectPath,
+      config.openSpecStore,
+      process.env.COMET_OPENSPEC || 'openspec',
+    );
+    return {
+      check: 'OpenSpec store',
+      status: 'pass',
+      message: `${config.openSpecStore} -> docs`,
+    };
+  } catch (error) {
+    return {
+      check: 'OpenSpec store',
+      status: 'warn',
+      message: `invalid registration (${(error as Error).message}) — run: ${repairStoreCommand(config.openSpecStore)}`,
+    };
+  }
 }
 
 async function checkSuperpowers(
@@ -283,48 +480,53 @@ function formatRuntimeEvalRecovery(
 }
 
 async function checkCometYamlValidity(projectPath: string): Promise<CheckResult[]> {
-  const changesDir = path.join(projectPath, 'openspec', 'changes');
-  if (!(await fileExists(changesDir))) return [];
-
-  const entries = await readDir(changesDir);
   const results: CheckResult[] = [];
+  const roots = [
+    { changesDir: path.join(projectPath, 'openspec', 'changes'), label: '' },
+    { changesDir: path.join(projectPath, 'docs', 'openspec', 'changes'), label: 'docs/' },
+  ];
 
-  for (const entry of entries) {
-    if (entry === 'archive') continue;
-    const changeDir = path.join(changesDir, entry);
-    const yamlPath = path.join(changeDir, '.comet.yaml');
-    if (!(await fileExists(yamlPath))) continue;
+  for (const root of roots) {
+    if (!(await fileExists(root.changesDir))) continue;
+    const entries = await readDir(root.changesDir);
+    for (const entry of entries) {
+      if (entry === 'archive') continue;
+      const changeDir = path.join(root.changesDir, entry);
+      const yamlPath = path.join(changeDir, '.comet.yaml');
+      if (!(await fileExists(yamlPath))) continue;
 
-    const diagnostic = await inspectClassicChange(changeDir, entry);
-    if (diagnostic.valid) {
-      results.push({
-        check: `.comet.yaml: ${entry}`,
-        status: 'pass',
-        message: `valid (step: ${diagnostic.currentStep ?? 'completed'}, mode: ${diagnostic.runtimeMode})`,
-      });
-      if (diagnostic.runtimeEval) {
-        const runtimeCheckMessage = diagnostic.runtimeEval.passed
-          ? `pass (${diagnostic.runtimeEval.stepId})`
-          : `fail (${diagnostic.runtimeEval.stepId}; missing: ${formatMissingEvidence(diagnostic.runtimeEval.missingEvidence)}; next: ${formatRuntimeEvalRecovery(diagnostic.nextCommand, diagnostic.runtimeEval.missingEvidence)})`;
+      const checkLabel = `${root.label}${entry}`;
+      const diagnostic = await inspectClassicChange(changeDir, entry);
+      if (diagnostic.valid) {
         results.push({
-          check: `runtime_check: ${entry}`,
-          status: diagnostic.runtimeEval.passed ? 'pass' : 'warn',
-          message: runtimeCheckMessage,
+          check: `.comet.yaml: ${checkLabel}`,
+          status: 'pass',
+          message: `valid (step: ${diagnostic.currentStep ?? 'completed'}, mode: ${diagnostic.runtimeMode})`,
         });
+        if (diagnostic.runtimeEval) {
+          const runtimeCheckMessage = diagnostic.runtimeEval.passed
+            ? `pass (${diagnostic.runtimeEval.stepId})`
+            : `fail (${diagnostic.runtimeEval.stepId}; missing: ${formatMissingEvidence(diagnostic.runtimeEval.missingEvidence)}; next: ${formatRuntimeEvalRecovery(diagnostic.nextCommand, diagnostic.runtimeEval.missingEvidence)})`;
+          results.push({
+            check: `runtime_check: ${checkLabel}`,
+            status: diagnostic.runtimeEval.passed ? 'pass' : 'warn',
+            message: runtimeCheckMessage,
+          });
+        }
+        continue;
       }
-      continue;
-    }
 
-    results.push({
-      check: `.comet.yaml: ${entry}`,
-      status: 'fail',
-      message: diagnostic.error ?? 'invalid Classic state',
-    });
-    results.push({
-      check: `next: ${entry}`,
-      status: 'warn',
-      message: 'inspect .comet.yaml and rerun comet doctor',
-    });
+      results.push({
+        check: `.comet.yaml: ${checkLabel}`,
+        status: 'fail',
+        message: diagnostic.error ?? 'invalid Classic state',
+      });
+      results.push({
+        check: `next: ${checkLabel}`,
+        status: 'warn',
+        message: 'inspect .comet.yaml and rerun comet doctor',
+      });
+    }
   }
 
   return results;
@@ -378,6 +580,13 @@ async function collectResultsWithContext(
   results.push(await checkSuperpowers(projectPath, scope, context));
   if (scope !== 'global') {
     results.push(await checkWorkingDirs(projectPath));
+    const configResult = await readArtifactLayoutConfig(projectPath);
+    const configCheck = checkArtifactLayoutConfig(configResult);
+    if (configCheck) results.push(configCheck);
+    const artifactLayout = await checkArtifactLayoutConsistency(projectPath, configResult.config);
+    if (artifactLayout) results.push(artifactLayout);
+    const store = await checkOpenSpecStore(projectPath, configResult.config);
+    if (store) results.push(store);
   }
   results.push(...(await checkSkillCompleteness(projectPath, scope, context)));
   results.push(await checkScriptsPresent());

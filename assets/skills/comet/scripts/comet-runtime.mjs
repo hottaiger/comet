@@ -126,17 +126,17 @@ var require_visit = __commonJS({
     visit.BREAK = BREAK;
     visit.SKIP = SKIP;
     visit.REMOVE = REMOVE;
-    function visit_(key, node, visitor, path19) {
-      const ctrl = callVisitor(key, node, visitor, path19);
+    function visit_(key, node, visitor, path20) {
+      const ctrl = callVisitor(key, node, visitor, path20);
       if (identity.isNode(ctrl) || identity.isPair(ctrl)) {
-        replaceNode(key, path19, ctrl);
-        return visit_(key, ctrl, visitor, path19);
+        replaceNode(key, path20, ctrl);
+        return visit_(key, ctrl, visitor, path20);
       }
       if (typeof ctrl !== "symbol") {
         if (identity.isCollection(node)) {
-          path19 = Object.freeze(path19.concat(node));
+          path20 = Object.freeze(path20.concat(node));
           for (let i = 0; i < node.items.length; ++i) {
-            const ci = visit_(i, node.items[i], visitor, path19);
+            const ci = visit_(i, node.items[i], visitor, path20);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -147,13 +147,13 @@ var require_visit = __commonJS({
             }
           }
         } else if (identity.isPair(node)) {
-          path19 = Object.freeze(path19.concat(node));
-          const ck = visit_("key", node.key, visitor, path19);
+          path20 = Object.freeze(path20.concat(node));
+          const ck = visit_("key", node.key, visitor, path20);
           if (ck === BREAK)
             return BREAK;
           else if (ck === REMOVE)
             node.key = null;
-          const cv = visit_("value", node.value, visitor, path19);
+          const cv = visit_("value", node.value, visitor, path20);
           if (cv === BREAK)
             return BREAK;
           else if (cv === REMOVE)
@@ -174,17 +174,17 @@ var require_visit = __commonJS({
     visitAsync.BREAK = BREAK;
     visitAsync.SKIP = SKIP;
     visitAsync.REMOVE = REMOVE;
-    async function visitAsync_(key, node, visitor, path19) {
-      const ctrl = await callVisitor(key, node, visitor, path19);
+    async function visitAsync_(key, node, visitor, path20) {
+      const ctrl = await callVisitor(key, node, visitor, path20);
       if (identity.isNode(ctrl) || identity.isPair(ctrl)) {
-        replaceNode(key, path19, ctrl);
-        return visitAsync_(key, ctrl, visitor, path19);
+        replaceNode(key, path20, ctrl);
+        return visitAsync_(key, ctrl, visitor, path20);
       }
       if (typeof ctrl !== "symbol") {
         if (identity.isCollection(node)) {
-          path19 = Object.freeze(path19.concat(node));
+          path20 = Object.freeze(path20.concat(node));
           for (let i = 0; i < node.items.length; ++i) {
-            const ci = await visitAsync_(i, node.items[i], visitor, path19);
+            const ci = await visitAsync_(i, node.items[i], visitor, path20);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -195,13 +195,13 @@ var require_visit = __commonJS({
             }
           }
         } else if (identity.isPair(node)) {
-          path19 = Object.freeze(path19.concat(node));
-          const ck = await visitAsync_("key", node.key, visitor, path19);
+          path20 = Object.freeze(path20.concat(node));
+          const ck = await visitAsync_("key", node.key, visitor, path20);
           if (ck === BREAK)
             return BREAK;
           else if (ck === REMOVE)
             node.key = null;
-          const cv = await visitAsync_("value", node.value, visitor, path19);
+          const cv = await visitAsync_("value", node.value, visitor, path20);
           if (cv === BREAK)
             return BREAK;
           else if (cv === REMOVE)
@@ -228,23 +228,23 @@ var require_visit = __commonJS({
       }
       return visitor;
     }
-    function callVisitor(key, node, visitor, path19) {
+    function callVisitor(key, node, visitor, path20) {
       if (typeof visitor === "function")
-        return visitor(key, node, path19);
+        return visitor(key, node, path20);
       if (identity.isMap(node))
-        return visitor.Map?.(key, node, path19);
+        return visitor.Map?.(key, node, path20);
       if (identity.isSeq(node))
-        return visitor.Seq?.(key, node, path19);
+        return visitor.Seq?.(key, node, path20);
       if (identity.isPair(node))
-        return visitor.Pair?.(key, node, path19);
+        return visitor.Pair?.(key, node, path20);
       if (identity.isScalar(node))
-        return visitor.Scalar?.(key, node, path19);
+        return visitor.Scalar?.(key, node, path20);
       if (identity.isAlias(node))
-        return visitor.Alias?.(key, node, path19);
+        return visitor.Alias?.(key, node, path20);
       return void 0;
     }
-    function replaceNode(key, path19, node) {
-      const parent = path19[path19.length - 1];
+    function replaceNode(key, path20, node) {
+      const parent = path20[path20.length - 1];
       if (identity.isCollection(parent)) {
         parent.items[key] = node;
       } else if (identity.isPair(parent)) {
@@ -854,10 +854,10 @@ var require_Collection = __commonJS({
     var createNode = require_createNode();
     var identity = require_identity();
     var Node = require_Node();
-    function collectionFromPath(schema, path19, value) {
+    function collectionFromPath(schema, path20, value) {
       let v = value;
-      for (let i = path19.length - 1; i >= 0; --i) {
-        const k = path19[i];
+      for (let i = path20.length - 1; i >= 0; --i) {
+        const k = path20[i];
         if (typeof k === "number" && Number.isInteger(k) && k >= 0) {
           const a = [];
           a[k] = v;
@@ -876,7 +876,7 @@ var require_Collection = __commonJS({
         sourceObjects: /* @__PURE__ */ new Map()
       });
     }
-    var isEmptyPath = (path19) => path19 == null || typeof path19 === "object" && !!path19[Symbol.iterator]().next().done;
+    var isEmptyPath = (path20) => path20 == null || typeof path20 === "object" && !!path20[Symbol.iterator]().next().done;
     var Collection = class extends Node.NodeBase {
       constructor(type, schema) {
         super(type);
@@ -906,11 +906,11 @@ var require_Collection = __commonJS({
        * be a Pair instance or a `{ key, value }` object, which may not have a key
        * that already exists in the map.
        */
-      addIn(path19, value) {
-        if (isEmptyPath(path19))
+      addIn(path20, value) {
+        if (isEmptyPath(path20))
           this.add(value);
         else {
-          const [key, ...rest] = path19;
+          const [key, ...rest] = path20;
           const node = this.get(key, true);
           if (identity.isCollection(node))
             node.addIn(rest, value);
@@ -924,8 +924,8 @@ var require_Collection = __commonJS({
        * Removes a value from the collection.
        * @returns `true` if the item was found and removed.
        */
-      deleteIn(path19) {
-        const [key, ...rest] = path19;
+      deleteIn(path20) {
+        const [key, ...rest] = path20;
         if (rest.length === 0)
           return this.delete(key);
         const node = this.get(key, true);
@@ -939,8 +939,8 @@ var require_Collection = __commonJS({
        * scalar values from their surrounding node; to disable set `keepScalar` to
        * `true` (collections are always returned intact).
        */
-      getIn(path19, keepScalar) {
-        const [key, ...rest] = path19;
+      getIn(path20, keepScalar) {
+        const [key, ...rest] = path20;
         const node = this.get(key, true);
         if (rest.length === 0)
           return !keepScalar && identity.isScalar(node) ? node.value : node;
@@ -958,8 +958,8 @@ var require_Collection = __commonJS({
       /**
        * Checks if the collection includes a value with the key `key`.
        */
-      hasIn(path19) {
-        const [key, ...rest] = path19;
+      hasIn(path20) {
+        const [key, ...rest] = path20;
         if (rest.length === 0)
           return this.has(key);
         const node = this.get(key, true);
@@ -969,8 +969,8 @@ var require_Collection = __commonJS({
        * Sets a value in this collection. For `!!set`, `value` needs to be a
        * boolean to add/remove the item from the set.
        */
-      setIn(path19, value) {
-        const [key, ...rest] = path19;
+      setIn(path20, value) {
+        const [key, ...rest] = path20;
         if (rest.length === 0) {
           this.set(key, value);
         } else {
@@ -3485,9 +3485,9 @@ var require_Document = __commonJS({
           this.contents.add(value);
       }
       /** Adds a value to the document. */
-      addIn(path19, value) {
+      addIn(path20, value) {
         if (assertCollection(this.contents))
-          this.contents.addIn(path19, value);
+          this.contents.addIn(path20, value);
       }
       /**
        * Create a new `Alias` node, ensuring that the target `node` has the required anchor.
@@ -3562,14 +3562,14 @@ var require_Document = __commonJS({
        * Removes a value from the document.
        * @returns `true` if the item was found and removed.
        */
-      deleteIn(path19) {
-        if (Collection.isEmptyPath(path19)) {
+      deleteIn(path20) {
+        if (Collection.isEmptyPath(path20)) {
           if (this.contents == null)
             return false;
           this.contents = null;
           return true;
         }
-        return assertCollection(this.contents) ? this.contents.deleteIn(path19) : false;
+        return assertCollection(this.contents) ? this.contents.deleteIn(path20) : false;
       }
       /**
        * Returns item at `key`, or `undefined` if not found. By default unwraps
@@ -3584,10 +3584,10 @@ var require_Document = __commonJS({
        * scalar values from their surrounding node; to disable set `keepScalar` to
        * `true` (collections are always returned intact).
        */
-      getIn(path19, keepScalar) {
-        if (Collection.isEmptyPath(path19))
+      getIn(path20, keepScalar) {
+        if (Collection.isEmptyPath(path20))
           return !keepScalar && identity.isScalar(this.contents) ? this.contents.value : this.contents;
-        return identity.isCollection(this.contents) ? this.contents.getIn(path19, keepScalar) : void 0;
+        return identity.isCollection(this.contents) ? this.contents.getIn(path20, keepScalar) : void 0;
       }
       /**
        * Checks if the document includes a value with the key `key`.
@@ -3598,10 +3598,10 @@ var require_Document = __commonJS({
       /**
        * Checks if the document includes a value at `path`.
        */
-      hasIn(path19) {
-        if (Collection.isEmptyPath(path19))
+      hasIn(path20) {
+        if (Collection.isEmptyPath(path20))
           return this.contents !== void 0;
-        return identity.isCollection(this.contents) ? this.contents.hasIn(path19) : false;
+        return identity.isCollection(this.contents) ? this.contents.hasIn(path20) : false;
       }
       /**
        * Sets a value in this document. For `!!set`, `value` needs to be a
@@ -3618,13 +3618,13 @@ var require_Document = __commonJS({
        * Sets a value in this document. For `!!set`, `value` needs to be a
        * boolean to add/remove the item from the set.
        */
-      setIn(path19, value) {
-        if (Collection.isEmptyPath(path19)) {
+      setIn(path20, value) {
+        if (Collection.isEmptyPath(path20)) {
           this.contents = value;
         } else if (this.contents == null) {
-          this.contents = Collection.collectionFromPath(this.schema, Array.from(path19), value);
+          this.contents = Collection.collectionFromPath(this.schema, Array.from(path20), value);
         } else if (assertCollection(this.contents)) {
-          this.contents.setIn(path19, value);
+          this.contents.setIn(path20, value);
         }
       }
       /**
@@ -5584,9 +5584,9 @@ var require_cst_visit = __commonJS({
     visit.BREAK = BREAK;
     visit.SKIP = SKIP;
     visit.REMOVE = REMOVE;
-    visit.itemAtPath = (cst, path19) => {
+    visit.itemAtPath = (cst, path20) => {
       let item = cst;
-      for (const [field2, index] of path19) {
+      for (const [field2, index] of path20) {
         const tok = item?.[field2];
         if (tok && "items" in tok) {
           item = tok.items[index];
@@ -5595,23 +5595,23 @@ var require_cst_visit = __commonJS({
       }
       return item;
     };
-    visit.parentCollection = (cst, path19) => {
-      const parent = visit.itemAtPath(cst, path19.slice(0, -1));
-      const field2 = path19[path19.length - 1][0];
+    visit.parentCollection = (cst, path20) => {
+      const parent = visit.itemAtPath(cst, path20.slice(0, -1));
+      const field2 = path20[path20.length - 1][0];
       const coll = parent?.[field2];
       if (coll && "items" in coll)
         return coll;
       throw new Error("Parent collection not found");
     };
-    function _visit(path19, item, visitor) {
-      let ctrl = visitor(item, path19);
+    function _visit(path20, item, visitor) {
+      let ctrl = visitor(item, path20);
       if (typeof ctrl === "symbol")
         return ctrl;
       for (const field2 of ["key", "value"]) {
         const token = item[field2];
         if (token && "items" in token) {
           for (let i = 0; i < token.items.length; ++i) {
-            const ci = _visit(Object.freeze(path19.concat([[field2, i]])), token.items[i], visitor);
+            const ci = _visit(Object.freeze(path20.concat([[field2, i]])), token.items[i], visitor);
             if (typeof ci === "number")
               i = ci - 1;
             else if (ci === BREAK)
@@ -5622,10 +5622,10 @@ var require_cst_visit = __commonJS({
             }
           }
           if (typeof ctrl === "function" && field2 === "key")
-            ctrl = ctrl(item, path19);
+            ctrl = ctrl(item, path20);
         }
       }
-      return typeof ctrl === "function" ? ctrl(item, path19) : ctrl;
+      return typeof ctrl === "function" ? ctrl(item, path20) : ctrl;
     }
     exports.visit = visit;
   }
@@ -6927,14 +6927,14 @@ var require_parser = __commonJS({
             case "scalar":
             case "single-quoted-scalar":
             case "double-quoted-scalar": {
-              const fs19 = this.flowScalar(this.type);
+              const fs20 = this.flowScalar(this.type);
               if (atNextItem || it.value) {
-                map.items.push({ start, key: fs19, sep: [] });
+                map.items.push({ start, key: fs20, sep: [] });
                 this.onKeyLine = true;
               } else if (it.sep) {
-                this.stack.push(fs19);
+                this.stack.push(fs20);
               } else {
-                Object.assign(it, { key: fs19, sep: [] });
+                Object.assign(it, { key: fs20, sep: [] });
                 this.onKeyLine = true;
               }
               return;
@@ -7062,13 +7062,13 @@ var require_parser = __commonJS({
             case "scalar":
             case "single-quoted-scalar":
             case "double-quoted-scalar": {
-              const fs19 = this.flowScalar(this.type);
+              const fs20 = this.flowScalar(this.type);
               if (!it || it.value)
-                fc.items.push({ start: [], key: fs19, sep: [] });
+                fc.items.push({ start: [], key: fs20, sep: [] });
               else if (it.sep)
-                this.stack.push(fs19);
+                this.stack.push(fs20);
               else
-                Object.assign(it, { key: fs19, sep: [] });
+                Object.assign(it, { key: fs20, sep: [] });
               return;
             }
             case "flow-map-end":
@@ -7387,8 +7387,8 @@ __export(state_exports, {
   writeRunState: () => writeRunState
 });
 import { randomUUID } from "crypto";
-import { promises as fs3 } from "fs";
-import path3 from "path";
+import { promises as fs4 } from "fs";
+import path4 from "path";
 function requiredString(doc, key) {
   const value = doc[key];
   if (typeof value !== "string" || value.length === 0) {
@@ -7398,7 +7398,7 @@ function requiredString(doc, key) {
 }
 function requiredRunReference(doc, key) {
   const value = requiredString(doc, key);
-  if (path3.isAbsolute(value) || /^(?:[A-Za-z]:|[\\/]|~)/u.test(value) || value.split(/[\\/]/u).includes("..")) {
+  if (path4.isAbsolute(value) || /^(?:[A-Za-z]:|[\\/]|~)/u.test(value) || value.split(/[\\/]/u).includes("..")) {
     throw new Error(`Invalid Run state: ${key} must stay inside the change directory`);
   }
   return value;
@@ -7507,10 +7507,10 @@ function runStateFromJson(json) {
   return runStateFromDocument(doc);
 }
 async function readRunState(changeDir) {
-  const file = path3.join(changeDir, RUN_STATE_FILE);
+  const file = path4.join(changeDir, RUN_STATE_FILE);
   let raw;
   try {
-    raw = await fs3.readFile(file, "utf8");
+    raw = await fs4.readFile(file, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw error;
@@ -7519,14 +7519,14 @@ async function readRunState(changeDir) {
   return runStateFromJson(json);
 }
 async function writeRunState(changeDir, state) {
-  await fs3.mkdir(path3.join(changeDir, ".comet"), { recursive: true });
-  const file = path3.join(changeDir, RUN_STATE_FILE);
-  const temporary = path3.join(changeDir, ".comet", `run-state.${randomUUID()}.tmp`);
-  await fs3.writeFile(temporary, JSON.stringify(runStateToJson(state), null, 2), "utf8");
-  await fs3.rename(temporary, file);
+  await fs4.mkdir(path4.join(changeDir, ".comet"), { recursive: true });
+  const file = path4.join(changeDir, RUN_STATE_FILE);
+  const temporary = path4.join(changeDir, ".comet", `run-state.${randomUUID()}.tmp`);
+  await fs4.writeFile(temporary, JSON.stringify(runStateToJson(state), null, 2), "utf8");
+  await fs4.rename(temporary, file);
 }
 async function removeRunState(changeDir) {
-  await fs3.rm(path3.join(changeDir, RUN_STATE_FILE), { force: true });
+  await fs4.rm(path4.join(changeDir, RUN_STATE_FILE), { force: true });
 }
 var field, RUN_STATE_FILE;
 var init_state = __esm({
@@ -7546,8 +7546,8 @@ import { pathToFileURL } from "url";
 // domains/comet-classic/classic-archive.ts
 import { createHash as createHash3 } from "crypto";
 import { spawnSync } from "child_process";
-import { promises as fs11 } from "fs";
-import path12 from "path";
+import { promises as fs12 } from "fs";
+import path13 from "path";
 
 // domains/comet-classic/classic-artifact-layout.ts
 var import_yaml = __toESM(require_dist(), 1);
@@ -7621,6 +7621,31 @@ async function hasActiveChange(projectRoot, storeRootRelative) {
     if (await exists(path.join(changesDir, entry2.name, ".comet.yaml"))) return true;
   }
   return false;
+}
+async function activeSnapshotLayout(projectRoot, storeRootRelative, expectedLayout) {
+  const changesDir = path.join(
+    projectRoot,
+    ...storeRootRelative.split("/").filter(Boolean),
+    "openspec",
+    "changes"
+  );
+  if (!await exists(changesDir)) return void 0;
+  let snapshot;
+  for (const entry2 of await fs.readdir(changesDir, { withFileTypes: true })) {
+    if (!entry2.isDirectory() || entry2.name === "archive") continue;
+    const statePath = path.join(changesDir, entry2.name, ".comet.yaml");
+    if (!await exists(statePath)) continue;
+    const state = await readYamlRecord(statePath);
+    const value = state.artifact_layout;
+    if (value !== "legacy" && value !== "docs") continue;
+    if (value !== expectedLayout) {
+      throw new Error(
+        `Active change '${entry2.name}' records ${value} layout but is stored in ${expectedLayout} layout. Repair or migrate the project before continuing.`
+      );
+    }
+    snapshot = value;
+  }
+  return snapshot;
 }
 async function configuredLayout(projectRoot) {
   const config = await readYamlRecord(path.join(projectRoot, ".comet", "config.yaml"));
@@ -7703,16 +7728,28 @@ async function resolveCometArtifactLayout(projectRootInput, options = {}) {
   if (explicit) {
     return buildLayout(projectRoot, explicit, explicitLayoutOptions(explicit, configured));
   }
+  const [docsActive, legacyActive] = await Promise.all([
+    hasActiveChange(projectRoot, "docs"),
+    hasActiveChange(projectRoot, ".")
+  ]);
+  if (docsActive && legacyActive) {
+    throw new Error(
+      "Multiple artifact layouts contain active Comet changes. Configure artifact_layout or repair the project layout."
+    );
+  }
+  const [docsSnapshot, legacySnapshot] = await Promise.all([
+    activeSnapshotLayout(projectRoot, "docs", "docs"),
+    activeSnapshotLayout(projectRoot, ".", "legacy")
+  ]);
+  const snapshotLayout = docsSnapshot ?? legacySnapshot;
+  if (snapshotLayout) {
+    return buildLayout(projectRoot, snapshotLayout, {
+      superpowersRoot: configured.superpowersRoot
+    });
+  }
   const docsHealthy = await isHealthyOpenSpecRoot(projectRoot, "docs");
   const legacyHealthy = await isHealthyOpenSpecRoot(projectRoot, ".");
   if (docsHealthy && legacyHealthy) {
-    const docsActive = await hasActiveChange(projectRoot, "docs");
-    const legacyActive = await hasActiveChange(projectRoot, ".");
-    if (docsActive && legacyActive) {
-      throw new Error(
-        "Multiple artifact layouts contain active Comet changes. Configure artifact_layout or repair the project layout."
-      );
-    }
     if (docsActive) {
       return buildLayout(projectRoot, "docs", {
         superpowersRoot: configured.superpowersRoot
@@ -7857,17 +7894,385 @@ async function resolveClassicChangeDirectory(name) {
   return resolveCometChangeDirectory(process.cwd(), name);
 }
 
+// domains/integrations/openspec.ts
+import { execFileSync } from "child_process";
+import fs2 from "fs";
+import path2 from "path";
+
+// platform/install/platforms.ts
+var PLATFORMS = [
+  {
+    id: "claude",
+    name: "Claude Code",
+    skillsDir: ".claude",
+    globalSkillsDir: ".claude",
+    openspecToolId: "claude",
+    rulesDir: "rules",
+    rulesFormat: "md",
+    supportsHooks: true,
+    hookFormat: "claude-code"
+  },
+  {
+    id: "cursor",
+    name: "Cursor",
+    skillsDir: ".cursor",
+    globalSkillsDir: ".cursor",
+    openspecToolId: "cursor",
+    rulesDir: "rules",
+    rulesFormat: "mdc"
+  },
+  {
+    id: "codex",
+    name: "Codex",
+    skillsDir: ".codex",
+    globalSkillsDir: ".codex",
+    openspecToolId: "codex",
+    rulesDir: "rules",
+    rulesFormat: "md",
+    supportsHooks: true,
+    hookFormat: "claude-code"
+  },
+  {
+    id: "opencode",
+    name: "OpenCode",
+    skillsDir: ".opencode",
+    globalSkillsDir: ".config/opencode",
+    openspecToolId: "opencode",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "windsurf",
+    name: "Windsurf",
+    skillsDir: ".windsurf",
+    globalSkillsDir: ".windsurf",
+    openspecToolId: "windsurf",
+    rulesDir: "rules",
+    rulesFormat: "md",
+    supportsHooks: true,
+    hookFormat: "windsurf"
+  },
+  {
+    id: "cline",
+    name: "Cline",
+    skillsDir: ".cline",
+    globalSkillsDir: ".cline",
+    openspecToolId: "cline",
+    // Cline rules go to .clinerules/ at project root, NOT inside .cline/
+    rulesBaseDir: "",
+    rulesDir: ".clinerules",
+    rulesFormat: "md"
+  },
+  {
+    id: "roocode",
+    name: "RooCode",
+    skillsDir: ".roo",
+    globalSkillsDir: ".roo",
+    openspecToolId: "roocode",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "continue",
+    name: "Continue",
+    skillsDir: ".continue",
+    globalSkillsDir: ".continue",
+    openspecToolId: "continue",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "github-copilot",
+    name: "GitHub Copilot",
+    skillsDir: ".github",
+    globalSkillsDir: ".github",
+    detectionPaths: [
+      ".github/copilot-instructions.md",
+      ".github/instructions",
+      ".github/prompts",
+      ".github/skills"
+    ],
+    openspecToolId: "github-copilot",
+    // Copilot uses .github/instructions/*.instructions.md format
+    rulesDir: "instructions",
+    rulesFormat: "copilot",
+    supportsHooks: true,
+    hookFormat: "copilot"
+  },
+  {
+    id: "gemini",
+    name: "Gemini CLI",
+    skillsDir: ".gemini",
+    globalSkillsDir: ".gemini",
+    openspecToolId: "gemini",
+    // Gemini uses GEMINI.md files, not a rules directory — no rulesDir
+    supportsHooks: true,
+    hookFormat: "gemini"
+  },
+  {
+    id: "amazon-q",
+    name: "Amazon Q Developer",
+    skillsDir: ".amazonq",
+    globalSkillsDir: ".amazonq",
+    openspecToolId: "amazon-q",
+    rulesDir: "rules",
+    rulesFormat: "md",
+    supportsHooks: true,
+    hookFormat: "claude-code"
+  },
+  {
+    id: "qwen",
+    name: "Qwen Code",
+    skillsDir: ".qwen",
+    globalSkillsDir: ".qwen",
+    openspecToolId: "qwen",
+    rulesDir: "rules",
+    rulesFormat: "md",
+    supportsHooks: true,
+    hookFormat: "qwen"
+  },
+  {
+    id: "kilocode",
+    name: "Kilo Code",
+    skillsDir: ".kilocode",
+    globalSkillsDir: ".kilocode",
+    openspecToolId: "kilocode",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "auggie",
+    name: "Auggie (Augment CLI)",
+    skillsDir: ".augment",
+    globalSkillsDir: ".augment",
+    openspecToolId: "auggie",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "kiro",
+    name: "Kiro",
+    skillsDir: ".kiro",
+    globalSkillsDir: ".kiro",
+    openspecToolId: "kiro",
+    // Kiro uses .kiro/steering/ not .kiro/rules/
+    rulesDir: "steering",
+    rulesFormat: "md",
+    supportsHooks: true,
+    hookFormat: "kiro"
+  },
+  {
+    id: "kimicode",
+    name: "Kimi Code",
+    skillsDir: ".kimi-code",
+    globalSkillsDir: ".kimi-code",
+    openspecToolId: "kimi"
+  },
+  {
+    id: "lingma",
+    name: "Lingma",
+    skillsDir: ".lingma",
+    globalSkillsDir: ".lingma",
+    openspecToolId: "lingma",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  { id: "junie", name: "Junie", skillsDir: ".junie", openspecToolId: "junie" },
+  { id: "codebuddy", name: "CodeBuddy Code", skillsDir: ".codebuddy", openspecToolId: "codebuddy" },
+  { id: "costrict", name: "CoStrict", skillsDir: ".cospec", openspecToolId: "costrict" },
+  { id: "crush", name: "Crush", skillsDir: ".crush", openspecToolId: "crush" },
+  { id: "factory", name: "Factory Droid", skillsDir: ".factory", openspecToolId: "factory" },
+  { id: "iflow", name: "iFlow", skillsDir: ".iflow", openspecToolId: "iflow" },
+  {
+    id: "pi",
+    name: "Pi",
+    skillsDir: ".pi",
+    globalSkillsDir: ".pi/agent",
+    openspecToolId: "pi"
+  },
+  {
+    id: "qoder",
+    name: "Qoder",
+    skillsDir: ".qoder",
+    globalSkillsDir: ".qoder",
+    openspecToolId: "qoder",
+    rulesDir: "rules",
+    rulesFormat: "md",
+    supportsHooks: true,
+    hookFormat: "qoder"
+  },
+  {
+    id: "antigravity",
+    name: "Antigravity",
+    skillsDir: ".agents",
+    globalSkillsDir: ".gemini/antigravity",
+    openspecToolId: "antigravity"
+  },
+  {
+    id: "antigravity2",
+    name: "Antigravity 2.0",
+    skillsDir: ".agents",
+    globalSkillsDir: ".gemini/config",
+    openspecToolId: "antigravity"
+  },
+  { id: "bob", name: "Bob Shell", skillsDir: ".bob", openspecToolId: "bob" },
+  { id: "forgecode", name: "ForgeCode", skillsDir: ".forge", openspecToolId: "forgecode" },
+  {
+    id: "trae",
+    name: "Trae",
+    skillsDir: ".trae",
+    globalSkillsDir: ".trae",
+    openspecToolId: "trae",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "trae-cn",
+    name: "Trae CN",
+    skillsDir: ".trae-cn",
+    globalSkillsDir: ".trae-cn",
+    // OpenSpec exposes Trae as one tool id; keep Comet's CN-specific install
+    // directories but reuse the supported OpenSpec Trae integration.
+    openspecToolId: "trae",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "zcode",
+    name: "ZCode",
+    skillsDir: ".zcode",
+    globalSkillsDir: ".zcode",
+    // openspec CLI has no zcode tool id; zcode is built on opencode (it shares the
+    // opencode.ai config schema), so we reuse openspec's opencode support and migrate
+    // the .opencode/{skills,commands} output to .zcode/ after install.
+    openspecToolId: "opencode",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  },
+  {
+    id: "mimocode",
+    name: "MimoCode",
+    skillsDir: ".mimocode",
+    globalSkillsDir: ".config/mimocode",
+    // MimoCode is built on OpenCode and reads the same skills/commands shape
+    // from its own config directory.
+    openspecToolId: "opencode",
+    rulesDir: "rules",
+    rulesFormat: "md"
+  }
+];
+
+// platform/process/command-error.ts
+var ESC = String.fromCharCode(27);
+var ANSI_ESCAPE_PATTERN = new RegExp(`${ESC}\\[[0-9;?]*[a-zA-Z]`, "g");
+var LOOSE_ESCAPE_PATTERN = new RegExp(`${ESC}\\[[^a-zA-Z\\r\\n]*`, "g");
+
+// platform/process/shell-quote.ts
+function quoteForShell(arg) {
+  if (arg.length > 0 && /^[A-Za-z0-9@+=:,./\\_-]+$/.test(arg)) {
+    return arg;
+  }
+  return `"${arg.replace(/"/g, '""')}"`;
+}
+function quoteArgsForShell(args) {
+  return args.map((arg) => quoteForShell(arg));
+}
+
+// domains/integrations/openspec.ts
+var VALID_TOOL_IDS = new Set(PLATFORMS.map((p) => p.openspecToolId));
+var ALL_OPENSPEC_WORKFLOWS = [
+  "propose",
+  "explore",
+  "new",
+  "continue",
+  "apply",
+  "ff",
+  "sync",
+  "archive",
+  "bulk-archive",
+  "verify",
+  "onboard"
+];
+function normalizeStorePath(targetPath) {
+  const resolved = path2.resolve(targetPath);
+  try {
+    return fs2.realpathSync.native?.(resolved) ?? fs2.realpathSync(resolved);
+  } catch {
+    return resolved;
+  }
+}
+function isOpenSpecStoreRoot(projectPath, registeredRoot) {
+  const expectedRoot = normalizeStorePath(path2.join(projectPath, "docs"));
+  const actualRoot = normalizeStorePath(registeredRoot);
+  return process.platform === "win32" ? actualRoot.toLowerCase() === expectedRoot.toLowerCase() : actualRoot === expectedRoot;
+}
+function readOpenSpecStoreList(projectPath, command) {
+  const invocation = { command, args: ["store", "list", "--json"] };
+  const useShell = process.platform === "win32";
+  const output = execFileSync(
+    invocation.command,
+    useShell ? quoteArgsForShell(invocation.args) : invocation.args,
+    {
+      cwd: projectPath,
+      env: { ...process.env, OPENSPEC_TELEMETRY: "0" },
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      timeout: 3e4,
+      shell: useShell
+    }
+  );
+  try {
+    const parsed = JSON.parse(String(output));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("expected a JSON object");
+    }
+    return parsed;
+  } catch (error) {
+    throw new Error(
+      `Unable to verify the configured OpenSpec store: openspec store list --json returned invalid JSON (${error.message}).`,
+      { cause: error }
+    );
+  }
+}
+function assertOpenSpecStoreRegistration(projectPath, storeId, command = process.env.COMET_OPENSPEC || "openspec") {
+  const store = readOpenSpecStoreList(projectPath, command).stores?.find(
+    (entry2) => entry2.id === storeId
+  );
+  if (typeof store?.root !== "string" || store.root.trim().length === 0) {
+    throw new Error(
+      `Configured OpenSpec store '${storeId}' is not registered. Run comet init --artifact-layout docs --openspec-store ${storeId} to register this project.`
+    );
+  }
+  const expectedRoot = normalizeStorePath(path2.join(projectPath, "docs"));
+  const registeredRoot = normalizeStorePath(store.root);
+  if (!isOpenSpecStoreRoot(projectPath, store.root)) {
+    throw new Error(
+      `Configured OpenSpec store '${storeId}' registry path does not match this project's docs directory: expected ${expectedRoot}, got ${registeredRoot}.`
+    );
+  }
+}
+var ALL_WORKFLOWS_CONFIG = JSON.stringify(
+  {
+    featureFlags: {},
+    profile: "custom",
+    delivery: "both",
+    workflows: [...ALL_OPENSPEC_WORKFLOWS]
+  },
+  null,
+  2
+) + "\n";
+
 // domains/comet-classic/classic-runtime-run.ts
-import { promises as fs9 } from "fs";
-import path10 from "path";
+import { promises as fs10 } from "fs";
+import path11 from "path";
 import { fileURLToPath } from "url";
 
 // domains/comet-classic/classic-evidence.ts
-import { promises as fs2 } from "fs";
-import path2 from "path";
+import { promises as fs3 } from "fs";
+import path3 from "path";
 async function fileExists(file) {
   try {
-    return (await fs2.stat(file)).isFile();
+    return (await fs3.stat(file)).isFile();
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
@@ -7875,39 +8280,39 @@ async function fileExists(file) {
 }
 function projectRootFromStoredLayout(changeDir, projection) {
   const openSpecRoot = projection.classic?.openSpecRoot;
-  const normalizedDir = path2.resolve(changeDir).replaceAll("\\", "/");
+  const normalizedDir = path3.resolve(changeDir).replaceAll("\\", "/");
   const normalizedRoot = openSpecRoot && openSpecRoot !== "." ? openSpecRoot.replaceAll("\\", "/").replace(/^\/+/u, "").replace(/\/+$/u, "") : "";
   const marker = normalizedRoot ? `/${normalizedRoot}/openspec/` : "/openspec/";
   const index = normalizedDir.lastIndexOf(marker);
   if (index < 0) return null;
-  return path2.resolve(normalizedDir.slice(0, index + 1));
+  return path3.resolve(normalizedDir.slice(0, index + 1));
 }
 async function projectRootFor(changeDir, projection) {
   try {
     const layout = await resolveCometArtifactLayout(process.cwd());
-    const changePath = path2.resolve(changeDir);
-    const relativeToChanges = path2.relative(layout.openSpec.changesDir, changePath);
-    const relativeToArchive = path2.relative(layout.openSpec.archiveDir, changePath);
-    if (!relativeToChanges.startsWith("..") && !path2.isAbsolute(relativeToChanges) || !relativeToArchive.startsWith("..") && !path2.isAbsolute(relativeToArchive)) {
+    const changePath = path3.resolve(changeDir);
+    const relativeToChanges = path3.relative(layout.openSpec.changesDir, changePath);
+    const relativeToArchive = path3.relative(layout.openSpec.archiveDir, changePath);
+    if (!relativeToChanges.startsWith("..") && !path3.isAbsolute(relativeToChanges) || !relativeToArchive.startsWith("..") && !path3.isAbsolute(relativeToArchive)) {
       return layout.projectRoot;
     }
   } catch {
   }
   const storedRoot = projectRootFromStoredLayout(changeDir, projection);
   if (storedRoot) return storedRoot;
-  let cursor = path2.resolve(changeDir);
-  while (path2.dirname(cursor) !== cursor) {
-    if (path2.basename(cursor) === "openspec") return path2.dirname(cursor);
-    cursor = path2.dirname(cursor);
+  let cursor = path3.resolve(changeDir);
+  while (path3.dirname(cursor) !== cursor) {
+    if (path3.basename(cursor) === "openspec") return path3.dirname(cursor);
+    cursor = path3.dirname(cursor);
   }
   throw new Error(`Classic change is not inside an openspec directory: ${changeDir}`);
 }
 function relativeSource(projectRoot, file) {
-  return path2.relative(projectRoot, file).split(path2.sep).join("/");
+  return path3.relative(projectRoot, file).split(path3.sep).join("/");
 }
 async function linkedFileEvidence(projectRoot, code, relativePath2) {
   if (!relativePath2) return { code, satisfied: false };
-  const file = path2.resolve(projectRoot, relativePath2);
+  const file = path3.resolve(projectRoot, relativePath2);
   return {
     code,
     satisfied: await fileExists(file),
@@ -7922,17 +8327,17 @@ async function directFileEvidence(projectRoot, code, file) {
   };
 }
 async function deltaSpecEvidence(projectRoot, changeDir) {
-  const specsDir = path2.join(changeDir, "specs");
+  const specsDir = path3.join(changeDir, "specs");
   let entries;
   try {
-    entries = await fs2.readdir(specsDir);
+    entries = await fs3.readdir(specsDir);
   } catch (error) {
     if (error.code === "ENOENT") {
       return { code: "openspec.delta-spec", satisfied: false };
     }
     throw error;
   }
-  const candidates = entries.map((entry2) => path2.join(specsDir, entry2, "spec.md"));
+  const candidates = entries.map((entry2) => path3.join(specsDir, entry2, "spec.md"));
   const existing = (await Promise.all(candidates.map(async (file) => await fileExists(file) ? file : null))).filter((file) => file !== null);
   return {
     code: "openspec.delta-spec",
@@ -7944,7 +8349,7 @@ async function deltaSpecEvidence(projectRoot, changeDir) {
 async function taskEvidence(projectRoot, tasksFile) {
   let source;
   try {
-    source = await fs2.readFile(tasksFile, "utf8");
+    source = await fs3.readFile(tasksFile, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") {
       return { code: "build.tasks-complete", satisfied: false };
@@ -7966,10 +8371,10 @@ function evidenceSatisfied(evidence, code) {
 async function collectClassicEvidence(changeDir, projection) {
   const projectRoot = await projectRootFor(changeDir, projection);
   const classic = projection.classic;
-  const proposal = path2.join(changeDir, "proposal.md");
-  const design = path2.join(changeDir, "design.md");
-  const tasks = path2.join(changeDir, "tasks.md");
-  const checkpoint = projection.run ? path2.resolve(changeDir, projection.run.checkpointRef) : path2.join(changeDir, ".comet", "checkpoint.json");
+  const proposal = path3.join(changeDir, "proposal.md");
+  const design = path3.join(changeDir, "design.md");
+  const tasks = path3.join(changeDir, "tasks.md");
+  const checkpoint = projection.run ? path3.resolve(changeDir, projection.run.checkpointRef) : path3.join(changeDir, ".comet", "checkpoint.json");
   const evidence = await Promise.all([
     directFileEvidence(projectRoot, "openspec.proposal", proposal),
     directFileEvidence(projectRoot, "openspec.design", design),
@@ -7992,8 +8397,8 @@ async function collectClassicEvidence(changeDir, projection) {
 
 // domains/comet-classic/classic-migrate.ts
 import { createHash as createHash2, randomUUID as randomUUID5 } from "crypto";
-import { promises as fs8 } from "fs";
-import path9 from "path";
+import { promises as fs9 } from "fs";
+import path10 from "path";
 
 // domains/comet-classic/classic-resolver.ts
 function profileFor(classic) {
@@ -8065,8 +8470,8 @@ function resolveClassicStepId(classic, evidence) {
 // domains/comet-classic/classic-store.ts
 var import_yaml2 = __toESM(require_dist(), 1);
 import { randomUUID as randomUUID2 } from "crypto";
-import { promises as fs4 } from "fs";
-import path4 from "path";
+import { promises as fs5 } from "fs";
+import path5 from "path";
 
 // domains/comet-classic/classic-state.ts
 init_state();
@@ -8355,7 +8760,7 @@ function stripLegacyCommandFields(document) {
 async function readDocument(file) {
   let source;
   try {
-    source = await fs4.readFile(file, "utf8");
+    source = await fs5.readFile(file, "utf8");
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
     return new import_yaml2.Document({});
@@ -8369,7 +8774,7 @@ async function readDocument(file) {
 }
 async function readClassicState(changeDir, options = {}) {
   const shouldMigrate = options.migrate !== false;
-  const file = path4.join(changeDir, ".comet.yaml");
+  const file = path5.join(changeDir, ".comet.yaml");
   const document = await readDocument(file);
   let doc = documentRecord(document);
   let migrated = stripLegacyCommandFields(document);
@@ -8385,31 +8790,31 @@ async function readClassicState(changeDir, options = {}) {
     }
   }
   if (migrated && shouldMigrate) {
-    const temporary = path4.join(changeDir, `.comet.yaml.${randomUUID2()}.tmp`);
-    await fs4.writeFile(temporary, document.toString(), "utf8");
-    await fs4.rename(temporary, file);
+    const temporary = path5.join(changeDir, `.comet.yaml.${randomUUID2()}.tmp`);
+    await fs5.writeFile(temporary, document.toString(), "utf8");
+    await fs5.rename(temporary, file);
   }
   return parseClassicStateDocument(documentRecord(document), run);
 }
 async function readLegacyState(changeDir) {
-  const document = await readDocument(path4.join(changeDir, ".comet.yaml"));
+  const document = await readDocument(path5.join(changeDir, ".comet.yaml"));
   return readLegacyStateSummary(documentRecord(document));
 }
 async function writeClassicState(changeDir, projection) {
-  const file = path4.join(changeDir, ".comet.yaml");
+  const file = path5.join(changeDir, ".comet.yaml");
   const document = await readDocument(file);
   applyProjection(document, {
     ...projection,
     unknownKeys: projection.unknownKeys ?? []
   });
   parseClassicStateDocument(documentRecord(document), projection.run ?? null);
-  await fs4.mkdir(changeDir, { recursive: true });
-  const temporary = path4.join(changeDir, `.comet.yaml.${randomUUID2()}.tmp`);
+  await fs5.mkdir(changeDir, { recursive: true });
+  const temporary = path5.join(changeDir, `.comet.yaml.${randomUUID2()}.tmp`);
   try {
-    await fs4.writeFile(temporary, document.toString(), "utf8");
-    await fs4.rename(temporary, file);
+    await fs5.writeFile(temporary, document.toString(), "utf8");
+    await fs5.rename(temporary, file);
   } catch (error) {
-    await fs4.rm(temporary, { force: true });
+    await fs5.rm(temporary, { force: true });
     throw error;
   }
   if (projection.run) {
@@ -8442,27 +8847,27 @@ function startRun(pkg, runId, skillHash) {
 
 // domains/engine/run-store.ts
 import { randomUUID as randomUUID3 } from "crypto";
-import { promises as fs5 } from "fs";
-import path5 from "path";
+import { promises as fs6 } from "fs";
+import path6 from "path";
 function resolveRunPath(changeDir, relativePath2) {
-  if (path5.isAbsolute(relativePath2))
+  if (path6.isAbsolute(relativePath2))
     throw new Error("Run path must stay inside the change directory");
-  const root = path5.resolve(changeDir);
-  const target = path5.resolve(root, relativePath2);
-  if (target !== root && !target.startsWith(root + path5.sep)) {
+  const root = path6.resolve(changeDir);
+  const target = path6.resolve(root, relativePath2);
+  if (target !== root && !target.startsWith(root + path6.sep)) {
     throw new Error("Run path must stay inside the change directory");
   }
   return target;
 }
 async function atomicWrite(file, content) {
-  await fs5.mkdir(path5.dirname(file), { recursive: true });
+  await fs6.mkdir(path6.dirname(file), { recursive: true });
   const temporary = `${file}.${randomUUID3()}.tmp`;
-  await fs5.writeFile(temporary, content, "utf8");
-  await fs5.rename(temporary, file);
+  await fs6.writeFile(temporary, content, "utf8");
+  await fs6.rename(temporary, file);
 }
 async function readOptionalText(file) {
   try {
-    return await fs5.readFile(file, "utf8");
+    return await fs6.readFile(file, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw error;
@@ -8470,8 +8875,8 @@ async function readOptionalText(file) {
 }
 async function appendTrajectory(changeDir, relativePath2, event) {
   const file = resolveRunPath(changeDir, relativePath2);
-  await fs5.mkdir(path5.dirname(file), { recursive: true });
-  await fs5.appendFile(file, JSON.stringify(event) + "\n", "utf8");
+  await fs6.mkdir(path6.dirname(file), { recursive: true });
+  await fs6.appendFile(file, JSON.stringify(event) + "\n", "utf8");
 }
 async function readTrajectory(changeDir, relativePath2) {
   const raw = await readOptionalText(resolveRunPath(changeDir, relativePath2));
@@ -8486,7 +8891,7 @@ async function readTrajectory(changeDir, relativePath2) {
 }
 async function readArtifacts(changeDir, relativePath2) {
   try {
-    return JSON.parse(await fs5.readFile(resolveRunPath(changeDir, relativePath2), "utf8"));
+    return JSON.parse(await fs6.readFile(resolveRunPath(changeDir, relativePath2), "utf8"));
   } catch (error) {
     if (error.code === "ENOENT") return {};
     throw error;
@@ -8512,7 +8917,7 @@ async function writePendingAction(changeDir, relativePath2, action) {
 }
 async function readPendingAction(changeDir, relativePath2) {
   try {
-    return JSON.parse(await fs5.readFile(resolveRunPath(changeDir, relativePath2), "utf8"));
+    return JSON.parse(await fs6.readFile(resolveRunPath(changeDir, relativePath2), "utf8"));
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw error;
@@ -8520,7 +8925,7 @@ async function readPendingAction(changeDir, relativePath2) {
 }
 async function clearPendingAction(changeDir, relativePath2) {
   try {
-    await fs5.unlink(resolveRunPath(changeDir, relativePath2));
+    await fs6.unlink(resolveRunPath(changeDir, relativePath2));
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
   }
@@ -8538,13 +8943,13 @@ async function readCheckpoint(changeDir, relativePath2) {
 
 // domains/skill/snapshot.ts
 import { createHash, randomUUID as randomUUID4 } from "crypto";
-import { promises as fs7 } from "fs";
-import path8 from "path";
+import { promises as fs8 } from "fs";
+import path9 from "path";
 
 // domains/skill/load.ts
 var import_yaml3 = __toESM(require_dist(), 1);
-import { promises as fs6 } from "fs";
-import path6 from "path";
+import { promises as fs7 } from "fs";
+import path7 from "path";
 var ACTION_TYPES = ["invoke_skill", "call_tool", "handoff", "ask_user", "checkpoint"];
 var ORCHESTRATION_MODES = ["deterministic", "adaptive"];
 var TOOL_KINDS = ["function", "mcp", "script", "agent"];
@@ -8726,7 +9131,7 @@ function narrowRuntimeEvals(value, filePath, fieldPath) {
   return value;
 }
 async function readYaml(filePath) {
-  const source = await fs6.readFile(filePath, "utf8");
+  const source = await fs7.readFile(filePath, "utf8");
   try {
     return (0, import_yaml3.parse)(source);
   } catch (error) {
@@ -8746,7 +9151,7 @@ async function readOptionalYaml(filePath) {
 }
 async function yamlFileExists(filePath) {
   try {
-    await fs6.access(filePath);
+    await fs7.access(filePath);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") {
@@ -8756,8 +9161,8 @@ async function yamlFileExists(filePath) {
   }
 }
 async function readRuntimeChecks(cometRoot) {
-  const checksPath = path6.join(cometRoot, "checks.yaml");
-  const evalsPath = path6.join(cometRoot, "evals.yaml");
+  const checksPath = path7.join(cometRoot, "checks.yaml");
+  const evalsPath = path7.join(cometRoot, "evals.yaml");
   const [hasChecks, hasEvals] = await Promise.all([
     yamlFileExists(checksPath),
     yamlFileExists(evalsPath)
@@ -8773,13 +9178,13 @@ async function readRuntimeChecks(cometRoot) {
   return { document: null };
 }
 async function loadPackageFromLayout(options) {
-  const packageRoot = path6.resolve(options.root);
-  const controlRoot = path6.resolve(options.controlRoot);
+  const packageRoot = path7.resolve(options.root);
+  const controlRoot = path7.resolve(options.controlRoot);
   if (options.requireSkillMarkdown) {
-    await fs6.access(path6.join(packageRoot, "SKILL.md"));
+    await fs7.access(path7.join(packageRoot, "SKILL.md"));
   }
-  const skillPath = path6.join(controlRoot, "skill.yaml");
-  const guardrailsPath = path6.join(controlRoot, "guardrails.yaml");
+  const skillPath = path7.join(controlRoot, "skill.yaml");
+  const guardrailsPath = path7.join(controlRoot, "guardrails.yaml");
   const definition = narrowSkillDefinition(await readYaml(skillPath), skillPath);
   const rawGuardrails = await readOptionalYaml(guardrailsPath);
   const guardrailDocument = rawGuardrails === null ? null : narrowGuardrails(rawGuardrails, guardrailsPath);
@@ -8804,16 +9209,16 @@ async function loadPackageFromLayout(options) {
   };
 }
 async function loadSkillPackage(root) {
-  const packageRoot = path6.resolve(root);
+  const packageRoot = path7.resolve(root);
   return loadPackageFromLayout({
     root: packageRoot,
-    controlRoot: path6.join(packageRoot, "comet"),
+    controlRoot: path7.join(packageRoot, "comet"),
     packageKind: "skill",
     requireSkillMarkdown: true
   });
 }
 async function loadRuntimePackage(root) {
-  const packageRoot = path6.resolve(root);
+  const packageRoot = path7.resolve(root);
   return loadPackageFromLayout({
     root: packageRoot,
     controlRoot: packageRoot,
@@ -8821,7 +9226,7 @@ async function loadRuntimePackage(root) {
     requireSkillMarkdown: false
   });
 }
-function loadSkillPackageDocument(document, root, filePath = path6.join(root, "package.json")) {
+function loadSkillPackageDocument(document, root, filePath = path7.join(root, "package.json")) {
   assertObject(document, filePath);
   const packageKind = document.packageKind === "runtime" ? "runtime" : void 0;
   const definition = narrowSkillDefinition(document.definition, filePath);
@@ -8836,7 +9241,7 @@ function loadSkillPackageDocument(document, root, filePath = path6.join(root, "p
     confirmationRequiredFor: definition.tools.filter((tool) => tool.requiresConfirmation).map((tool) => tool.id)
   };
   return {
-    root: path6.resolve(root),
+    root: path7.resolve(root),
     packageKind,
     definition,
     guardrails: {
@@ -8848,7 +9253,7 @@ function loadSkillPackageDocument(document, root, filePath = path6.join(root, "p
 }
 
 // domains/skill/validate.ts
-import path7 from "path";
+import path8 from "path";
 function validatesAction(action, pkg, errors, stepId) {
   if (action.type === "invoke_skill" && !pkg.definition.skills.some((item) => item.id === action.ref)) {
     errors.push(`step ${stepId} references undeclared skill: ${action.ref ?? "(missing)"}`);
@@ -8901,8 +9306,8 @@ function validateSkillPackage(pkg) {
   }
   for (const tool of definition.tools) {
     if (tool.kind !== "script") continue;
-    const normalized2 = path7.posix.normalize(tool.source.replaceAll("\\", "/"));
-    if (path7.isAbsolute(tool.source) || normalized2 === ".." || normalized2.startsWith("../")) {
+    const normalized2 = path8.posix.normalize(tool.source.replaceAll("\\", "/"));
+    if (path8.isAbsolute(tool.source) || normalized2 === ".." || normalized2.startsWith("../")) {
       errors.push(`script tool ${tool.id} must reference a relative path inside the Skill package`);
     }
   }
@@ -8940,25 +9345,25 @@ function packageDocument(pkg) {
   });
 }
 function normalizedRelativePath(source) {
-  return path8.posix.normalize(source.replaceAll("\\", "/"));
+  return path9.posix.normalize(source.replaceAll("\\", "/"));
 }
 function assertInside(parent, target, label) {
-  const relative = path8.relative(parent, target);
-  if (relative === "" || !path8.isAbsolute(relative) && !relative.startsWith(`..${path8.sep}`)) {
+  const relative = path9.relative(parent, target);
+  if (relative === "" || !path9.isAbsolute(relative) && !relative.startsWith(`..${path9.sep}`)) {
     return;
   }
   throw new Error(`${label} resolves outside the Skill package`);
 }
 async function readPackageFile(root, relativePath2, label) {
   const normalized2 = normalizedRelativePath(relativePath2);
-  if (path8.posix.isAbsolute(normalized2) || normalized2 === ".." || normalized2.startsWith("../")) {
+  if (path9.posix.isAbsolute(normalized2) || normalized2 === ".." || normalized2.startsWith("../")) {
     throw new Error(`${label} resolves outside the Skill package`);
   }
-  const target = path8.resolve(root, ...normalized2.split("/"));
+  const target = path9.resolve(root, ...normalized2.split("/"));
   assertInside(root, target, label);
   let realTarget;
   try {
-    realTarget = await fs7.realpath(target);
+    realTarget = await fs8.realpath(target);
   } catch (error) {
     if (error.code === "ENOENT") {
       throw new Error(`${label} does not exist: ${relativePath2}`, { cause: error });
@@ -8966,13 +9371,13 @@ async function readPackageFile(root, relativePath2, label) {
     throw error;
   }
   assertInside(root, realTarget, label);
-  if (!(await fs7.stat(realTarget)).isFile()) {
+  if (!(await fs8.stat(realTarget)).isFile()) {
     throw new Error(`${label} is not a file: ${relativePath2}`);
   }
-  return { path: normalized2, content: await fs7.readFile(realTarget) };
+  return { path: normalized2, content: await fs8.readFile(realTarget) };
 }
 async function snapshotFiles(pkg) {
-  const root = await fs7.realpath(pkg.root);
+  const root = await fs8.realpath(pkg.root);
   const files = pkg.packageKind === "runtime" ? [] : [await readPackageFile(root, "SKILL.md", "SKILL.md")];
   for (const tool of pkg.definition.tools) {
     if (tool.kind !== "script") continue;
@@ -9000,7 +9405,7 @@ async function hashSkillPackage(pkg) {
 }
 async function pathExists(target) {
   try {
-    await fs7.access(target);
+    await fs8.access(target);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -9009,12 +9414,12 @@ async function pathExists(target) {
 }
 async function verifyPublishedSnapshot(snapshotDir, material) {
   try {
-    const storedHash = (await fs7.readFile(path8.join(snapshotDir, "sha256"), "utf8")).trim();
+    const storedHash = (await fs8.readFile(path9.join(snapshotDir, "sha256"), "utf8")).trim();
     if (storedHash !== material.hash) throw new Error("hash mismatch");
-    const storedPackage = await fs7.readFile(path8.join(snapshotDir, "package.json"), "utf8");
+    const storedPackage = await fs8.readFile(path9.join(snapshotDir, "package.json"), "utf8");
     if (storedPackage !== packageJson(material.document)) throw new Error("package mismatch");
     for (const file of material.files) {
-      const stored = await fs7.readFile(path8.join(snapshotDir, ...file.path.split("/")));
+      const stored = await fs8.readFile(path9.join(snapshotDir, ...file.path.split("/")));
       if (!stored.equals(file.content)) throw new Error(`file mismatch: ${file.path}`);
     }
   } catch (error) {
@@ -9023,37 +9428,37 @@ async function verifyPublishedSnapshot(snapshotDir, material) {
 }
 async function createSkillSnapshot(pkg, changeDir) {
   const material = await snapshotMaterial(pkg);
-  const snapshotsRoot = path8.resolve(changeDir, ".comet", "skill-snapshots");
-  const snapshotDir = path8.join(snapshotsRoot, material.hash);
-  await fs7.mkdir(snapshotsRoot, { recursive: true });
+  const snapshotsRoot = path9.resolve(changeDir, ".comet", "skill-snapshots");
+  const snapshotDir = path9.join(snapshotsRoot, material.hash);
+  await fs8.mkdir(snapshotsRoot, { recursive: true });
   if (await pathExists(snapshotDir)) {
     await verifyPublishedSnapshot(snapshotDir, material);
     return { hash: material.hash, snapshotDir };
   }
-  const temporaryDir = path8.join(snapshotsRoot, `.tmp-${randomUUID4()}`);
+  const temporaryDir = path9.join(snapshotsRoot, `.tmp-${randomUUID4()}`);
   assertInside(snapshotsRoot, temporaryDir, "Temporary snapshot");
   assertInside(snapshotsRoot, snapshotDir, "Published snapshot");
   try {
-    await fs7.mkdir(temporaryDir);
+    await fs8.mkdir(temporaryDir);
     for (const file of material.files) {
-      const destination = path8.join(temporaryDir, ...file.path.split("/"));
+      const destination = path9.join(temporaryDir, ...file.path.split("/"));
       assertInside(temporaryDir, destination, `Snapshot file ${file.path}`);
-      await fs7.mkdir(path8.dirname(destination), { recursive: true });
-      await fs7.writeFile(destination, file.content);
+      await fs8.mkdir(path9.dirname(destination), { recursive: true });
+      await fs8.writeFile(destination, file.content);
     }
-    await fs7.writeFile(path8.join(temporaryDir, "package.json"), packageJson(material.document));
-    await fs7.writeFile(path8.join(temporaryDir, "sha256"), material.hash + "\n");
-    await fs7.rename(temporaryDir, snapshotDir);
+    await fs8.writeFile(path9.join(temporaryDir, "package.json"), packageJson(material.document));
+    await fs8.writeFile(path9.join(temporaryDir, "sha256"), material.hash + "\n");
+    await fs8.rename(temporaryDir, snapshotDir);
   } catch (error) {
     if (await pathExists(snapshotDir)) {
       try {
         await verifyPublishedSnapshot(snapshotDir, material);
       } finally {
-        await fs7.rm(temporaryDir, { recursive: true, force: true });
+        await fs8.rm(temporaryDir, { recursive: true, force: true });
       }
       return { hash: material.hash, snapshotDir };
     }
-    await fs7.rm(temporaryDir, { recursive: true, force: true });
+    await fs8.rm(temporaryDir, { recursive: true, force: true });
     throw error;
   }
   return { hash: material.hash, snapshotDir };
@@ -9062,16 +9467,16 @@ async function readSkillSnapshot(changeDir, hash) {
   if (!/^[a-f0-9]{64}$/u.test(hash)) {
     throw new Error(`Invalid Skill snapshot hash: ${hash}`);
   }
-  const snapshotsRoot = path8.resolve(changeDir, ".comet", "skill-snapshots");
-  const snapshotDir = path8.join(snapshotsRoot, hash);
+  const snapshotsRoot = path9.resolve(changeDir, ".comet", "skill-snapshots");
+  const snapshotDir = path9.join(snapshotsRoot, hash);
   assertInside(snapshotsRoot, snapshotDir, "Skill snapshot");
   try {
-    const storedHash = (await fs7.readFile(path8.join(snapshotDir, "sha256"), "utf8")).trim();
+    const storedHash = (await fs8.readFile(path9.join(snapshotDir, "sha256"), "utf8")).trim();
     if (storedHash !== hash) {
       throw new Error(`stored hash is ${storedHash || "(empty)"}`);
     }
-    const packagePath = path8.join(snapshotDir, "package.json");
-    const document = JSON.parse(await fs7.readFile(packagePath, "utf8"));
+    const packagePath = path9.join(snapshotDir, "package.json");
+    const document = JSON.parse(await fs8.readFile(packagePath, "utf8"));
     const pkg = loadSkillPackageDocument(document, snapshotDir, packagePath);
     const errors = validateSkillPackage(pkg);
     if (errors.length > 0) {
@@ -9090,7 +9495,7 @@ async function readSkillSnapshot(changeDir, hash) {
 // domains/comet-classic/classic-migrate.ts
 async function pathExists2(target) {
   try {
-    await fs8.access(target);
+    await fs9.access(target);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -9098,10 +9503,10 @@ async function pathExists2(target) {
   }
 }
 function projectRootFor2(changeDir) {
-  let cursor = path9.resolve(changeDir);
-  while (path9.dirname(cursor) !== cursor) {
-    if (path9.basename(cursor) === "openspec") return path9.dirname(cursor);
-    cursor = path9.dirname(cursor);
+  let cursor = path10.resolve(changeDir);
+  while (path10.dirname(cursor) !== cursor) {
+    if (path10.basename(cursor) === "openspec") return path10.dirname(cursor);
+    cursor = path10.dirname(cursor);
   }
   throw new Error(`Classic change is not inside an openspec directory: ${changeDir}`);
 }
@@ -9125,9 +9530,9 @@ async function migrationArtifacts(changeDir, evidence) {
   const artifacts = Object.fromEntries(
     evidence.filter((item) => item.satisfied && item.source).map((item) => [artifactKey(item.code), item.source])
   );
-  const progress = path9.join(changeDir, "subagent-progress.md");
+  const progress = path10.join(changeDir, "subagent-progress.md");
   if (await pathExists2(progress)) {
-    artifacts.subagent_progress = path9.relative(projectRoot, progress).split(path9.sep).join("/");
+    artifacts.subagent_progress = path10.relative(projectRoot, progress).split(path10.sep).join("/");
   }
   const handoff = evidence.find((item) => item.code === "design.handoff" && item.satisfied);
   if (handoff?.source) artifacts.handoff_context = handoff.source;
@@ -9161,7 +9566,7 @@ function migrationEvents(run, profile, timestamp) {
   ];
 }
 async function removeCreatedFiles(files) {
-  await Promise.all(files.map((file) => fs8.rm(file, { recursive: true, force: true })));
+  await Promise.all(files.map((file) => fs9.rm(file, { recursive: true, force: true })));
 }
 async function ensureClassicRun(changeDir, options) {
   const projection = await readClassicState(changeDir);
@@ -9187,7 +9592,7 @@ async function ensureClassicRun(changeDir, options) {
         run: projection.run,
         evidence: await collectClassicEvidence(changeDir, projection),
         migrated: false,
-        snapshotDir: path9.join(changeDir, ".comet", "skill-snapshots", projection.run.skillHash)
+        snapshotDir: path10.join(changeDir, ".comet", "skill-snapshots", projection.run.skillHash)
       };
     }
     const snapshot = await createSkillSnapshot(options.skillPackage, changeDir);
@@ -9205,7 +9610,7 @@ async function ensureClassicRun(changeDir, options) {
     throw new Error(`Classic Skill package does not define resolved step: ${step}`);
   }
   const expectedHash = await hashSkillPackage(options.skillPackage);
-  const expectedSnapshotDir = path9.join(changeDir, ".comet", "skill-snapshots", expectedHash);
+  const expectedSnapshotDir = path10.join(changeDir, ".comet", "skill-snapshots", expectedHash);
   const snapshotExisted = await pathExists2(expectedSnapshotDir);
   const createdFiles = [];
   try {
@@ -9223,12 +9628,12 @@ async function ensureClassicRun(changeDir, options) {
     const handoff = evidence.find((item) => item.code === "design.handoff" && item.satisfied);
     let context = null;
     if (handoff?.source) {
-      context = await fs8.readFile(path9.resolve(projectRoot, handoff.source), "utf8");
+      context = await fs9.readFile(path10.resolve(projectRoot, handoff.source), "utf8");
       await writeContext(changeDir, run.contextRef, context);
-      createdFiles.push(path9.resolve(changeDir, run.contextRef));
+      createdFiles.push(path10.resolve(changeDir, run.contextRef));
     }
     await writeArtifacts(changeDir, run.artifactsRef, artifacts);
-    createdFiles.push(path9.resolve(changeDir, run.artifactsRef));
+    createdFiles.push(path10.resolve(changeDir, run.artifactsRef));
     const timestamp = (options.now?.() ?? /* @__PURE__ */ new Date()).toISOString();
     const checkpoint = {
       runId: run.runId,
@@ -9239,8 +9644,8 @@ async function ensureClassicRun(changeDir, options) {
       createdAt: timestamp
     };
     await writeCheckpoint(changeDir, run.checkpointRef, checkpoint);
-    createdFiles.push(path9.resolve(changeDir, run.checkpointRef));
-    createdFiles.push(path9.resolve(changeDir, run.trajectoryRef));
+    createdFiles.push(path10.resolve(changeDir, run.checkpointRef));
+    createdFiles.push(path10.resolve(changeDir, run.trajectoryRef));
     for (const event of migrationEvents(run, profile, timestamp)) {
       await appendTrajectory(changeDir, run.trajectoryRef, event);
     }
@@ -9258,7 +9663,7 @@ async function ensureClassicRun(changeDir, options) {
     };
   } catch (error) {
     await removeCreatedFiles(createdFiles);
-    if (!snapshotExisted) await fs8.rm(expectedSnapshotDir, { recursive: true, force: true });
+    if (!snapshotExisted) await fs9.rm(expectedSnapshotDir, { recursive: true, force: true });
     throw error;
   }
 }
@@ -9266,7 +9671,7 @@ async function ensureClassicRun(changeDir, options) {
 // domains/comet-classic/classic-runtime-run.ts
 async function directoryExists(directory) {
   try {
-    return (await fs9.stat(directory)).isDirectory();
+    return (await fs10.stat(directory)).isDirectory();
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
@@ -9274,7 +9679,7 @@ async function directoryExists(directory) {
 }
 async function fileExists2(file) {
   try {
-    return (await fs9.stat(file)).isFile();
+    return (await fs10.stat(file)).isFile();
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
@@ -9505,17 +9910,17 @@ function embeddedClassicRuntimePackage(root) {
   };
 }
 async function classicRuntimeRoot() {
-  const runtimeDirectory = path10.dirname(fileURLToPath(import.meta.url));
+  const runtimeDirectory = path11.dirname(fileURLToPath(import.meta.url));
   const candidates = [
     process.env.COMET_RUNTIME_CLASSIC_ROOT,
-    path10.resolve(runtimeDirectory, "..", "runtime", "classic"),
-    path10.resolve(runtimeDirectory, "..", "..", "comet", "runtime", "classic"),
-    path10.resolve(runtimeDirectory, "..", "..", "assets", "skills", "comet", "runtime", "classic"),
-    path10.resolve("assets", "skills", "comet", "runtime", "classic"),
+    path11.resolve(runtimeDirectory, "..", "runtime", "classic"),
+    path11.resolve(runtimeDirectory, "..", "..", "comet", "runtime", "classic"),
+    path11.resolve(runtimeDirectory, "..", "..", "assets", "skills", "comet", "runtime", "classic"),
+    path11.resolve("assets", "skills", "comet", "runtime", "classic"),
     process.env.COMET_CLASSIC_SKILL_ROOT,
-    path10.resolve(runtimeDirectory, "..", "..", "comet-classic"),
-    path10.resolve(runtimeDirectory, "..", "..", "assets", "skills", "comet-classic"),
-    path10.resolve("assets", "skills", "comet-classic")
+    path11.resolve(runtimeDirectory, "..", "..", "comet-classic"),
+    path11.resolve(runtimeDirectory, "..", "..", "assets", "skills", "comet-classic"),
+    path11.resolve("assets", "skills", "comet-classic")
   ].filter((candidate) => Boolean(candidate));
   for (const candidate of candidates) {
     if (await directoryExists(candidate)) return candidate;
@@ -9523,7 +9928,7 @@ async function classicRuntimeRoot() {
   return null;
 }
 async function loadClassicRuntimePackage(root) {
-  if (await fileExists2(path10.join(root, "skill.yaml"))) {
+  if (await fileExists2(path11.join(root, "skill.yaml"))) {
     return loadRuntimePackage(root);
   }
   return loadSkillPackage(root);
@@ -9531,7 +9936,7 @@ async function loadClassicRuntimePackage(root) {
 async function ensureClassicRuntimeRun(changeDir) {
   const root = await classicRuntimeRoot();
   return ensureClassicRun(changeDir, {
-    skillPackage: root ? await loadClassicRuntimePackage(root) : embeddedClassicRuntimePackage(path10.dirname(fileURLToPath(import.meta.url)))
+    skillPackage: root ? await loadClassicRuntimePackage(root) : embeddedClassicRuntimePackage(path11.dirname(fileURLToPath(import.meta.url)))
   });
 }
 async function ensureStrictClassicRuntimeRun(changeDir) {
@@ -9581,18 +9986,18 @@ async function transitionClassicRuntimeRun(changeDir, classic, run, data) {
 }
 
 // domains/comet-classic/classic-state-events.ts
-import { promises as fs10 } from "fs";
-import path11 from "path";
-var CLASSIC_STATE_EVENT_LOG = path11.join(".comet", "state-events.jsonl");
+import { promises as fs11 } from "fs";
+import path12 from "path";
+var CLASSIC_STATE_EVENT_LOG = path12.join(".comet", "state-events.jsonl");
 async function appendClassicStateEvent(changeDir, input) {
   const record = {
     schemaVersion: 1,
     timestamp: (/* @__PURE__ */ new Date()).toISOString(),
     ...input
   };
-  const file = path11.join(changeDir, CLASSIC_STATE_EVENT_LOG);
-  await fs10.mkdir(path11.dirname(file), { recursive: true });
-  await fs10.appendFile(file, `${JSON.stringify(record)}
+  const file = path12.join(changeDir, CLASSIC_STATE_EVENT_LOG);
+  await fs11.mkdir(path12.dirname(file), { recursive: true });
+  await fs11.appendFile(file, `${JSON.stringify(record)}
 `, "utf8");
   return record;
 }
@@ -9751,7 +10156,7 @@ var ArchiveOutput = class {
 };
 async function exists2(file) {
   try {
-    await fs11.access(file);
+    await fs12.access(file);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -9777,10 +10182,10 @@ function artifactsHash(artifacts) {
 async function findArchiveDir(change, preferred, archiveRoot) {
   if (await exists2(preferred)) return preferred;
   if (!await exists2(archiveRoot)) return null;
-  for (const entry2 of (await fs11.readdir(archiveRoot)).sort()) {
+  for (const entry2 of (await fs12.readdir(archiveRoot)).sort().reverse()) {
     if (!entry2.endsWith(`-${change}`)) continue;
     const candidate = `${archiveRoot}/${entry2}`;
-    if ((await fs11.stat(candidate)).isDirectory()) return candidate;
+    if ((await fs12.stat(candidate)).isDirectory()) return candidate;
   }
   return null;
 }
@@ -9810,7 +10215,7 @@ async function annotateFrontmatter(output, file, archiveName, extraFields, dryRu
     output.stepsTotal += 1;
     return;
   }
-  const original = await fs11.readFile(file, "utf8");
+  const original = await fs12.readFile(file, "utf8");
   const firstLine = original.split(/\r?\n/u)[0] ?? "";
   let updated;
   if (firstLine === "---") {
@@ -9842,7 +10247,7 @@ async function annotateFrontmatter(output, file, archiveName, extraFields, dryRu
 ${original}`;
     if (!updated.endsWith("\n")) updated += "\n";
   }
-  await fs11.writeFile(file, updated);
+  await fs12.writeFile(file, updated);
   output.stderr.push(green(`  [OK] Annotated: ${file}`));
   output.stepsOk += 1;
   output.stepsTotal += 1;
@@ -9850,10 +10255,10 @@ ${original}`;
 async function verifyMainSpecsClean(projectRoot, specsRoot) {
   if (!await exists2(specsRoot)) return;
   let found = false;
-  for (const entry2 of await fs11.readdir(specsRoot)) {
+  for (const entry2 of await fs12.readdir(specsRoot)) {
     const specFile = `${specsRoot}/${entry2}/spec.md`;
     if (!await exists2(specFile)) continue;
-    const matches = (await fs11.readFile(specFile, "utf8")).split(/\r?\n/u).map((line, index) => ({ line, number: index + 1 })).filter((item) => /^## (ADDED|MODIFIED|REMOVED|RENAMED) Requirements$/u.test(item.line));
+    const matches = (await fs12.readFile(specFile, "utf8")).split(/\r?\n/u).map((line, index) => ({ line, number: index + 1 })).filter((item) => /^## (ADDED|MODIFIED|REMOVED|RENAMED) Requirements$/u.test(item.line));
     if (matches.length > 0) {
       found = true;
       process.stderr.write(
@@ -9874,11 +10279,14 @@ var classicArchiveCommand = async (args) => {
   try {
     validateChangeName(change);
     const layout = await resolveCometArtifactLayout(process.cwd());
-    const activeDir = path12.join(layout.openSpec.changesDir, change);
+    const activeDir = path13.join(layout.openSpec.changesDir, change);
     const today = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
     let archiveName = `${today}-${change}`;
-    let archiveDir = path12.join(layout.openSpec.archiveDir, archiveName);
+    let archiveDir = path13.join(layout.openSpec.archiveDir, archiveName);
     const openspec = process.env.COMET_OPENSPEC || "openspec";
+    if (layout.openSpec.storeId) {
+      assertOpenSpecStoreRegistration(layout.projectRoot, layout.openSpec.storeId, openspec);
+    }
     output.stderr.push(`=== Comet Archive: ${change} ===`);
     const activeExists = await exists2(`${activeDir}/.comet.yaml`);
     const recoveredArchive = activeExists ? null : await findArchiveDir(change, archiveDir, layout.openSpec.archiveDir);
@@ -9892,7 +10300,7 @@ var classicArchiveCommand = async (args) => {
     }
     if (recoveredArchive) {
       archiveDir = recoveredArchive;
-      archiveName = path12.basename(recoveredArchive);
+      archiveName = path13.basename(recoveredArchive);
     }
     const projection = await readClassicState(changeDir);
     if (!projection.classic) {
@@ -9989,7 +10397,7 @@ var classicArchiveCommand = async (args) => {
         return output.toResult(1);
       }
       archiveDir = resolvedArchive;
-      archiveName = path12.basename(resolvedArchive);
+      archiveName = path13.basename(resolvedArchive);
       output.stderr.push(
         green(
           `  [OK] OpenSpec archive completed: ${projectRelativePath(layout.projectRoot, archiveDir)}`
@@ -10121,8 +10529,8 @@ var classicArchiveCommand = async (args) => {
 var import_yaml5 = __toESM(require_dist(), 1);
 import { spawnSync as spawnSync2 } from "child_process";
 import { createHash as createHash4 } from "crypto";
-import { existsSync, promises as fs13, readFileSync } from "fs";
-import path14 from "path";
+import { existsSync, promises as fs14, readFileSync } from "fs";
+import path15 from "path";
 
 // domains/comet-classic/classic-runtime-evals.ts
 var STEP_EVIDENCE = {
@@ -10216,8 +10624,8 @@ async function inspectClassicChange(changeDir, name) {
 
 // domains/comet-classic/classic-validate-command.ts
 var import_yaml4 = __toESM(require_dist(), 1);
-import { promises as fs12 } from "fs";
-import path13 from "path";
+import { promises as fs13 } from "fs";
+import path14 from "path";
 var GREEN2 = "\x1B[32m";
 var RED2 = "\x1B[31m";
 var YELLOW2 = "\x1B[33m";
@@ -10267,7 +10675,7 @@ function color(code, message) {
 }
 async function exists3(file) {
   try {
-    await fs12.access(file);
+    await fs13.access(file);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -10288,7 +10696,7 @@ var classicValidateCommand = async (args) => {
     };
   }
   const { directory, label } = await resolveClassicChangeDirectory(name);
-  const yamlFile = path13.join(directory, ".comet.yaml");
+  const yamlFile = path14.join(directory, ".comet.yaml");
   const lines = [`[VALIDATE] ${label}/.comet.yaml`];
   let errors = 0;
   let warnings = 0;
@@ -10302,7 +10710,7 @@ var classicValidateCommand = async (args) => {
   };
   let source;
   try {
-    source = await fs12.readFile(yamlFile, "utf8");
+    source = await fs13.readFile(yamlFile, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") {
       fail3(".comet.yaml does not exist");
@@ -10339,7 +10747,7 @@ var classicValidateCommand = async (args) => {
   }
   for (const field2 of ["design_doc", "plan", "handoff_context"]) {
     const value = text(record[field2]);
-    if (value && !await exists3(path13.resolve(value))) {
+    if (value && !await exists3(path14.resolve(value))) {
       fail3(`${field2}='${value}' does not exist on disk`);
     }
   }
@@ -10437,7 +10845,7 @@ var GuardOutput = class {
 };
 async function exists4(file) {
   try {
-    await fs13.access(file);
+    await fs14.access(file);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -10446,7 +10854,7 @@ async function exists4(file) {
 }
 async function nonempty(file) {
   try {
-    return (await fs13.stat(file)).size > 0;
+    return (await fs14.stat(file)).size > 0;
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
@@ -10483,8 +10891,8 @@ function stripWrappingQuotes(value) {
   return value;
 }
 async function readField(changeDir, field2) {
-  const file = path14.join(changeDir, ".comet.yaml");
-  const document = (0, import_yaml5.parseDocument)(await fs13.readFile(file, "utf8"), { uniqueKeys: false });
+  const file = path15.join(changeDir, ".comet.yaml");
+  const document = (0, import_yaml5.parseDocument)(await fs14.readFile(file, "utf8"), { uniqueKeys: false });
   if (document.errors.length > 0) {
     throw new GuardFailure(`ERROR: Invalid .comet.yaml: ${document.errors[0].message}`);
   }
@@ -10499,7 +10907,7 @@ async function projectConfigValue(field2, changeDir) {
   if (changeValue && changeValue !== "null") return changeValue;
   for (const config of [".comet/config.yaml"]) {
     if (!await exists4(config)) continue;
-    for (const line of (await fs13.readFile(config, "utf8")).split(/\r?\n/u)) {
+    for (const line of (await fs14.readFile(config, "utf8")).split(/\r?\n/u)) {
       if (new RegExp(`^${field2}:`, "u").test(line)) {
         const value = stripWrappingQuotes(
           stripInlineComment(line.replace(new RegExp(`^${field2}:\\s*`, "u"), ""))
@@ -10536,7 +10944,7 @@ function countEnglishWords(source) {
 }
 async function documentLanguageMatchesConfigured(changeDir, file) {
   const language = await configuredLanguage(changeDir);
-  const source = stripFencedCodeBlocks(await fs13.readFile(file, "utf8"));
+  const source = stripFencedCodeBlocks(await fs14.readFile(file, "utf8"));
   const cjk = countCjkChars(source);
   const englishWords = countEnglishWords(source);
   if (language === "zh-CN" && cjk < 20 && englishWords >= 20) {
@@ -10560,7 +10968,7 @@ async function handoffSourceFiles(changeDir) {
   const files = [`${changeDir}/proposal.md`, `${changeDir}/design.md`, `${changeDir}/tasks.md`];
   const specs = `${changeDir}/specs`;
   if (await exists4(specs)) {
-    for (const entry2 of (await fs13.readdir(specs)).sort()) {
+    for (const entry2 of (await fs14.readdir(specs)).sort()) {
       const spec = `${specs}/${entry2}/spec.md`;
       if (await exists4(spec)) files.push(spec);
     }
@@ -10580,7 +10988,7 @@ async function preflight(changeDir, name) {
   if (!await exists4(changeDir)) {
     throw new GuardFailure(red2(`FATAL: change directory not found: ${changeDir}`));
   }
-  if (!await exists4(path14.join(changeDir, ".comet.yaml"))) {
+  if (!await exists4(path15.join(changeDir, ".comet.yaml"))) {
     throw new GuardFailure(red2(`FATAL: .comet.yaml not found in ${changeDir}`));
   }
   const result5 = await classicValidateCommand([name], { json: false });
@@ -10642,9 +11050,9 @@ async function runChecks(output, builders) {
   return blocked2;
 }
 async function removedProjectCommandField(field2) {
-  const config = path14.join(".comet", "config.yaml");
+  const config = path15.join(".comet", "config.yaml");
   if (!await exists4(config)) return false;
-  const document = (0, import_yaml5.parseDocument)(await fs13.readFile(config, "utf8"));
+  const document = (0, import_yaml5.parseDocument)(await fs14.readFile(config, "utf8"));
   if (document.errors.length > 0) {
     throw new Error(
       `.comet/config.yaml is invalid YAML (${document.errors[0].message}); cannot check for removed "${field2}" field. Fix the config and retry.`
@@ -10671,7 +11079,7 @@ async function buildPasses() {
   if (await removedProjectCommandField("build_command")) {
     return removedProjectCommandRun("build_command");
   }
-  if (await exists4("package.json") && /"build"/u.test(await fs13.readFile("package.json", "utf8"))) {
+  if (await exists4("package.json") && /"build"/u.test(await fs14.readFile("package.json", "utf8"))) {
     return runInferred("npm run build");
   }
   if (await exists4("pom.xml")) {
@@ -10693,14 +11101,14 @@ async function verificationCommandPasses() {
   return buildPasses();
 }
 async function tasksAllDone(changeDir) {
-  const tasks = path14.join(changeDir, "tasks.md");
+  const tasks = path15.join(changeDir, "tasks.md");
   if (!await exists4(tasks)) {
     return fail(
       `tasks.md is missing at ${tasks}
 Next: restore or create tasks.md for this change before leaving build.`
     );
   }
-  const source = await fs13.readFile(tasks, "utf8");
+  const source = await fs14.readFile(tasks, "utf8");
   if (!/- \[x\]/u.test(source)) {
     return fail(
       "tasks.md has no completed tasks.\nNext: complete implementation tasks and mark them with '- [x]'."
@@ -10717,9 +11125,9 @@ Next: complete or explicitly remove unfinished tasks, then mark tasks.md with '-
   return pass();
 }
 async function tasksHasAny(changeDir) {
-  const tasks = path14.join(changeDir, "tasks.md");
+  const tasks = path15.join(changeDir, "tasks.md");
   if (!await exists4(tasks)) return false;
-  return /- \[/u.test(await fs13.readFile(tasks, "utf8"));
+  return /- \[/u.test(await fs14.readFile(tasks, "utf8"));
 }
 async function planTasksAllDone(changeDir) {
   const plan = await readField(changeDir, "plan");
@@ -10730,7 +11138,7 @@ async function planTasksAllDone(changeDir) {
 Next: restore the Superpowers plan file or update .comet.yaml plan before leaving build.`
     );
   }
-  const source = await fs13.readFile(plan, "utf8");
+  const source = await fs14.readFile(plan, "utf8");
   const unfinished = source.split(/\r?\n/u).map((line, index) => ({ line, number: index + 1 })).filter((entry2) => /^\s*- \[ \]/u.test(entry2.line));
   if (unfinished.length > 0) {
     return fail(
@@ -10819,7 +11227,7 @@ async function archivedIsTrue(changeDir) {
   return await readField(changeDir, "archived") === "true";
 }
 async function designDocFrontmatterHas(designDoc, field2, expected) {
-  const source = (await fs13.readFile(designDoc, "utf8")).replace(/^\uFEFF/u, "");
+  const source = (await fs14.readFile(designDoc, "utf8")).replace(/^\uFEFF/u, "");
   let inFrontmatter = false;
   for (const line of source.split(/\r?\n/u)) {
     if (!inFrontmatter) {
@@ -10884,7 +11292,7 @@ async function designHandoffMarkdownTraceable(changeDir) {
   const markdown = `${context.replace(/\.json$/u, "")}.md`;
   if (!await nonempty(markdown))
     return fail(`design handoff markdown is missing or empty: ${markdown}`);
-  const source = await fs13.readFile(markdown, "utf8");
+  const source = await fs14.readFile(markdown, "utf8");
   const problems = [];
   if (!/^Generated-by: comet-handoff\.sh$/mu.test(source)) {
     problems.push("handoff markdown is missing Generated-by marker");
@@ -10911,7 +11319,7 @@ async function betaSpecJsonStructurallyValid(changeDir) {
   const context = await readField(changeDir, "handoff_context");
   if (!context || context === "null") return fail("handoff_context is missing from .comet.yaml");
   if (!await nonempty(context)) return fail(`spec-context.json is missing or empty: ${context}`);
-  const source = await fs13.readFile(context, "utf8");
+  const source = await fs14.readFile(context, "utf8");
   const problems = [];
   let parsed;
   try {
@@ -10948,19 +11356,19 @@ async function guardOpenChecks(output, changeDir) {
   const checks = [
     check(
       "proposal.md exists and non-empty",
-      async () => await nonempty(path14.join(changeDir, "proposal.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "proposal.md")) ? pass() : fail("")
     ),
     check(
       "proposal.md matches configured language",
-      () => documentLanguageMatchesConfigured(changeDir, path14.join(changeDir, "proposal.md"))
+      () => documentLanguageMatchesConfigured(changeDir, path15.join(changeDir, "proposal.md"))
     ),
     check(
       "tasks.md exists and non-empty",
-      async () => await nonempty(path14.join(changeDir, "tasks.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "tasks.md")) ? pass() : fail("")
     ),
     check(
       "tasks.md matches configured language",
-      () => documentLanguageMatchesConfigured(changeDir, path14.join(changeDir, "tasks.md"))
+      () => documentLanguageMatchesConfigured(changeDir, path15.join(changeDir, "tasks.md"))
     ),
     check(
       "tasks.md has at least one task",
@@ -10973,11 +11381,11 @@ async function guardOpenChecks(output, changeDir) {
       0,
       check(
         "design.md exists and non-empty",
-        async () => await nonempty(path14.join(changeDir, "design.md")) ? pass() : fail("")
+        async () => await nonempty(path15.join(changeDir, "design.md")) ? pass() : fail("")
       ),
       check(
         "design.md matches configured language",
-        () => documentLanguageMatchesConfigured(changeDir, path14.join(changeDir, "design.md"))
+        () => documentLanguageMatchesConfigured(changeDir, path15.join(changeDir, "design.md"))
       )
     );
   }
@@ -10989,27 +11397,27 @@ async function guardDesignChecks(output, changeDir, change) {
   const builders = [
     check(
       "proposal.md exists",
-      async () => await nonempty(path14.join(changeDir, "proposal.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "proposal.md")) ? pass() : fail("")
     ),
     check(
       "proposal.md matches configured language",
-      () => documentLanguageMatchesConfigured(changeDir, path14.join(changeDir, "proposal.md"))
+      () => documentLanguageMatchesConfigured(changeDir, path15.join(changeDir, "proposal.md"))
     ),
     check(
       "design.md exists",
-      async () => await nonempty(path14.join(changeDir, "design.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "design.md")) ? pass() : fail("")
     ),
     check(
       "design.md matches configured language",
-      () => documentLanguageMatchesConfigured(changeDir, path14.join(changeDir, "design.md"))
+      () => documentLanguageMatchesConfigured(changeDir, path15.join(changeDir, "design.md"))
     ),
     check(
       "tasks.md exists",
-      async () => await nonempty(path14.join(changeDir, "tasks.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "tasks.md")) ? pass() : fail("")
     ),
     check(
       "tasks.md matches configured language",
-      () => documentLanguageMatchesConfigured(changeDir, path14.join(changeDir, "tasks.md"))
+      () => documentLanguageMatchesConfigured(changeDir, path15.join(changeDir, "tasks.md"))
     ),
     check("design handoff context exists", () => designHandoffContextValid(changeDir, change)),
     check("design handoff markdown is traceable", () => designHandoffMarkdownTraceable(changeDir))
@@ -11060,6 +11468,11 @@ async function guardDesignChecks(output, changeDir, change) {
 }
 async function guardBuildChecks(output, changeDir, change) {
   return runChecks(output, [
+    check("docs layout design handoff is current", async () => {
+      const layout = await readField(changeDir, "artifact_layout");
+      const workflow = await readField(changeDir, "workflow");
+      return layout === "docs" && workflow === "full" ? designHandoffContextValid(changeDir, change) : pass();
+    }),
     check("isolation selected", () => isolationSelected(changeDir, change)),
     check("build_mode selected", () => buildModeSelected(changeDir, change)),
     check("build_mode allowed for workflow", () => buildModeAllowedForWorkflow(changeDir)),
@@ -11070,11 +11483,11 @@ async function guardBuildChecks(output, changeDir, change) {
     check("Superpowers plan all tasks checked", () => planTasksAllDone(changeDir)),
     check(
       "proposal.md exists",
-      async () => await nonempty(path14.join(changeDir, "proposal.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "proposal.md")) ? pass() : fail("")
     ),
     check(
       "proposal.md matches configured language",
-      () => documentLanguageMatchesConfigured(changeDir, path14.join(changeDir, "proposal.md"))
+      () => documentLanguageMatchesConfigured(changeDir, path15.join(changeDir, "proposal.md"))
     ),
     check("Superpowers plan matches configured language", async () => {
       const plan = await readField(changeDir, "plan");
@@ -11089,8 +11502,13 @@ async function guardBuildChecks(output, changeDir, change) {
     })
   ]);
 }
-async function guardVerifyChecks(output, changeDir) {
+async function guardVerifyChecks(output, changeDir, change) {
   return runChecks(output, [
+    check("docs layout design handoff is current", async () => {
+      const layout = await readField(changeDir, "artifact_layout");
+      const workflow = await readField(changeDir, "workflow");
+      return layout === "docs" && workflow === "full" ? designHandoffContextValid(changeDir, change) : pass();
+    }),
     check("tasks.md all tasks checked", () => tasksAllDone(changeDir)),
     // Verification command runs after tasks check — no point running tests
     // if tasks.md is incomplete.
@@ -11118,11 +11536,11 @@ async function guardArchiveChecks(output, changeDir) {
     check("archived is true", async () => await archivedIsTrue(changeDir) ? pass() : fail("")),
     check(
       "proposal.md exists",
-      async () => await nonempty(path14.join(changeDir, "proposal.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "proposal.md")) ? pass() : fail("")
     ),
     check(
       "design.md exists",
-      async () => await nonempty(path14.join(changeDir, "design.md")) ? pass() : fail("")
+      async () => await nonempty(path15.join(changeDir, "design.md")) ? pass() : fail("")
     ),
     check("tasks.md all tasks checked", () => tasksAllDone(changeDir))
   ]);
@@ -11180,7 +11598,7 @@ Valid phases: open, design, build, verify, archive`
     if (phase === "open") blocked2 = await guardOpenChecks(output, changeDir);
     else if (phase === "design") blocked2 = await guardDesignChecks(output, changeDir, change);
     else if (phase === "build") blocked2 = await guardBuildChecks(output, changeDir, change);
-    else if (phase === "verify") blocked2 = await guardVerifyChecks(output, changeDir);
+    else if (phase === "verify") blocked2 = await guardVerifyChecks(output, changeDir, change);
     else blocked2 = await guardArchiveChecks(output, changeDir);
     if (blocked2) {
       output.stderr.push("");
@@ -11205,8 +11623,8 @@ Valid phases: open, design, build, verify, archive`
 // domains/comet-classic/classic-handoff.ts
 var import_yaml6 = __toESM(require_dist(), 1);
 import { createHash as createHash5 } from "crypto";
-import { promises as fs14, readFileSync as readFileSync2 } from "fs";
-import path15 from "path";
+import { promises as fs15, readFileSync as readFileSync2 } from "fs";
+import path16 from "path";
 var GREEN4 = "\x1B[32m";
 var RED4 = "\x1B[31m";
 var YELLOW4 = "\x1B[33m";
@@ -11240,7 +11658,7 @@ var HandoffOutput = class {
 };
 async function exists5(file) {
   try {
-    await fs14.access(file);
+    await fs15.access(file);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -11249,7 +11667,7 @@ async function exists5(file) {
 }
 async function nonempty2(file) {
   try {
-    return (await fs14.stat(file)).size > 0;
+    return (await fs15.stat(file)).size > 0;
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
@@ -11278,7 +11696,7 @@ async function handoffSourceFiles2(changeDir) {
   const files = [`${changeDir}/proposal.md`, `${changeDir}/design.md`, `${changeDir}/tasks.md`];
   const specs = `${changeDir}/specs`;
   if (await exists5(specs)) {
-    for (const entry2 of (await fs14.readdir(specs)).sort()) {
+    for (const entry2 of (await fs15.readdir(specs)).sort()) {
       const spec = `${specs}/${entry2}/spec.md`;
       if (await exists5(spec)) files.push(spec);
     }
@@ -11326,7 +11744,7 @@ async function writeMarkdownContext(changeDir, change, mode, contextHash, output
   ];
   for (const file of await handoffSourceFiles2(changeDir)) {
     if (!await exists5(file)) continue;
-    const content = await fs14.readFile(file, "utf8");
+    const content = await fs15.readFile(file, "utf8");
     const total = lineCount(content);
     lines.push(
       `## ${file}`,
@@ -11351,7 +11769,7 @@ async function writeMarkdownContext(changeDir, change, mode, contextHash, output
     }
     lines.push("");
   }
-  await fs14.writeFile(output, lines.join("\n"));
+  await fs15.writeFile(output, lines.join("\n"));
 }
 async function writeJsonContext(changeDir, change, mode, contextHash, output) {
   const entries = [];
@@ -11374,7 +11792,7 @@ async function writeJsonContext(changeDir, change, mode, contextHash, output) {
     "}",
     ""
   ].join("\n");
-  await fs14.writeFile(output, document);
+  await fs15.writeFile(output, document);
 }
 async function writeSpecProjectionForFile(file, content) {
   return [
@@ -11414,11 +11832,11 @@ async function writeSpecMarkdownContext(changeDir, change, contextHash, output) 
   const specs = `${changeDir}/specs`;
   let projected = false;
   if (await exists5(specs)) {
-    for (const entry2 of (await fs14.readdir(specs)).sort()) {
+    for (const entry2 of (await fs15.readdir(specs)).sort()) {
       const spec = `${specs}/${entry2}/spec.md`;
       if (!await exists5(spec)) continue;
       projected = true;
-      lines.push(...await writeSpecProjectionForFile(spec, await fs14.readFile(spec, "utf8")));
+      lines.push(...await writeSpecProjectionForFile(spec, await fs15.readFile(spec, "utf8")));
     }
   }
   if (!projected) {
@@ -11427,7 +11845,7 @@ async function writeSpecMarkdownContext(changeDir, change, contextHash, output) 
   lines.push(
     "Full source files remain canonical. If a required heading or scenario is missing here, regenerate the handoff or read the source spec directly. Supporting files (proposal, design, tasks) are referenced by hash only."
   );
-  await fs14.writeFile(output, lines.join("\n"));
+  await fs15.writeFile(output, lines.join("\n"));
 }
 async function writeSpecJsonContext(changeDir, change, contextHash, output) {
   const entries = [];
@@ -11436,7 +11854,7 @@ async function writeSpecJsonContext(changeDir, change, contextHash, output) {
     const role = /\/specs\/[^/]+\/spec\.md$/u.test(file) ? "spec" : "supporting";
     entries.push({ path: file, sha256: hashFile2(file), role });
   }
-  await fs14.writeFile(
+  await fs15.writeFile(
     output,
     `${JSON.stringify(
       {
@@ -11455,8 +11873,8 @@ async function writeSpecJsonContext(changeDir, change, contextHash, output) {
   );
 }
 async function readField2(changeDir, field2) {
-  const file = path15.join(changeDir, ".comet.yaml");
-  const document = (0, import_yaml6.parseDocument)(await fs14.readFile(file, "utf8"), { uniqueKeys: false });
+  const file = path16.join(changeDir, ".comet.yaml");
+  const document = (0, import_yaml6.parseDocument)(await fs15.readFile(file, "utf8"), { uniqueKeys: false });
   if (document.errors.length > 0) {
     throw new HandoffFailure(`ERROR: Invalid .comet.yaml: ${document.errors[0].message}`);
   }
@@ -11490,7 +11908,7 @@ async function completedHandoffIsCurrent(changeDir, run, contextHash, contextJso
     readCheckpoint(changeDir, run.checkpointRef)
   ]);
   if (!await exists5(contextJson) || !await exists5(contextMd)) return false;
-  if (context !== await fs14.readFile(contextMd, "utf8")) return false;
+  if (context !== await fs15.readFile(contextMd, "utf8")) return false;
   if (artifacts.handoff_context !== contextJson || artifacts.handoff_markdown !== contextMd) {
     return false;
   }
@@ -11613,7 +12031,7 @@ var classicHandoffCommand = async (args) => {
       run: pendingRun,
       unknownKeys: (await readClassicState(changeDir)).unknownKeys
     });
-    await fs14.mkdir(handoffDir, { recursive: true });
+    await fs15.mkdir(handoffDir, { recursive: true });
     if (handoffMode === "beta") {
       await writeSpecMarkdownContext(label, change, contextHash, contextMd);
       await writeSpecJsonContext(label, change, contextHash, contextJson);
@@ -11621,7 +12039,7 @@ var classicHandoffCommand = async (args) => {
       await writeMarkdownContext(label, change, handoffMode, contextHash, contextMd);
       await writeJsonContext(label, change, handoffMode, contextHash, contextJson);
     }
-    const context = await fs14.readFile(contextMd, "utf8");
+    const context = await fs15.readFile(contextMd, "utf8");
     await writeContext(changeDir, pendingRun.contextRef, context);
     const artifacts = {
       ...await readArtifacts(changeDir, pendingRun.artifactsRef),
@@ -11678,8 +12096,8 @@ var classicHandoffCommand = async (args) => {
 };
 
 // domains/comet-classic/classic-hook-guard.ts
-import { existsSync as existsSync2, promises as fs15, readFileSync as readFileSync3 } from "fs";
-import path16 from "path";
+import { existsSync as existsSync2, promises as fs16, readFileSync as readFileSync3 } from "fs";
+import path17 from "path";
 function result(exitCode, message) {
   return { exitCode, stderr: message + "\n" };
 }
@@ -11704,52 +12122,52 @@ function normalized(value) {
 function parseProjectRoot(args) {
   const index = args.indexOf("--project-root");
   const value = index >= 0 ? args[index + 1] : void 0;
-  return path16.resolve(value && !value.startsWith("--") ? value : process.cwd());
+  return path17.resolve(value && !value.startsWith("--") ? value : process.cwd());
 }
 function relativeToProjectRoot(target, projectRoot) {
-  const relative = normalized(path16.relative(projectRoot, target));
+  const relative = normalized(path17.relative(projectRoot, target));
   if (relative === "") return "";
-  if (relative.startsWith("../") || relative === ".." || path16.isAbsolute(relative)) return null;
+  if (relative.startsWith("../") || relative === ".." || path17.isAbsolute(relative)) return null;
   return relative;
 }
 async function physicalPathForPossiblyMissingTarget(target) {
-  const resolved = path16.resolve(target);
-  const root = path16.parse(resolved).root;
+  const resolved = path17.resolve(target);
+  const root = path17.parse(resolved).root;
   const missingSegments = [];
   let cursor = resolved;
   while (cursor && cursor !== root) {
     try {
-      const physicalBase = await fs15.realpath(cursor);
-      return path16.join(physicalBase, ...missingSegments.reverse());
+      const physicalBase = await fs16.realpath(cursor);
+      return path17.join(physicalBase, ...missingSegments.reverse());
     } catch (error) {
       const code = error.code;
       if (code !== "ENOENT" && code !== "ENOTDIR") throw error;
-      missingSegments.push(path16.basename(cursor));
-      cursor = path16.dirname(cursor);
+      missingSegments.push(path17.basename(cursor));
+      cursor = path17.dirname(cursor);
     }
   }
   try {
-    const physicalRoot = await fs15.realpath(root);
-    return path16.join(physicalRoot, ...missingSegments.reverse());
+    const physicalRoot = await fs16.realpath(root);
+    return path17.join(physicalRoot, ...missingSegments.reverse());
   } catch {
     return null;
   }
 }
 async function projectRelative(target, projectRoot) {
-  const rawCandidate = path16.isAbsolute(target) ? target : path16.resolve(process.cwd(), target);
+  const rawCandidate = path17.isAbsolute(target) ? target : path17.resolve(process.cwd(), target);
   let candidate = normalized(rawCandidate);
   const rootRelative = relativeToProjectRoot(rawCandidate, projectRoot);
   if (rootRelative !== null) return rootRelative;
   try {
     const physicalCandidate = await physicalPathForPossiblyMissingTarget(rawCandidate);
-    const physicalRoot = await fs15.realpath(projectRoot);
+    const physicalRoot = await fs16.realpath(projectRoot);
     if (physicalCandidate) {
       const physicalRootRelative = relativeToProjectRoot(physicalCandidate, physicalRoot);
       if (physicalRootRelative !== null) return physicalRootRelative;
       candidate = normalized(physicalCandidate);
     }
   } catch {
-    if (!path16.isAbsolute(target)) return normalized(target).replace(/^\.\//u, "");
+    if (!path17.isAbsolute(target)) return normalized(target).replace(/^\.\//u, "");
   }
   return candidate.replace(/^\.\//u, "");
 }
@@ -11798,13 +12216,13 @@ async function activeChanges(projectRoot) {
   for (const layout of await candidateArtifactLayouts(projectRoot)) {
     const changesDir = layout.openSpec.changesDir;
     if (!existsSync2(changesDir)) continue;
-    for (const entry2 of (await fs15.readdir(changesDir, { withFileTypes: true })).sort(
+    for (const entry2 of (await fs16.readdir(changesDir, { withFileTypes: true })).sort(
       (left, right) => left.name.localeCompare(right.name)
     )) {
       if (!entry2.isDirectory() || entry2.name === "archive") continue;
-      const changeDir = path16.join(changesDir, entry2.name);
+      const changeDir = path17.join(changesDir, entry2.name);
       const key = normalized(changeDir);
-      if (seen.has(key) || !existsSync2(path16.join(changeDir, ".comet.yaml"))) continue;
+      if (seen.has(key) || !existsSync2(path17.join(changeDir, ".comet.yaml"))) continue;
       seen.add(key);
       const governing = await loadGoverningChange(changeDir);
       if (!governing || governing.archived) continue;
@@ -11837,7 +12255,7 @@ function allowsSuperpowersArtifacts(governing) {
   return governing.phase === "design" || governing.phase === "build" || governing.phase === "verify";
 }
 function governingChangeName(governing) {
-  return governing.changeDir ? path16.basename(governing.changeDir) : null;
+  return governing.changeDir ? path17.basename(governing.changeDir) : null;
 }
 var SUPERPOWERS_ARTIFACT_SUFFIXES = /* @__PURE__ */ new Set([
   "design",
@@ -11894,8 +12312,8 @@ async function changeDirForOpenSpecPath(projectRoot, prefix, name) {
     const relativeChangesDir = projectRelativePath(projectRoot, layout.openSpec.changesDir);
     return `${normalized(relativeChangesDir)}/` === prefix;
   });
-  if (matchedLayout) return path16.join(matchedLayout.openSpec.changesDir, name);
-  return path16.join(projectRoot, ...prefix.replace(/\/$/u, "").split("/").filter(Boolean), name);
+  if (matchedLayout) return path17.join(matchedLayout.openSpec.changesDir, name);
+  return path17.join(projectRoot, ...prefix.replace(/\/$/u, "").split("/").filter(Boolean), name);
 }
 async function governingChange(relativePath2, projectRoot) {
   const changePrefix = openSpecChangePrefix(relativePath2);
@@ -11905,7 +12323,7 @@ async function governingChange(relativePath2, projectRoot) {
       changePrefix.prefix,
       changePrefix.name
     );
-    const stateFile2 = path16.join(changeDir, ".comet.yaml");
+    const stateFile2 = path17.join(changeDir, ".comet.yaml");
     if (existsSync2(stateFile2)) {
       const governing = await loadGoverningChange(changeDir);
       if (governing) return governing;
@@ -12440,15 +12858,15 @@ var classicIntentCommand = async (args, _options) => {
 };
 
 // domains/comet-classic/classic-resume-probe.ts
-import path17 from "path";
-import { promises as fs17 } from "fs";
+import path18 from "path";
+import { promises as fs18 } from "fs";
 import { spawn } from "child_process";
 
 // platform/fs/file-system.ts
-import { promises as fs16 } from "fs";
+import { promises as fs17 } from "fs";
 async function fileExists3(filePath) {
   try {
-    await fs16.access(filePath);
+    await fs17.access(filePath);
     return true;
   } catch {
     return false;
@@ -12456,7 +12874,7 @@ async function fileExists3(filePath) {
 }
 async function readDir(dirPath) {
   try {
-    return await fs16.readdir(dirPath);
+    return await fs17.readdir(dirPath);
   } catch (error) {
     const code = error?.code;
     if (code === "ENOENT" || code === "ENOTDIR") {
@@ -12508,13 +12926,13 @@ function result3(action, change, confidence, reason, evidence = []) {
 }
 async function readIfExists(filePath) {
   if (!await fileExists3(filePath)) return "";
-  return fs17.readFile(filePath, "utf8");
+  return fs18.readFile(filePath, "utf8");
 }
 async function changeSearchText(changeDir, classic) {
   const files = ["proposal.md", "design.md", "tasks.md"];
   const parts = [classic.name, classic.workflow, classic.phase];
   for (const file of files) {
-    parts.push(await readIfExists(path17.join(changeDir, file)));
+    parts.push(await readIfExists(path18.join(changeDir, file)));
   }
   return parts.join("\n").toLowerCase();
 }
@@ -12578,9 +12996,24 @@ function diagnosticFromProjection(changeDir, name, projection) {
   };
 }
 async function hasOpenSpecChangeFiles(changeDir) {
-  return await fileExists3(path17.join(changeDir, "proposal.md")) || await fileExists3(path17.join(changeDir, "design.md")) || await fileExists3(path17.join(changeDir, "tasks.md"));
+  return await fileExists3(path18.join(changeDir, "proposal.md")) || await fileExists3(path18.join(changeDir, "design.md")) || await fileExists3(path18.join(changeDir, "tasks.md"));
+}
+async function hasActiveCometChange(changesDir) {
+  if (!await fileExists3(changesDir)) return false;
+  for (const entry2 of await readDir(changesDir)) {
+    if (entry2 === "archive") continue;
+    if (await fileExists3(path18.join(changesDir, entry2, ".comet.yaml"))) return true;
+  }
+  return false;
 }
 async function discoverActiveChanges(projectRoot) {
+  const [docsActive, legacyActive] = await Promise.all([
+    hasActiveCometChange(path18.join(projectRoot, "docs", "openspec", "changes")),
+    hasActiveCometChange(path18.join(projectRoot, "openspec", "changes"))
+  ]);
+  if (docsActive && legacyActive) {
+    return { changes: [], layoutConflict: true };
+  }
   let layout;
   try {
     layout = await resolveCometArtifactLayout(projectRoot);
@@ -12597,10 +13030,10 @@ async function discoverActiveChanges(projectRoot) {
   const changes = [];
   for (const entry2 of entries) {
     if (entry2 === "archive") continue;
-    const changeDir = path17.join(changesDir, entry2);
-    const stat = await fs17.stat(changeDir).catch(() => null);
+    const changeDir = path18.join(changesDir, entry2);
+    const stat = await fs18.stat(changeDir).catch(() => null);
     if (!stat?.isDirectory()) continue;
-    const hasCometState = await fileExists3(path17.join(changeDir, ".comet.yaml"));
+    const hasCometState = await fileExists3(path18.join(changeDir, ".comet.yaml"));
     if (!hasCometState) {
       if (!await hasOpenSpecChangeFiles(changeDir)) continue;
       const missingStateChange = {
@@ -12625,6 +13058,7 @@ async function discoverActiveChanges(projectRoot) {
         buildPause: null,
         hasClassicProjection: false,
         verifyResult: null,
+        handoffReady: false,
         text: "",
         missingCometState: true
       };
@@ -12639,6 +13073,8 @@ async function discoverActiveChanges(projectRoot) {
     const phase = classic?.phase ?? diagnostic.phase;
     const workflow = classic?.workflow ?? diagnostic.workflow;
     if (phase === "archive" || classic?.archived) continue;
+    const requiresDocsHandoff = layout.layout === "docs" && workflow === "full" && (phase === "build" || phase === "verify");
+    const handoffReady = !requiresDocsHandoff || Boolean(classic?.handoffContext) && /^[a-f0-9]{64}$/u.test(classic?.handoffHash ?? "") && await fileExists3(path18.resolve(projectRoot, classic.handoffContext));
     const change = {
       name: entry2,
       changeDir,
@@ -12650,6 +13086,7 @@ async function discoverActiveChanges(projectRoot) {
       buildPause: classic?.buildPause ?? null,
       hasClassicProjection,
       verifyResult: classic?.verifyResult ?? null,
+      handoffReady,
       text: "",
       missingCometState: false
     };
@@ -12734,6 +13171,7 @@ function hasDecisionPoint(change) {
   if (change.missingCometState) return true;
   if (!change.hasClassicProjection) return true;
   if (!change.diagnostic.valid) return true;
+  if (!change.handoffReady) return true;
   if (change.phase === "archive") return true;
   if (change.verifyResult === "fail") return true;
   if (change.diagnostic.runtimeEval && !change.diagnostic.runtimeEval.passed) return true;
@@ -12921,8 +13359,8 @@ var classicResumeProbeCommand = async (args) => {
 var import_yaml7 = __toESM(require_dist(), 1);
 import { spawnSync as spawnSync3 } from "child_process";
 import { randomUUID as randomUUID6 } from "crypto";
-import { existsSync as existsSync3, promises as fs18 } from "fs";
-import path18 from "path";
+import { existsSync as existsSync3, promises as fs19 } from "fs";
+import path19 from "path";
 init_state();
 var GREEN5 = "\x1B[32m";
 var RED5 = "\x1B[31m";
@@ -13041,7 +13479,7 @@ function validateRelativePath(value, field2) {
 }
 async function exists6(file) {
   try {
-    await fs18.access(file);
+    await fs19.access(file);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -13050,7 +13488,7 @@ async function exists6(file) {
 }
 async function nonempty3(file) {
   try {
-    return (await fs18.stat(file)).size > 0;
+    return (await fs19.stat(file)).size > 0;
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
@@ -13062,11 +13500,11 @@ async function changeDirectory(name) {
 async function readDocument2(file) {
   let source;
   try {
-    source = await fs18.readFile(file, "utf8");
+    source = await fs19.readFile(file, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") {
       fail2(
-        `ERROR: .comet.yaml not found at ${path18.relative(process.cwd(), file).replaceAll("\\", "/")}`
+        `ERROR: .comet.yaml not found at ${path19.relative(process.cwd(), file).replaceAll("\\", "/")}`
       );
     }
     throw error;
@@ -13076,13 +13514,13 @@ async function readDocument2(file) {
   return document;
 }
 async function atomicWrite2(file, content) {
-  await fs18.mkdir(path18.dirname(file), { recursive: true });
+  await fs19.mkdir(path19.dirname(file), { recursive: true });
   const temporary = `${file}.${randomUUID6()}.tmp`;
   try {
-    await fs18.writeFile(temporary, content, "utf8");
-    await fs18.rename(temporary, file);
+    await fs19.writeFile(temporary, content, "utf8");
+    await fs19.rename(temporary, file);
   } catch (error) {
-    await fs18.rm(temporary, { force: true });
+    await fs19.rm(temporary, { force: true });
     throw error;
   }
 }
@@ -13170,7 +13608,7 @@ function sparseClassicState(record) {
   };
 }
 async function projectConfigValue2(field2) {
-  const file = path18.resolve(".comet", "config.yaml");
+  const file = path19.resolve(".comet", "config.yaml");
   if (!await exists6(file)) return null;
   const document = await readDocument2(file);
   const value = document.get(field2);
@@ -13215,7 +13653,7 @@ async function stateFile(name) {
   const change = await changeDirectory(name);
   return {
     ...change,
-    file: path18.join(change.directory, ".comet.yaml")
+    file: path19.join(change.directory, ".comet.yaml")
   };
 }
 async function readField3(name, field2) {
@@ -13318,7 +13756,7 @@ async function init(output, name, workflow) {
   validateEnum(workflow, PROFILES);
   const { file, label, directory } = await stateFile(name);
   if (await exists6(file)) fail2(`ERROR: .comet.yaml already exists at ${label}/.comet.yaml`);
-  await fs18.mkdir(directory, { recursive: true });
+  await fs19.mkdir(directory, { recursive: true });
   const preset = workflow !== "full";
   const reviewMode = preset ? "off" : await reviewModeDefault();
   const layout = await resolveCometArtifactLayout(process.cwd());
@@ -13402,13 +13840,13 @@ async function requireOpenArtifacts(name) {
   const { directory } = await stateFile(name);
   const workflow = await readField3(name, "workflow");
   for (const artifact of ["proposal.md", "tasks.md"]) {
-    if (!await nonempty3(path18.join(directory, artifact))) {
+    if (!await nonempty3(path19.join(directory, artifact))) {
       fail2(
         `ERROR: Cannot transition '${name}': ${artifact} must exist and be non-empty before leaving open`
       );
     }
   }
-  if (workflow === "full" && !await nonempty3(path18.join(directory, "design.md"))) {
+  if (workflow === "full" && !await nonempty3(path19.join(directory, "design.md"))) {
     fail2(
       `ERROR: Cannot transition '${name}': design.md must exist and be non-empty before leaving open`
     );
@@ -13416,14 +13854,14 @@ async function requireOpenArtifacts(name) {
 }
 async function requireDesignEvidence(name) {
   const designDoc = await readField3(name, "design_doc");
-  if (!designDoc || designDoc === "null" || !await nonempty3(path18.resolve(designDoc))) {
+  if (!designDoc || designDoc === "null" || !await nonempty3(path19.resolve(designDoc))) {
     fail2(
       `ERROR: Cannot transition '${name}': design_doc must point to an existing Design Doc before leaving design`
     );
   }
 }
 async function writeSparseTransitionEffects(directory, effects) {
-  const file = path18.join(directory, ".comet.yaml");
+  const file = path19.join(directory, ".comet.yaml");
   const document = await readDocument2(file);
   for (const effect of effects) {
     const field2 = wireField2(effect.field);
@@ -13438,7 +13876,7 @@ async function applyTransitionEvent(output, name, event) {
   let sparse = false;
   if (!classic) {
     if (projection.run) fail2("ERROR: Classic state projection is missing");
-    const document = await readDocument2(path18.join(directory, ".comet.yaml"));
+    const document = await readDocument2(path19.join(directory, ".comet.yaml"));
     classic = sparseClassicState(document.toJS());
     sparse = true;
   }
@@ -13485,7 +13923,7 @@ async function transition(output, name, event) {
   } else if (event === "verify-pass") {
     await requirePhase(name, "verify");
     const report = await readField3(name, "verification_report");
-    if (!report || !await exists6(path18.resolve(report))) {
+    if (!report || !await exists6(path19.resolve(report))) {
       fail2(
         `ERROR: Cannot transition '${name}': verification_report must point to an existing report file`
       );
@@ -13539,9 +13977,9 @@ async function next(output, name) {
 async function taskCheckoff(output, taskFile, taskText) {
   validateRelativePath(taskFile, "task file");
   if (!taskText) fail2("ERROR: Task text cannot be empty");
-  const file = path18.resolve(taskFile);
+  const file = path19.resolve(taskFile);
   if (!await exists6(file)) fail2(`ERROR: Task file not found: ${taskFile}`);
-  const lines = (await fs18.readFile(file, "utf8")).split(/\r?\n/u);
+  const lines = (await fs19.readFile(file, "utf8")).split(/\r?\n/u);
   const matches = lines.filter(
     (line) => [`- [ ] ${taskText}`, `- [x] ${taskText}`, `- [X] ${taskText}`].includes(line)
   );
@@ -13579,21 +14017,21 @@ async function check2(output, name, phase) {
       designDoc ? `design_doc=${designDoc} (expected: empty/null)` : "design_doc is empty/null"
     );
     for (const artifact of ["proposal.md", "design.md", "tasks.md"]) {
-      (await nonempty3(path18.join(directory, artifact)) ? pass2 : reject)(
-        `${artifact} ${await nonempty3(path18.join(directory, artifact)) ? "non-empty" : "missing or empty"}`
+      (await nonempty3(path19.join(directory, artifact)) ? pass2 : reject)(
+        `${artifact} ${await nonempty3(path19.join(directory, artifact)) ? "non-empty" : "missing or empty"}`
       );
     }
   } else if (phase === "build") {
     const workflow = await readField3(name, "workflow");
     const designDoc = await readField3(name, "design_doc");
     if (workflow === "full") {
-      (designDoc && designDoc !== "null" && await exists6(path18.resolve(designDoc)) ? pass2 : reject)(`design_doc=${designDoc} (expected: non-null and file exists)`);
+      (designDoc && designDoc !== "null" && await exists6(path19.resolve(designDoc)) ? pass2 : reject)(`design_doc=${designDoc} (expected: non-null and file exists)`);
     } else {
       pass2(`workflow=${workflow} (design_doc not required)`);
     }
     for (const artifact of ["proposal.md", "tasks.md"]) {
-      (await nonempty3(path18.join(directory, artifact)) ? pass2 : reject)(
-        `${artifact} ${await nonempty3(path18.join(directory, artifact)) ? "non-empty" : "missing or empty"}`
+      (await nonempty3(path19.join(directory, artifact)) ? pass2 : reject)(
+        `${artifact} ${await nonempty3(path19.join(directory, artifact)) ? "non-empty" : "missing or empty"}`
       );
     }
   } else if (phase === "verify") {
@@ -13615,7 +14053,7 @@ async function check2(output, name, phase) {
 }
 function fieldStatus(field2, value, file) {
   if (!value || value === "null") return `  - ${field2}: PENDING`;
-  if (file && !existsSync3(path18.resolve(file))) {
+  if (file && !existsSync3(path19.resolve(file))) {
     return `  - ${field2}: BROKEN (path ${value} does not exist)`;
   }
   return `  - ${field2}: DONE (${value})`;
@@ -13624,7 +14062,7 @@ async function recoverOpen(output, directory) {
   output.stdout.push("  Artifacts:");
   let complete = 0;
   for (const artifact of ["proposal.md", "design.md", "tasks.md"]) {
-    const done = await nonempty3(path18.join(directory, artifact));
+    const done = await nonempty3(path19.join(directory, artifact));
     if (done) complete += 1;
     output.stdout.push(`  - ${artifact}: ${done ? "DONE" : "PENDING"}`);
   }
@@ -13637,7 +14075,7 @@ async function recoverDesign(output, name, directory) {
   output.stdout.push("  Artifacts:");
   for (const artifact of ["proposal.md", "design.md", "tasks.md"]) {
     output.stdout.push(
-      `  - ${artifact}: ${await nonempty3(path18.join(directory, artifact)) ? "DONE" : "MISSING (unexpected in design phase)"}`
+      `  - ${artifact}: ${await nonempty3(path19.join(directory, artifact)) ? "DONE" : "MISSING (unexpected in design phase)"}`
     );
   }
   const handoff = await readField3(name, "handoff_context");
@@ -13651,11 +14089,11 @@ async function recoverDesign(output, name, directory) {
     fieldStatus("design_doc", design, design),
     ""
   );
-  if (design && design !== "null" && await exists6(path18.resolve(design))) {
+  if (design && design !== "null" && await exists6(path19.resolve(design))) {
     output.stdout.push(
       "Recovery action: Design Doc already created and linked. Run guard to transition to build."
     );
-  } else if (handoff && handoff !== "null" && await exists6(path18.resolve(handoff))) {
+  } else if (handoff && handoff !== "null" && await exists6(path19.resolve(handoff))) {
     output.stdout.push(
       "Recovery action: Handoff generated but Design Doc not yet created. Resume from brainstorming confirmation (Step 1c)."
     );
@@ -13685,7 +14123,7 @@ async function recoverBuild(output, name, directory, workflow) {
     decisions.push(fieldStatus("subagent_dispatch", subagentDispatch));
   }
   output.stdout.push(...decisions, "", "  Plan:", fieldStatus("plan", plan, plan), "");
-  const tasks = path18.join(directory, "tasks.md");
+  const tasks = path19.join(directory, "tasks.md");
   if (!await exists6(tasks)) {
     output.stdout.push(
       "  Tasks: tasks.md MISSING",
@@ -13694,14 +14132,14 @@ async function recoverBuild(output, name, directory, workflow) {
     );
     return;
   }
-  const lines = (await fs18.readFile(tasks, "utf8")).split(/\r?\n/u);
+  const lines = (await fs19.readFile(tasks, "utf8")).split(/\r?\n/u);
   const total = lines.filter((line) => /^\s*- \[[ xX]\] /u.test(line)).length;
   const done = lines.filter((line) => /^\s*- \[[xX]\] /u.test(line)).length;
   const pending = total - done;
   let planTotal = 0;
   let planDone = 0;
-  if (plan && plan !== "null" && await exists6(path18.resolve(plan))) {
-    const planLines = (await fs18.readFile(path18.resolve(plan), "utf8")).split(/\r?\n/u);
+  if (plan && plan !== "null" && await exists6(path19.resolve(plan))) {
+    const planLines = (await fs19.readFile(path19.resolve(plan), "utf8")).split(/\r?\n/u);
     planTotal = planLines.filter((line) => /^\s*- \[[ xX]\] /u.test(line)).length;
     planDone = planLines.filter((line) => /^\s*- \[[xX]\] /u.test(line)).length;
   }
@@ -13828,19 +14266,19 @@ async function scale(output, name) {
   validateChangeName4(name);
   const { file, directory, label } = await stateFile(name);
   if (!await exists6(file)) fail2(`ERROR: .comet.yaml not found at ${label}/.comet.yaml`);
-  const tasksFile = path18.join(directory, "tasks.md");
-  const taskCount = await exists6(tasksFile) ? (await fs18.readFile(tasksFile, "utf8")).split(/\r?\n/u).filter((line) => /^- \[/u.test(line)).length : 0;
-  const specs = path18.join(directory, "specs");
+  const tasksFile = path19.join(directory, "tasks.md");
+  const taskCount = await exists6(tasksFile) ? (await fs19.readFile(tasksFile, "utf8")).split(/\r?\n/u).filter((line) => /^- \[/u.test(line)).length : 0;
+  const specs = path19.join(directory, "specs");
   let deltaSpecs = 0;
   if (await exists6(specs)) {
-    for (const entry2 of await fs18.readdir(specs)) {
-      if (await exists6(path18.join(specs, entry2, "spec.md"))) deltaSpecs += 1;
+    for (const entry2 of await fs19.readdir(specs)) {
+      if (await exists6(path19.join(specs, entry2, "spec.md"))) deltaSpecs += 1;
     }
   }
   const plan = await readField3(name, "plan");
   let baseRef = "";
-  if (plan && plan !== "null" && await exists6(path18.resolve(plan))) {
-    const match = (await fs18.readFile(path18.resolve(plan), "utf8")).match(/^base-ref:\s*(.+)$/mu);
+  if (plan && plan !== "null" && await exists6(path19.resolve(plan))) {
+    const match = (await fs19.readFile(path19.resolve(plan), "utf8")).match(/^base-ref:\s*(.+)$/mu);
     baseRef = match?.[1].trim() ?? "";
   }
   if (!baseRef) baseRef = await readField3(name, "base_ref");

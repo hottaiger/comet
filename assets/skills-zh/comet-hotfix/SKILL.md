@@ -22,6 +22,8 @@ description: "Use when 用户要修复已有行为 bug，且不新增 capability
 
 精简版 OpenSpec 产物必须使用 Comet 配置产物语言。`.comet.yaml` 尚不存在时读取 `.comet/config.yaml` 的 `language`，初始化后使用 `"$COMET_BASH" "$COMET_STATE" get <name> language` 读取。
 
+加载外部 OpenSpec Skill 后，其中任何 raw `openspec ...` 命令都必须改用 `comet openspec ...`，不得绕过 Comet 的 artifact layout resolver。
+
 执行链路：open → build → verify → archive。Hotfix 为每个阶段提供默认决策：精简开启、直接构建、按规模验证、验证通过后进入归档前最终确认。
 
 开始前按 `comet/reference/scripts.md` 定位 Comet 脚本（定位 `comet-env.mjs`）；从任意入口恢复时先按 `comet/reference/context-recovery.md` 确认 phase/workflow。

@@ -16,6 +16,8 @@ description: "Use when a Comet change has completed build and needs implementati
 
 Verification reports and branch-handling notes must use the configured Comet artifact language from `"$COMET_BASH" "$COMET_STATE" get <name> language`.
 
+After loading an external OpenSpec Skill, every raw `openspec ...` command must use `comet openspec ...` instead and must not bypass Comet's artifact layout resolver.
+
 ### 0b. Entry State Verification (Entry Check)
 
 Locate scripts via `comet/reference/scripts.md`, then run entry verification. When resuming from any entry point, first run the recovery check in `comet/reference/context-recovery.md`:

@@ -1,6 +1,7 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 import { fileExists, readDir } from '../../platform/fs/file-system.js';
+import { resolveCometArtifactLayout } from '../../domains/comet-classic/classic-artifact-layout.js';
 import { inspectClassicChange } from '../../domains/comet-classic/classic-diagnostics.js';
 import { readClassicState } from '../../domains/comet-classic/classic-store.js';
 
@@ -38,7 +39,8 @@ async function countTasks(tasksPath: string): Promise<{ done: number; total: num
 }
 
 async function getActiveChanges(projectPath: string): Promise<ChangeStatus[]> {
-  const changesDir = path.join(projectPath, 'openspec', 'changes');
+  const layout = await resolveCometArtifactLayout(projectPath);
+  const changesDir = layout.openSpec.changesDir;
   if (!(await fileExists(changesDir))) return [];
 
   const entries = await readDir(changesDir);

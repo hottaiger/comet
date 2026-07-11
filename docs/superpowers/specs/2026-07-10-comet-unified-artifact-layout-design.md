@@ -345,12 +345,19 @@ comet init --openspec-store <id>
 3. 为 `docs` 注册或修复 OpenSpec store。
 4. 写入 `.comet/config.yaml`。
 5. 输出工作目录时同时展示 OpenSpec 和 Superpowers 目录。
+6. 最终选择 docs layout 且发现健康的 legacy `openspec/` root 时，先询问是否立即迁移，不再直接失败。健康 root 必须是非链接目录，包含 `config.yaml` 或 `config.yml`、`specs/`、`changes/` 和 `changes/archive/`，且目录树中没有 symbolic link 或 junction。
+   - 没有 active change 时，确认后执行等价于 `comet migrate docs --apply` 的迁移。
+   - 有 active change 时，必须说明迁移会失效 handoff，并进行第二次确认；只有确认后才执行等价于 `comet migrate docs --apply --include-active` 的迁移。
+   - 用户暂不迁移时，输出下一步命令；没有 active change 时为 `comet migrate docs --apply`，有 active change 时为 `comet migrate docs --apply --include-active`。本次 init 必须继续使用 legacy layout，不得创建 docs OpenSpec root 或写 docs layout 配置，避免双根半迁移状态。
 
 非交互模式下，默认不改变既有行为。只有显式传 `--artifact-layout docs` 才创建 docs layout。
+即使发现 legacy `openspec/`，`init --yes` 和 `--json` 也不得自动迁移；docs init 必须安全失败并给出相同的后续迁移命令，绝不创建双根。
 
 ### `comet update`
 
 `update` 不应自动迁移旧项目目录。它只更新 Skill、rules、hooks、project instructions 和 `.comet/config.yaml` 中已存在的兼容字段。
+
+对当前项目的交互式 project-scope update，如果发现 legacy `openspec/`，应在更新完成前询问是否迁移，并使用与 `init` 相同的 active change 二次确认和后续命令规则。`update --all` 与 `--json` 不得对任何项目弹出迁移提示或自动移动目录；它们保持既有输出契约。
 
 如果发现项目已经是 docs layout，`update` 应验证 OpenSpec store 是否可用；不可用时给出 repair 指引：
 
@@ -779,6 +786,10 @@ repair 可以创建缺失的空目录，但不得覆盖现有文件。
 - legacy 和 docs 同名 change 冲突时报错。
 - stale store id 可通过 `--repair-store` 修复。
 - `--apply` 不覆盖已有用户文件。
+- 交互式 `init` 和当前项目 `update` 发现 legacy `openspec/` 时，用户可选择立即迁移或稍后迁移。
+- 延后迁移输出与 active 状态匹配的精确命令；active change 未经二次确认不得传递 `--include-active`。
+- `init --yes`、`--json` 和 `update --all` 不自动迁移，也不产生交互提示。
+- init 延后迁移或非交互 docs init 发现 legacy root 时，不创建 docs OpenSpec root 或 docs layout 配置。
 
 ### Eval tests
 

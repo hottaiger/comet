@@ -166,11 +166,27 @@ Comet Eval的自动化双Agent架构能够在线上与LangSmith/LangFuse环境�
 | `--yes`             | 非交互模式，自动选择已检测平台（未检测到则选择全部） |
 | `--scope <scope>`   | 安装范围：`project` 或 `global`                      |
 | `--language <lang>` | 技能语言：`en` 或 `zh`（跳过交互式语言选择）         |
+| `--artifact-layout <layout>` | 产物布局：`legacy` 或 `docs`；新项目可将 OpenSpec 与 Superpowers 产物统一放到 `docs/` |
+| `--openspec-store <id>` | docs layout 使用的本机 OpenSpec store id |
 | `--skip-existing`   | 跳过已安装的组件                                     |
 | `--overwrite`       | 覆盖已安装的组件                                     |
 | `--json`            | 输出结构化 JSON                                      |
 
 当同一平台检测到多个已安装组件时，交互式 init 会先提供一次批量选择：全部覆盖、全部跳过，或逐项选择。
+
+</details>
+
+<details>
+<summary><code>comet openspec [args...]</code> — 在当前 Comet 产物布局中运行 OpenSpec</summary>
+
+统一解析 legacy 或 docs layout，并为支持 store 的 OpenSpec 命令选择当前项目 store。可通过 `--project <dir>` 指定项目根；`--json` 保持 OpenSpec JSON 输出不混入 Comet 文案。
+
+</details>
+
+<details>
+<summary><code>comet migrate docs [path]</code> — 预览或应用 docs 产物布局迁移</summary>
+
+默认只输出迁移计划。使用 `--apply` 执行；存在 active change 时必须显式增加 `--include-active`；使用 `--repair-store` 与 `--openspec-store <id>` 修复 OpenSpec store 注册。
 
 </details>
 
@@ -461,12 +477,13 @@ Comet 使用解耦状态架构，文件独立管理
 | 文件                                      | 归属     | 用途                           |
 | ----------------------------------------- | -------- | ------------------------------ |
 | `.openspec.yaml`                          | OpenSpec | Spec 生命周期、变更元数据      |
-| `openspec/changes/<name>/.comet.yaml`     | Comet    | 工作流阶段、执行模式、验证状态 |
+| `<openspec-change-dir>/.comet.yaml`       | Comet    | 工作流阶段、执行模式、验证状态 |
 | `.comet/run-state.json`                   | Engine   | Run 身份和执行状态（机器所有） |
 | `.comet/state-events.jsonl`               | Comet    | 追加式状态转移审计日志         |
 
 每个 change 目录下的 `.comet.yaml` 保存 Classic 工作流状态，只保留 `run_id` 指向 Engine Run。Engine 的机器状态放在
 该 change 的 `.comet/run-state.json`，使用 `currentStep`、`status`、`iteration` 等 camelCase 字段；旧 YAML 中残留的 Run 字段会在兼容读取后迁移出去，`skill` 不再是当前 `.comet.yaml` 的合法字段。项目级默认配置只放在 `.comet/config.yaml`。
+`<openspec-change-dir>` 由 `comet openspec status --change "<name>" --json` 返回的 `changeRoot` 确定，可能位于 `openspec/changes/` 或 `docs/openspec/changes/`。
 
 阶段推进由 TypeScript transition table、`comet-state transition`、`comet-guard --apply` 和归档命令统一处理。
 每次成功推进都会向 `.comet/state-events.jsonl` 追加一条审计事件，记录来源、前后状态和实际字段变化。

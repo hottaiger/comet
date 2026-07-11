@@ -48,18 +48,19 @@ export async function collectDashboardSnapshot(
 ): Promise<DashboardSnapshot> {
   const resolvedRoot = path.resolve(projectPath);
   const layout = await resolveCometArtifactLayout(resolvedRoot).catch(() => null);
-  const changesRoots = layout
-    ? [{ dir: layout.openSpec.changesDir, layout: layout.layout }]
-    : [
-        {
-          dir: path.join(resolvedRoot, 'docs', 'openspec', 'changes'),
-          layout: 'docs' as const,
-        },
-        {
-          dir: path.join(resolvedRoot, 'openspec', 'changes'),
-          layout: 'legacy' as const,
-        },
-      ];
+  const changesRoots = [
+    {
+      dir: path.join(resolvedRoot, 'docs', 'openspec', 'changes'),
+      layout: 'docs' as const,
+    },
+    {
+      dir: path.join(resolvedRoot, 'openspec', 'changes'),
+      layout: 'legacy' as const,
+    },
+  ].sort((left, right) => {
+    if (!layout || left.layout === right.layout) return 0;
+    return left.layout === layout.layout ? -1 : 1;
+  });
 
   const [activeChanges, archivedChanges, git] = await Promise.all([
     collectActiveChanges(changesRoots, resolvedRoot),
@@ -337,7 +338,7 @@ async function buildChangeItem(input: BuildChangeInput): Promise<ChangeDashboard
     name: input.name,
     displayName,
     status: input.status,
-    path: input.dir,
+    path: path.relative(input.projectRoot, input.dir).replaceAll(path.sep, '/'),
     layout: input.layout,
     workflow: yaml.workflow ?? null,
     phase,
@@ -413,7 +414,7 @@ function buildArchiveInfo(input: BuildChangeInput): ArchiveInfo {
   const match = input.name.match(ARCHIVE_NAME_PATTERN);
   const info: ArchiveInfo = {
     archiveName: input.name,
-    archivePath: input.dir,
+    archivePath: path.relative(input.projectRoot, input.dir).replaceAll(path.sep, '/'),
   };
   if (match) {
     info.archivedAt = match[1];

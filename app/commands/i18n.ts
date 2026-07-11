@@ -78,6 +78,13 @@ export type TranslationKey =
   | 'updateAllProjectsYes'
   | 'updateAllProjectsNo'
   | 'configMerged'
+  | 'legacyOpenSpecMigrationPrompt'
+  | 'legacyOpenSpecMigrationNow'
+  | 'legacyOpenSpecMigrationLater'
+  | 'legacyOpenSpecMigrationActivePrompt'
+  | 'legacyOpenSpecMigrationActiveConfirm'
+  | 'legacyOpenSpecMigrationDeferred'
+  | 'legacyOpenSpecMigrationRequired'
   | 'cancelled'
   | 'installMode'
   | 'installModeCopy'
@@ -166,6 +173,16 @@ const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
     updateAllProjectsNo: 'No, cancel',
     configMerged:
       'Project config merged (.comet/config.yaml): preserved your values, added any missing fields',
+    legacyOpenSpecMigrationPrompt:
+      'Legacy OpenSpec artifacts were found. Migrate them to docs/openspec now?',
+    legacyOpenSpecMigrationNow: 'Migrate now',
+    legacyOpenSpecMigrationLater: 'Keep the legacy layout for now',
+    legacyOpenSpecMigrationActivePrompt:
+      'Migrating active changes invalidates existing handoffs. Continue?',
+    legacyOpenSpecMigrationActiveConfirm: 'Migrate active changes and invalidate handoffs',
+    legacyOpenSpecMigrationDeferred: 'Keeping the legacy artifact layout. Run later:',
+    legacyOpenSpecMigrationRequired:
+      'Legacy OpenSpec artifacts require migration before using the docs artifact layout. Run:',
     cancelled: 'Cancelled.',
     installMode: 'Installation mode:',
     installModeCopy: 'Copy (traditional, independent copies per platform)',
@@ -252,6 +269,14 @@ const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
     updateAllProjectsYes: '是，更新所有已索引项目',
     updateAllProjectsNo: '否，取消',
     configMerged: '项目配置已合并 (.comet/config.yaml)：已保留你的设置，补齐缺失字段',
+    legacyOpenSpecMigrationPrompt: '检测到旧版 OpenSpec 产物。现在迁移到 docs/openspec 吗？',
+    legacyOpenSpecMigrationNow: '立即迁移',
+    legacyOpenSpecMigrationLater: '暂时保留 legacy 布局',
+    legacyOpenSpecMigrationActivePrompt: '迁移活动变更会使现有 handoff 失效。是否继续？',
+    legacyOpenSpecMigrationActiveConfirm: '迁移活动变更并使 handoff 失效',
+    legacyOpenSpecMigrationDeferred: '本次保留 legacy artifact 布局，稍后运行：',
+    legacyOpenSpecMigrationRequired:
+      '使用 docs artifact 布局前必须迁移旧版 OpenSpec 产物。请运行：',
     cancelled: '已取消。',
     installMode: '安装模式：',
     installModeCopy: 'Copy（传统方式，每个平台独立副本）',

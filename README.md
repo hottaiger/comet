@@ -189,12 +189,28 @@ Initializes OpenSpec, Superpowers, and Comet skills for selected AI coding platf
 | `--yes`             | Non-interactive mode, auto-select detected platforms (or all if none detected) |
 | `--scope <scope>`   | Install scope: `project` or `global`                                           |
 | `--language <lang>` | Skill language: `en` or `zh` (skips interactive language prompt)               |
+| `--artifact-layout <layout>` | Artifact layout: `legacy` or `docs`; new projects can keep OpenSpec and Superpowers artifacts under `docs/` |
+| `--openspec-store <id>` | Local OpenSpec store id used by docs layout |
 | `--skip-existing`   | Skip already installed components                                              |
 | `--overwrite`       | Overwrite already installed components                                         |
 | `--json`            | Output structured JSON                                                         |
 
 When multiple existing components are found on the same platform, interactive init offers one bulk choice: overwrite
 all, skip all, or choose per component.
+
+</details>
+
+<details>
+<summary><code>comet openspec [args...]</code> — Run OpenSpec in the current Comet artifact layout</summary>
+
+Resolves legacy or docs layout and selects the current project store for OpenSpec commands that support stores. Use `--project <dir>` to select the project root; `--json` preserves clean OpenSpec JSON output.
+
+</details>
+
+<details>
+<summary><code>comet migrate docs [path]</code> — Preview or apply docs artifact migration</summary>
+
+Prints a migration plan by default. Use `--apply` to execute it; active changes require explicit `--include-active`; use `--repair-store` with `--openspec-store <id>` to repair OpenSpec registration.
 
 </details>
 
@@ -495,7 +511,7 @@ Comet uses a decoupled state architecture with separate files
 | File                                      | Owner    | Purpose                                             |
 | ----------------------------------------- | -------- | --------------------------------------------------- |
 | `.openspec.yaml`                          | OpenSpec | Spec lifecycle, change metadata                     |
-| `openspec/changes/<name>/.comet.yaml`     | Comet    | Workflow phase, execution mode, verification status |
+| `<openspec-change-dir>/.comet.yaml`       | Comet    | Workflow phase, execution mode, verification status |
 | `.comet/run-state.json`                   | Engine   | Run identity and execution state (machine-owned)    |
 | `.comet/state-events.jsonl`               | Comet    | Append-only state transition audit log              |
 
@@ -503,6 +519,7 @@ Each change-level `.comet.yaml` stores Classic workflow state and only keeps `ru
 Machine-owned Engine state lives in the change's `.comet/run-state.json` with camelCase fields such as `currentStep`,
 `status`, and `iteration`. Legacy Run fields left in YAML are migrated after compatibility reads, and `skill` is no
 longer a valid current `.comet.yaml` field. Project defaults live in `.comet/config.yaml`.
+Resolve `<openspec-change-dir>` from the `changeRoot` returned by `comet openspec status --change "<name>" --json`; it may be under `openspec/changes/` or `docs/openspec/changes/`.
 
 Phase progression is handled consistently by the TypeScript transition table, `comet-state transition`,
 `comet-guard --apply`, and archive commands. Each successful progression appends an audit event to
