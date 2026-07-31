@@ -135,6 +135,55 @@ def test_load_task_reads_instruction_as_utf8(mock_tasks_dir: Path):
     assert task.render_prompt(run_id="123", artifact_name="unused") == "Fix Bob’s task 123."
 
 
+def test_render_prompt_selects_exact_instruction_variant(mock_tasks_dir: Path):
+    task_dir = mock_tasks_dir / "test-basic"
+    task_dir.joinpath("task.toml").write_text(
+        BASIC_TASK_TOML.replace(
+            'default_treatments = ["CONTROL", "COMET_FULL_040_BETA"]',
+            'default_treatments = ["CONTROL", "COMET_FULL_040_BETA"]\n'
+            'instruction_variants = ["direct", "business", "repair"]',
+        ),
+        encoding="utf-8",
+    )
+    task_dir.joinpath("instruction.md").write_text(
+        """<!-- TASK_VARIANT: direct -->
+Direct {run_id}.
+<!-- TASK_VARIANT: business -->
+Business {run_id}.
+<!-- TASK_VARIANT: repair -->
+Repair {run_id}.
+""",
+        encoding="utf-8",
+    )
+
+    task = load_task("test-basic", mock_tasks_dir)
+
+    assert task.config.instruction_variants == ["direct", "business", "repair"]
+    assert task.render_prompt(task_variant="business", run_id="123") == "Business 123."
+    assert "Direct" not in task.render_prompt(task_variant="business", run_id="123")
+
+
+def test_render_prompt_rejects_unknown_instruction_variant(mock_tasks_dir: Path):
+    task_dir = mock_tasks_dir / "test-basic"
+    task_dir.joinpath("task.toml").write_text(
+        BASIC_TASK_TOML.replace(
+            'default_treatments = ["CONTROL", "COMET_FULL_040_BETA"]',
+            'default_treatments = ["CONTROL", "COMET_FULL_040_BETA"]\n'
+            'instruction_variants = ["direct"]',
+        ),
+        encoding="utf-8",
+    )
+    task_dir.joinpath("instruction.md").write_text(
+        "<!-- TASK_VARIANT: direct -->\nDirect {run_id}.\n",
+        encoding="utf-8",
+    )
+
+    task = load_task("test-basic", mock_tasks_dir)
+
+    with pytest.raises(ValueError, match="Unknown task variant"):
+        task.render_prompt(task_variant="missing", run_id="123")
+
+
 def test_comet_task_index_lists_real_tasks():
     index_path = get_tasks_dir() / "index.yaml"
 

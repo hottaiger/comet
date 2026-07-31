@@ -14,14 +14,18 @@ Usage:
     pytest local/tests/tasks/test_tasks.py --task=comet-full-workflow --treatment=COMET_FULL_040_BETA --count=2 -n 2 -v
 """
 
+import difflib
+import json
+import os
 import sys
 import uuid
+from pathlib import Path
 
 import pytest
 import conftest
 from conftest import get_fixtures
 
-from scaffold import NoiseTask, Treatment
+from scaffold import Treatment
 from scaffold.python import extract_events, parse_output
 from scaffold.python.profiles import resolve_profile_name, run_profile_rubric
 from scaffold.python.tasks import list_tasks, load_task
@@ -98,9 +102,7 @@ def generate_test_params(task_filter: str | None, treatment_filter: str | None, 
         treatment_list = expand_treatment_patterns(patterns, all_treatments)
     elif dynamic and manifest_tasks:
         treatment_list = [
-            treatment
-            for treatment in manifest_baseline_treatments
-            if treatment in all_treatments
+            treatment for treatment in manifest_baseline_treatments if treatment in all_treatments
         ]
         if dynamic.name not in treatment_list:
             treatment_list.append(dynamic.name)
@@ -215,7 +217,9 @@ interaction:
         "load_treatments",
         lambda: {
             "CONTROL": TreatmentConfig(name="CONTROL", description="Control"),
-            "COMET_FULL_040_BETA": TreatmentConfig(name="COMET_FULL_040_BETA", description="Comet full"),
+            "COMET_FULL_040_BETA": TreatmentConfig(
+                name="COMET_FULL_040_BETA", description="Comet full"
+            ),
         },
     )
 
@@ -295,7 +299,8 @@ def pytest_generate_tests(metafunc):
     ``--count N`` repeats each (task, treatment) pair N times so the report can
     compute pass-rate distributions instead of a single noisy sample.
     """
-    if "task_name" in metafunc.fixturenames and "treatment_name" in metafunc.fixturenames:
+    required_fixtures = {"task_name", "treatment_name", "rep_index", "task_variant"}
+    if required_fixtures.issubset(metafunc.fixturenames):
         task_filter = metafunc.config.getoption("--task")
         treatment_filter = metafunc.config.getoption("--treatment")
         count = int(metafunc.config.getoption("--count") or 1)
@@ -306,8 +311,21 @@ def pytest_generate_tests(metafunc):
         params = []
         for rep in range(count):
             for task_name, treatment_name in base_params:
-                params.append(pytest.param(task_name, treatment_name, id=f"{task_name}-{treatment_name}-r{rep+1}"))
-        metafunc.parametrize("task_name,treatment_name", params)
+                task = load_task(task_name)
+                variants = task.config.instruction_variants
+                variant_override = os.environ.get("BENCH_TASK_VARIANT")
+                variant = variant_override or (variants[rep % len(variants)] if variants else None)
+                rep_index = int(os.environ.get("BENCH_REP_INDEX", rep + 1))
+                params.append(
+                    pytest.param(
+                        task_name,
+                        treatment_name,
+                        rep_index,
+                        variant,
+                        id=f"{task_name}-{treatment_name}-r{rep_index}",
+                    )
+                )
+        metafunc.parametrize("task_name,treatment_name,rep_index,task_variant", params)
 
 
 # =============================================================================
@@ -315,8 +333,103 @@ def pytest_generate_tests(metafunc):
 # =============================================================================
 
 
+def _execution_contract(treatments, treatment_names: list[str]) -> dict:
+    """Ensure execution controls are identical across the compared treatments."""
+    contracts = {name: dict(treatments[name].execution or {}) for name in treatment_names}
+    fingerprints = {json.dumps(value, sort_keys=True) for value in contracts.values()}
+    if len(fingerprints) > 1:
+        raise ValueError("Treatment execution settings differ; DETAIL must be the only variable")
+    return contracts[treatment_names[0]] if treatment_names else {}
+
+
+def _write_attempt_evidence(
+    task,
+    test_dir: Path,
+    result,
+    passed: list[str],
+    failed: list[str],
+    execution: dict,
+    task_variant: str | None,
+    rep_index: int,
+) -> None:
+    raw_dir = os.environ.get("BENCH_ATTEMPT_EVIDENCE_DIR")
+    if not raw_dir:
+        return
+    evidence_dir = Path(raw_dir)
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    (evidence_dir / "agent_trajectory.jsonl").write_text(result.stdout or "", encoding="utf-8")
+
+    source_results = test_dir / "_test_results.json"
+    if source_results.exists():
+        (evidence_dir / "_test_results.json").write_bytes(source_results.read_bytes())
+    elif not (evidence_dir / "_test_results.json").exists():
+        (evidence_dir / "_test_results.json").write_text("{}\n", encoding="utf-8")
+
+    diff_lines: list[str] = []
+    relative_files = {
+        path.relative_to(task.environment_dir)
+        for path in task.environment_dir.rglob("*")
+        if path.is_file()
+    } | {
+        path.relative_to(test_dir)
+        for path in test_dir.rglob("*")
+        if path.is_file()
+        and not any(part.startswith(".") for part in path.relative_to(test_dir).parts)
+        and not any(
+            part in {"node_modules", "__pycache__", "scaffold", "validation", "data"}
+            for part in path.relative_to(test_dir).parts
+        )
+    }
+    for relative in sorted(relative_files):
+        before_path = task.environment_dir / relative
+        after_path = test_dir / relative
+        try:
+            before = (
+                before_path.read_text(encoding="utf-8").splitlines(keepends=True)
+                if before_path.exists()
+                else []
+            )
+            after = (
+                after_path.read_text(encoding="utf-8").splitlines(keepends=True)
+                if after_path.exists()
+                else []
+            )
+        except UnicodeDecodeError:
+            continue
+        if before != after:
+            diff_lines.extend(
+                difflib.unified_diff(
+                    before,
+                    after,
+                    fromfile=f"a/{relative}",
+                    tofile=f"b/{relative}",
+                )
+            )
+    (evidence_dir / "diff.patch").write_text("".join(diff_lines), encoding="utf-8")
+    (evidence_dir / "runner_result.json").write_text(
+        json.dumps(
+            {
+                "passed": passed,
+                "failed": failed,
+                "returncode": result.returncode,
+                "task_variant": task_variant,
+                "rep": rep_index,
+                "execution": {
+                    "model": execution.get("model"),
+                    "timeout_sec": execution.get("timeout_sec"),
+                    "system_prompt": execution.get("system_prompt"),
+                    "system_prompt_applied_via": "CLAUDE.md",
+                },
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 @pytest.mark.timeout(PYTEST_TIMEOUT)
-def test_task_treatment(task_name, treatment_name):
+def test_task_treatment(task_name, treatment_name, rep_index, task_variant):
     """Run a task with a treatment and validate results."""
     fixtures = get_fixtures()
     task = load_task(task_name)
@@ -327,6 +440,13 @@ def test_task_treatment(task_name, treatment_name):
     if treatment_name not in treatments:
         pytest.skip(f"Treatment {treatment_name} not found")
     treatment_cfg = treatments[treatment_name]
+    if task.config.evaluation.profile == "detail-less-bem":
+        compared_treatments = [name for name in task.default_treatments if name in treatments] or [
+            treatment_name
+        ]
+        execution = _execution_contract(treatments, compared_treatments)
+    else:
+        execution = dict(treatment_cfg.execution or {})
     skill_hints = treatment_cfg.skills[0] if treatment_cfg.skills else {}
     validators = task.load_validators()
 
@@ -352,7 +472,7 @@ def test_task_treatment(task_name, treatment_name):
     for var_name, var_template in task.config.setup.template_vars.items():
         template_vars[var_name] = var_template.format(run_id=run_id)
 
-    prompt = task.render_prompt(**template_vars)
+    prompt = task.render_prompt(task_variant=task_variant, **template_vars)
     target_profile = None
     if treatment_cfg.skills:
         target_profile = treatment_cfg.skills[0].get("profile")
@@ -361,18 +481,26 @@ def test_task_treatment(task_name, treatment_name):
         override=fixtures.request_config.getoption("--profile"),
         target_profile=target_profile,
     )
+    system_prompt = execution.get("system_prompt")
+    claude_md = conftest._build_eval_claude_md(profile_name, treatment.claude_md)
+    if system_prompt:
+        claude_md = "\n\n".join(section for section in (system_prompt, claude_md) if section)
     fixtures.setup_test_context(
         skills=treatment.skills,
-        claude_md=conftest._build_eval_claude_md(profile_name, treatment.claude_md),
+        claude_md=claude_md,
         environment_dir=task.environment_dir,
     )
     interaction = conftest._resolve_interaction_config(task, profile_name, fixtures.request_config)
-    skill_package_path = (
-        conftest._snapshot_dynamic_skill_package(fixtures.test_dir, skill_hints)
-        or skill_hints.get("path")
-    )
+    skill_package_path = conftest._snapshot_dynamic_skill_package(
+        fixtures.test_dir, skill_hints
+    ) or skill_hints.get("path")
 
-    result = fixtures.run_claude(prompt, timeout=CLAUDE_TIMEOUT, interaction=interaction)
+    result = fixtures.run_claude(
+        prompt,
+        timeout=int(execution.get("timeout_sec", CLAUDE_TIMEOUT)),
+        model=execution.get("model"),
+        interaction=interaction,
+    )
 
     events = extract_events(parse_output(result.stdout))
     outputs = {
@@ -403,11 +531,22 @@ def test_task_treatment(task_name, treatment_name):
             "mode": interaction.mode,
             "max_turns": interaction.max_turns,
         },
+        "task_variant": task_variant,
+        "rep": rep_index,
+        "execution": {
+            "model": execution.get("model"),
+            "timeout_sec": execution.get("timeout_sec"),
+            "system_prompt": execution.get("system_prompt"),
+            "system_prompt_applied_via": "CLAUDE.md" if system_prompt else None,
+        },
     }
     events["profile"] = outputs["profile"]
     events["skill_sources"] = outputs["skill_sources"]
     events["eval_manifest"] = outputs["eval_manifest"]
     events["interaction"] = outputs["interaction"]
+    events["task_variant"] = outputs["task_variant"]
+    events["rep"] = outputs["rep"]
+    events["execution"] = outputs["execution"]
 
     passed, failed = run_validators(validators, fixtures.test_dir, outputs)
     completion_slices = _split_comet_completion_checks(passed, failed)
@@ -427,9 +566,22 @@ def test_task_treatment(task_name, treatment_name):
         rubric_outputs.update(completion_slices)
         if _is_control_business_only_run(profile_name, treatment_name):
             rubric_outputs["workflow_completion"] = {"passed": [], "failed": []}
-    rubric_passed, rubric_failed = run_profile_rubric(profile_name, fixtures.test_dir, rubric_outputs)
+    rubric_passed, rubric_failed = run_profile_rubric(
+        profile_name, fixtures.test_dir, rubric_outputs
+    )
     passed = passed + rubric_passed
     failed = failed + rubric_failed
+
+    _write_attempt_evidence(
+        task,
+        fixtures.test_dir,
+        result,
+        passed,
+        failed,
+        execution,
+        task_variant,
+        rep_index,
+    )
 
     fixtures.record_result(
         events,

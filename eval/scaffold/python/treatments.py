@@ -2,6 +2,7 @@
 
 import hashlib
 import re
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,7 @@ class TreatmentConfig:
     claude_md: str = ""
     skills: list[dict[str, Any]] = field(default_factory=list)
     noise_tasks: list[str] = field(default_factory=list)
+    execution: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -232,8 +234,25 @@ def load_treatments_yaml(path: Path) -> dict[str, TreatmentConfig]:
             claude_md=cfg.get("claude_md", ""),
             skills=cfg.get("skills", []),
             noise_tasks=cfg.get("noise_tasks", []),
+            execution=cfg.get("execution", {}),
         )
     return treatments
+
+
+def load_treatment_toml(path: Path) -> TreatmentConfig:
+    if not path.exists():
+        raise FileNotFoundError(f"Treatment file not found: {path}")
+    with path.open("rb") as treatment_file:
+        cfg = tomllib.load(treatment_file)
+    name = cfg.get("name", path.stem)
+    return TreatmentConfig(
+        name=name,
+        description=cfg.get("description", ""),
+        claude_md=cfg.get("claude_md", ""),
+        skills=cfg.get("skills", []),
+        noise_tasks=cfg.get("noise_tasks", []),
+        execution=cfg.get("execution", {}),
+    )
 
 
 def load_treatments() -> dict[str, TreatmentConfig]:
@@ -241,6 +260,9 @@ def load_treatments() -> dict[str, TreatmentConfig]:
     if not treatments_folder.exists():
         return {}
     treatments = {}
+    for toml_file in sorted(treatments_folder.glob("*.toml")):
+        treatment = load_treatment_toml(toml_file)
+        treatments[treatment.name] = treatment
     for category in sorted(treatments_folder.iterdir()):
         if not category.is_dir():
             continue
@@ -263,7 +285,6 @@ def load_treatment(name: str):
         description=cfg.description,
         skills=skills,
         claude_md=cfg.claude_md if cfg.claude_md else None,
-        validators=[],
     )
 
 

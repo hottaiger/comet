@@ -1,0 +1,1 @@
+{"passed": ["[text-number-of-lines] single-line Taro Text present", "[no-text-overflow] absent", "[no-white-space] absent", "[public-less-checker] passed", "[stylelint] passed"], "failed": []}

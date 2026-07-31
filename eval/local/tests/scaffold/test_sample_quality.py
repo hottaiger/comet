@@ -112,6 +112,24 @@ def test_validator_failure_with_observable_run_is_included():
     assert quality.include_in_analysis is True
 
 
+def test_completed_stream_json_metadata_does_not_trigger_outer_failure_flag():
+    quality = infer_sample_quality(
+        events={
+            "duration_seconds": 42,
+            "total_tokens": 1000,
+            "total_cost_usd": 0.12,
+        },
+        stdout=(
+            '{"type":"system","tools":["network","container"]}\n'
+            '{"type":"result","duration_ms":42000}\n'
+        ),
+        returncode=0,
+    )
+
+    assert quality.status == "included"
+    assert quality.reason_code == "valid_signal"
+
+
 def test_harness_attribution_without_hard_noise_is_flagged():
     quality = infer_sample_quality(
         events={"duration_seconds": 10, "skills_invoked": []},

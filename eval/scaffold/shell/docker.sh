@@ -250,8 +250,11 @@ docker_run() {
 
     docker run --rm \
         -v "$windir://workspace" \
+        --user "$(id -u):$(id -g)" \
+        -e HOME=/tmp \
+        -e PYTHONPATH=/workspace \
         -w //workspace \
-        "${ENV_ARGS[@]}" \
+        ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} \
         "$image_name" \
         "${cmd[@]}"
 }
@@ -334,17 +337,21 @@ docker_run_claude() {
     if [[ -n "$TIMEOUT_CMD" ]]; then
         $TIMEOUT_CMD "$timeout" docker run --rm \
             -v "$windir://workspace" \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
             ${PLUGIN_MOUNT_ARGS[@]+"${PLUGIN_MOUNT_ARGS[@]}"} \
             -w //workspace \
-            "${ENV_ARGS[@]}" \
+            ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} \
             "$image_name" \
             "${cmd[@]}"
     else
         docker run --rm \
             -v "$windir://workspace" \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
             ${PLUGIN_MOUNT_ARGS[@]+"${PLUGIN_MOUNT_ARGS[@]}"} \
             -w //workspace \
-            "${ENV_ARGS[@]}" \
+            ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} \
             "$image_name" \
             "${cmd[@]}"
     fi
@@ -375,7 +382,7 @@ docker_run_claude_loop() {
         -v "$shell_dir://opt/scaffold-shell:ro" \
         ${PLUGIN_MOUNT_ARGS[@]+"${PLUGIN_MOUNT_ARGS[@]}"} \
         -w //workspace \
-        "${ENV_ARGS[@]}" \
+        ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} \
         "$image_name" \
         bash //opt/scaffold-shell/run-claude-loop.sh "$prompt" \
             ${PLUGIN_CLI_ARGS[@]+"${PLUGIN_CLI_ARGS[@]}"} \

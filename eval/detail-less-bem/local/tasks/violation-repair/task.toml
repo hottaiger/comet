@@ -1,0 +1,32 @@
+[metadata]
+name = "violation-repair"
+description = "Repair nested, pseudo-class, gap, and unitless-line-height public Less violations"
+difficulty = "medium"
+category = "generic"
+tags = ["detail-less-bem", "repair", "stylelint", "public-less"]
+default_treatments = ["CONTROL", "DETAIL_LESS_BEM"]
+instruction_variants = ["direct", "business", "repair"]
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+
+[template]
+required = []
+
+[environment]
+description = "Taro TSX and public Less with deliberately invalid nesting, pseudo-class, gap, and line-height."
+dockerfile = "environment/Dockerfile"
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+timeout_sec = 600
+
+[validation]
+test_scripts = "test_violation_repair.py"
+target_artifacts = ["src/ViolationRepair.tsx", "src/violation-repair.less"]
+timeout = 120
+
+[evaluation]
+profile = "detail-less-bem"
+required_skills = ["detail-less-bem"]
+expected_artifacts = ["src/ViolationRepair.tsx", "src/violation-repair.less"]
+require_skill_invocation = false
+
+[interaction]
+mode = "none"

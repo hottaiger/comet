@@ -1,0 +1,253 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -0,0 +1 @@
++Complete the assigned task in the provided workspace. Do not use external services.--- a/_test_context.json
++++ b/_test_context.json
+@@ -0,0 +1 @@
++{"run_id": "45c84947-8997-4c8f-83f7-a572bf23c325", "treatment_name": "CONTROL", "events": {"tool_calls": [{"tool": "Bash", "input": {"command": "find /workspace -type f \\( -name \"*.less\" -o -name \"*.html\" -o -name \"*.json\" \\) | head -50", "description": "Find Less, HTML, and JSON files in workspace"}, "output": "/workspace/.stylelintrc.json\n/workspace/src/vehicle-list.less"}, {"tool": "Bash", "input": {"command": "ls -la /workspace/", "description": "List workspace root"}, "output": "total 16\ndrwx------ 8  501 dialout  256 Jul 22 03:16 .\ndrwxr-xr-x 1 root root    4096 Jul 22 03:16 ..\ndrwxr-xr-x 3  501 dialout   96 Jul 22 03:16 .claude\n-rw-r--r-- 1  501 dialout  411 Jul 21 15:57 .stylelintrc.json\n-rw-r--r-- 1  501 dialout   83 Jul 22 03:16 CLAUDE.md\n-rw-r--r-- 1  501 dialout  754 Jul 22 00:46 Dockerfile\ndrwxr-xr-x 3  501 dialout   96 Jul 21 15:57 scripts\ndrwxr-xr-x 4  501 dialout  128 Jul 21 15:57 src"}, {"tool": "Bash", "input": {"command": "ls -la /workspace/src/ /workspace/scripts/", "description": "List src and scripts directories"}, "output": "/workspace/scripts/:\ntotal 4\ndrwxr-xr-x 3 501 dialout   96 Jul 21 15:57 .\ndrwx------ 8 501 dialout  256 Jul 22 03:16 ..\n-rw-r--r-- 1 501 dialout 2341 Jul 21 15:57 check-public-less.mjs\n\n/workspace/src/:\ntotal 8\ndrwxr-xr-x 4 501 dialout 128 Jul 21 15:57 .\ndrwx------ 8 501 dialout 256 Jul 22 03:16 ..\n-rw-r--r-- 1 501 dialout 200 Jul 21 15:57 vehicle-list.less\n-rw-r--r-- 1 501 dialout 461 Jul 21 15:57 vehicle-list.tsx"}, {"tool": "Read", "input": {"file_path": "/workspace/.stylelintrc.json"}, "output": "1\t{\n2\t  \"rules\": {\n3\t    \"max-nesting-depth\": 0,\n4\t    \"property-disallowed-list\": [\"gap\", \"row-gap\", \"column-gap\"],\n5\t    \"selector-class-pattern\": \"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$\",\n6\t    \"selector-max-compound-selectors\": 1,\n7\t    \"selector-max-id\": 0,\n8\t    \"selector-max-type\": 0,\n9\t    \"selector-max-attribute\": 0,\n10\t    \"selector-max-pseudo-class\": 0\n11\t  }\n12\t}\n13\t\n14\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/vehicle-list.less"}, "output": "1\t.vehicle-list {\n2\t  display: flex;\n3\t  flex-direction: column;\n4\t  gap: 12px;\n5\t}\n6\t\n7\t.vehicle-list__item {\n8\t  padding: 12px;\n9\t}\n10\t\n11\t.vehicle-list__name {\n12\t  color: #1f1f1f;\n13\t  font-size: 28px;\n14\t  line-height: 36px;\n15\t}\n16\t\n17\t"}, {"tool": "Read", "input": {"file_path": "/workspace/Dockerfile"}, "output": "1\tFROM python:3.11.9-slim-bookworm AS python-runtime\n2\t\n3\t# environment_image_tag=detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0\n4\tFROM node:20.18.0-bookworm-slim\n5\t\n6\tARG CLAUDE_CODE_VERSION=2.1.205\n7\t\n8\tWORKDIR /workspace\n9\t\n10\tCOPY --from=python-runtime /usr/local /usr/local\n11\tRUN apt-get update && apt-get install -y --no-install-recommends \\\n12\t    libbz2-1.0 libexpat1 libffi8 libgdbm6 liblzma5 libncursesw6 \\\n13\t    libreadline8 libsqlite3-0 libssl3 zlib1g && \\\n14\t    rm -rf /var/lib/apt/lists/* && \\\n15\t    pip install --no-cache-dir pytest==8.3.3 && \\\n16\t    npm install --global stylelint@16.10.0 @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}\n17\t\n18\tCOPY .stylelintrc.json /workspace/.stylelintrc.json\n19\tCOPY scripts /workspace/scripts\n20\tCOPY src /workspace/src\n21\t\n22\tCMD [\"bash\"]\n23\t"}, {"tool": "Read", "input": {"file_path": "/workspace/scripts/check-public-less.mjs"}, "output": "1\t#!/usr/bin/env node\n2\timport { existsSync, readFileSync } from 'node:fs';\n3\t\n4\tconst BEM = /^\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;\n5\tconst FORBIDDEN = new Set(['gap', 'row-gap', 'column-gap', 'float', 'filter', 'backdrop-filter', 'background-image', 'background', 'outline', 'visibility', 'transition', 'animation', 'text-overflow', 'white-space', 'word-break']);\n6\t\n7\texport function validateLess(source, file = '<input>') {\n8\t  const issues = [];\n9\t  const stack = [];\n10\t  source.split(/\\r?\\n/).forEach((line, index) => {\n11\t    const lineNumber = index + 1;\n12\t    const trimmed = line.trim();\n13\t    const selector = trimmed.match(/^(.+?)\\s*\\{$/);\n14\t    if (selector) {\n15\t      const value = selector[1].trim();\n16\t      if (stack.length || !BEM.test(value)) issues.push(`${file}:${lineNumber} [top-level-single-selector] invalid selector: ${value}`);\n17\t      stack.push({ lineNumber, declarations: [] });\n18\t      return;\n19\t    }\n20\t    const declaration = trimmed.match(/^([a-z-]+)\\s*:\\s*([^;]+);?$/i);\n21\t    if (declaration && stack.length) {\n22\t      const property = declaration[1].toLowerCase();\n23\t      const value = declaration[2].trim();\n24\t      stack.at(-1).declarations.push(property);\n25\t      if (FORBIDDEN.has(property)) issues.push(`${file}:${lineNumber} [forbidden-property] ${property} is forbidden`);\n26\t      if (property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) issues.push(`${file}:${lineNumber} [line-height-px] line-height must use px`);\n27\t      return;\n28\t    }\n29\t    if (trimmed === '}') {\n30\t      const rule = stack.pop();\n31\t      if (!rule) issues.push(`${file}:${lineNumber} [syntax] unmatched closing brace`);\n32\t      else if (!rule.declarations.length) issues.push(`${file}:${rule.lineNumber} [empty-rule] empty rule`);\n33\t    }\n34\t  });\n35\t  for (const rule of stack) issues.push(`${file}:${rule.lineNumber} [syntax] missing closing brace`);\n36\t  return issues;\n37\t}\n38\t\n39\tconst files = process.argv.slice(2);\n40\tif (!files.length) {\n41\t  console.error('[file] provide at least one Less file');\n42\t  process.exitCode = 1;\n43\t} else {\n44\t  const issues = files.flatMap((file) => existsSync(file) ? validateLess(readFileSync(file, 'utf8'), file) : [`${file}:0 [file] file not found`]);\n45\t  if (issues.length) {\n46\t    console.error(issues.join('\\n'));\n47\t    process.exitCode = 1;\n48\t  } else console.log(`PASS ${files.length} Less file(s)`);\n49\t}\n50\t\n51\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/vehicle-list.tsx"}, "output": "1\timport { Text, View } from '@tarojs/components';\n2\t\n3\timport './vehicle-list.less';\n4\t\n5\ttype Vehicle = {\n6\t  id: string;\n7\t  name: string;\n8\t};\n9\t\n10\texport function VehicleList({ vehicles }: { vehicles: Vehicle[] }) {\n11\t  return (\n12\t    <View className=\"vehicle-list\">\n13\t      {vehicles.map((vehicle) => (\n14\t        <View className=\"vehicle-list__item\" key={vehicle.id}>\n15\t          <Text className=\"vehicle-list__name\">{vehicle.name}</Text>\n16\t        </View>\n17\t      ))}\n18\t    </View>\n19\t  );\n20\t}\n21\t\n22\t"}, {"tool": "Write", "input": {"file_path": "/workspace/src/vehicle-list.less", "content": ".vehicle-list {\n  display: flex;\n  flex-direction: column;\n}\n\n.vehicle-list__item {\n  padding: 12px;\n  margin-bottom: 12px;\n}\n\n.vehicle-list__item--last {\n  margin-bottom: 0;\n}\n\n.vehicle-list__name {\n  color: #1f1f1f;\n  font-size: 28px;\n  line-height: 36px;\n}"}, "output": "The file /workspace/src/vehicle-list.less has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "Write", "input": {"file_path": "/workspace/src/vehicle-list.tsx", "content": "import { Text, View } from '@tarojs/components';\n\nimport './vehicle-list.less';\n\ntype Vehicle = {\n  id: string;\n  name: string;\n};\n\nexport function VehicleList({ vehicles }: { vehicles: Vehicle[] }) {\n  const lastIndex = vehicles.length - 1;\n  return (\n    <View className=\"vehicle-list\">\n      {vehicles.map((vehicle, index) => {\n        const className =\n          index === lastIndex\n            ? 'vehicle-list__item vehicle-list__item--last'\n            : 'vehicle-list__item';\n        return (\n          <View className={className} key={vehicle.id}>\n            <Text className=\"vehicle-list__name\">{vehicle.name}</Text>\n          </View>\n        );\n      })}\n    </View>\n  );\n}"}, "output": "The file /workspace/src/vehicle-list.tsx has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "TaskCreate", "input": {"subject": "Run Less checker", "description": "Execute scripts/check-public-less.mjs against src/vehicle-list.less and confirm it passes.", "activeForm": "Running Less checker"}, "output": "Task #1 created successfully: Run Less checker"}, {"tool": "TaskCreate", "input": {"subject": "Run Stylelint", "description": "Execute stylelint on src/vehicle-list.less using .stylelintrc.json and confirm it passes.", "activeForm": "Running Stylelint"}, "output": "Task #2 created successfully: Run Stylelint"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "in_progress"}, "output": "Updated task #1 status"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "in_progress"}, "output": "Updated task #2 status"}, {"tool": "Bash", "input": {"command": "node scripts/check-public-less.mjs src/vehicle-list.less", "description": "Run the public Less checker on vehicle-list.less"}, "output": "PASS 1 Less file(s)"}, {"tool": "Bash", "input": {"command": "npx --yes stylelint@16.10.0 --config .stylelintrc.json src/vehicle-list.less", "description": "Run stylelint against vehicle-list.less with project config"}, "output": "npm notice\nnpm notice New major version of npm available! 10.8.2 -> 12.0.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.1\nnpm notice To update run: npm install -g npm@12.0.1\nnpm notice"}, {"tool": "Bash", "input": {"command": "npx --yes stylelint@16.10.0 --config .stylelintrc.json src/vehicle-list.less; echo \"exit: $?\"", "description": "Run stylelint and capture exit code"}, "output": "exit: 0"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "completed"}, "output": "Updated task #1 status"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "completed"}, "output": "Updated task #2 status"}], "files_read": ["/workspace/.stylelintrc.json", "/workspace/src/vehicle-list.less", "/workspace/Dockerfile", "/workspace/scripts/check-public-less.mjs", "/workspace/src/vehicle-list.tsx"], "files_created": ["/workspace/src/vehicle-list.less", "/workspace/src/vehicle-list.tsx"], "files_modified": [], "commands_run": ["find /workspace -type f \\( -name \"*.less\" -o -name \"*.html\" -o -name \"*.json\" \\) | head -50", "ls -la /workspace/", "ls -la /workspace/src/ /workspace/scripts/", "node scripts/check-public-less.mjs src/vehicle-list.less", "npx --yes stylelint@16.10.0 --config .stylelintrc.json src/vehicle-list.less", "npx --yes stylelint@16.10.0 --config .stylelintrc.json src/vehicle-list.less; echo \"exit: $?\""], "skills_invoked": [], "duration_seconds": 46.404, "num_turns": 20, "input_tokens": 25538, "output_tokens": 3819, "cache_read_input_tokens": 201216, "cache_creation_input_tokens": 0, "total_tokens": 230573, "total_cost_usd": 0.32675699999999996, "model_usage": {"MiniMax-M3": {"inputTokens": 26047, "outputTokens": 3834, "cacheReadInputTokens": 201344, "cacheCreationInputTokens": 0, "webSearchRequests": 0, "costUSD": 0.32675699999999996, "contextWindow": 200000, "maxOutputTokens": 32000}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "list-spacing-b", "rep": 2, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "required_skills": ["detail-less-bem"], "expected_artifacts": ["src/vehicle-list.tsx", "src/vehicle-list.less"], "require_skill_invocation": true, "rubric_criteria": [], "skill_package_path": null, "generated_node_skills": [], "route_conformance_task": null, "route_conformance_expected_node_order": [], "baseline_treatments": [], "quality_gates": {}, "required_output_schemas": [], "expected_evidence": [], "draft_hash": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "list-spacing-b", "rep": 2, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}, "target_artifacts": ["src/vehicle-list.tsx", "src/vehicle-list.less"]}--- a/_test_results.json
++++ b/_test_results.json
+@@ -0,0 +1 @@
++{"passed": ["check-public-less: passed", "stylelint: passed", "list-spacing: no gap properties or pseudo selectors", "last-item-margin: item spacing and --last reset are present"], "failed": ["modifier-attachment rule: map output must append vehicle-list__item--last to vehicle-list__item for the final item"]}--- a/comet_checks.py
++++ b/comet_checks.py
+@@ -0,0 +1,187 @@
++"""Shared comet-workflow validation checks for eval tasks.
++
++Each comet task validator imports :func:`run_comet_checks` to get the four
++generic checks (openspec artifacts, comet state, workflow phases, tests written)
++and appends its own task-specific checks. All checks run inside Docker and emit
++results via the standard ``_test_results.json`` protocol.
++
++A check is a dict ``{"check": <name>, "status": "passed"|"failed", "message": ...}``.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++WORKSPACE = Path("/workspace")
++RESULTS_FILE = "_test_results.json"
++
++
++def _passed(name: str, message: str = "") -> dict:
++    return {"check": name, "status": "passed", "message": message}
++
++
++def _failed(name: str, message: str) -> dict:
++    return {"check": name, "status": "failed", "message": message}
++
++
++def check_openspec_artifacts() -> dict:
++    """proposal.md + tasks.md exist in a change dir (active or archived)."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("openspec_artifacts", "openspec/changes/ directory not found")
++
++    candidates: list[Path] = []
++    for d in changes_dir.iterdir():
++        if not d.is_dir():
++            continue
++        if d.name == "archive":
++            candidates.extend(s for s in d.iterdir() if s.is_dir())
++        else:
++            candidates.append(d)
++
++    if not candidates:
++        return _failed("openspec_artifacts", "No change directories found")
++
++    for change_dir in candidates:
++        if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++            return _passed("openspec_artifacts", f"found in {change_dir.name}")
++
++    return _failed("openspec_artifacts", f"proposal.md/tasks.md not found together (checked {len(candidates)} dirs)")
++
++
++def check_comet_state() -> dict:
++    """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("comet_state", "openspec/changes/ not found")
++
++    # Search active + archived change dirs for .comet.yaml.
++    state_files: list[Path] = []
++    for root, _dirs, files in os_walk(changes_dir):
++        for f in files:
++            if f == ".comet.yaml":
++                state_files.append(Path(root) / f)
++
++    if not state_files:
++        archive_dir = changes_dir / "archive"
++        if archive_dir.exists():
++            for change_dir in archive_dir.iterdir():
++                if not change_dir.is_dir():
++                    continue
++                if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++                    return _passed("comet_state", "phase=archived")
++        return _failed("comet_state", "No .comet.yaml found under openspec/changes/")
++
++    # Read the first one and check it has a recognised phase.
++    try:
++        text = state_files[0].read_text(errors="ignore")
++    except OSError:
++        return _failed("comet_state", f"Cannot read {state_files[0]}")
++
++    m = re.search(r"^phase:\s*(\S+)", text, re.MULTILINE)
++    if not m:
++        return _failed("comet_state", "No 'phase:' field in .comet.yaml")
++    phase = m.group(1)
++    valid = {"open", "design", "build", "verify", "archive", "archived"}
++    if phase not in valid:
++        return _failed("comet_state", f"Unrecognised phase: {phase}")
++    return _passed("comet_state", f"phase={phase}")
++
++
++def check_workflow_phases() -> dict:
++    """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
++    evidence = 0
++    found: list[str] = []
++
++    # Phase 1 (open): proposal/tasks
++    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
++        evidence += 1; found.append("open")
++    # Phase 2 (design): design.md or docs/superpowers/specs/
++    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
++        evidence += 1; found.append("design")
++    # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
++    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
++        evidence += 1; found.append("build")
++    # Phase 4 (verify): verification report or docs/superpowers/reports/
++    if (
++        _glob_exists("openspec/changes/**/verification.md")
++        or _glob_exists("openspec/changes/**/verification-report.md")
++        or _glob_exists("docs/superpowers/reports/*.md")
++    ):
++        evidence += 1; found.append("verify")
++    # Phase 5 (archive): openspec/changes/archive/
++    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
++        evidence += 1; found.append("archive")
++
++    if evidence >= 4:
++        return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")
++    if evidence >= 2:
++        return _failed("workflow_phases", f"Only {evidence}/5 phases evidenced ({','.join(found)})")
++    return _failed("workflow_phases", f"Only {evidence}/5 phases ({','.join(found)})")
++
++
++def check_tests_written() -> dict:
++    """The agent wrote or extended tests (test_*.py with real assertions)."""
++    test_files = list(WORKSPACE.glob("test_*.py")) + list(WORKSPACE.glob("**/test_*.py"))
++    # Filter out the validator itself and scaffold copies.
++    test_files = [f for f in test_files if "scaffold" not in str(f) and "validation" not in str(f)]
++    has_assert = False
++    for tf in test_files:
++        try:
++            if "assert" in tf.read_text(errors="ignore").lower():
++                has_assert = True
++                break
++        except OSError:
++            continue
++    if has_assert:
++        return _passed("tests_written", f"{len(test_files)} test file(s) with assertions")
++    if test_files:
++        return _failed("tests_written", f"{len(test_files)} test file(s) but none with assertions")
++    return _failed("tests_written", "No test files written by the agent")
++
++
++def run_comet_checks() -> list[dict]:
++    """Run all four generic comet-workflow checks."""
++    return [
++        check_openspec_artifacts(),
++        check_comet_state(),
++        check_workflow_phases(),
++        check_tests_written(),
++    ]
++
++
++def write_results(results: list[dict]) -> None:
++    """Write the combined results to _test_results.json and print a summary."""
++    out = {"checks": results}
++    results_path = WORKSPACE / RESULTS_FILE
++    try:
++        results_path.write_text(json.dumps(out))
++    except OSError:
++        pass
++    failed = [r for r in results if r["status"] == "failed"]
++    for r in results:
++        status = "✓" if r["status"] == "passed" else "✗"
++        print(f"  {status} {r['check']}: {r.get('message', '')}")
++    print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")
++    if failed:
++        import sys
++        sys.exit(1)
++
++
++# --- helpers ---------------------------------------------------------------
++
++def os_walk(root: Path):
++    """os.walk that tolerates permission errors."""
++    import os
++    for dirpath, dirnames, filenames in os.walk(root):
++        yield dirpath, dirnames, filenames
++
++
++def _glob_exists(pattern: str) -> bool:
++    """True if any file matches the glob pattern under WORKSPACE."""
++    try:
++        return any(WORKSPACE.glob(pattern))
++    except Exception:
++        return False
+--- a/src/vehicle-list.less
++++ b/src/vehicle-list.less
+@@ -1,16 +1,19 @@
+ .vehicle-list {
+   display: flex;
+   flex-direction: column;
+-  gap: 12px;
+ }
+ 
+ .vehicle-list__item {
+   padding: 12px;
++  margin-bottom: 12px;
++}
++
++.vehicle-list__item--last {
++  margin-bottom: 0;
+ }
+ 
+ .vehicle-list__name {
+   color: #1f1f1f;
+   font-size: 28px;
+   line-height: 36px;
+-}
+-
++}--- a/src/vehicle-list.tsx
++++ b/src/vehicle-list.tsx
+@@ -8,14 +8,20 @@
+ };
+ 
+ export function VehicleList({ vehicles }: { vehicles: Vehicle[] }) {
++  const lastIndex = vehicles.length - 1;
+   return (
+     <View className="vehicle-list">
+-      {vehicles.map((vehicle) => (
+-        <View className="vehicle-list__item" key={vehicle.id}>
+-          <Text className="vehicle-list__name">{vehicle.name}</Text>
+-        </View>
+-      ))}
++      {vehicles.map((vehicle, index) => {
++        const className =
++          index === lastIndex
++            ? 'vehicle-list__item vehicle-list__item--last'
++            : 'vehicle-list__item';
++        return (
++          <View className={className} key={vehicle.id}>
++            <Text className="vehicle-list__name">{vehicle.name}</Text>
++          </View>
++        );
++      })}
+     </View>
+   );
+-}
+-
++}

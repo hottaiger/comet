@@ -1,0 +1,31 @@
+{
+  "passed": [
+    "[horizontal-flex] entry-row \u663e\u5f0f\u6a2a\u5411 flex",
+    "[equal-width] entry-card \u4f7f\u7528 flex: 1",
+    "[gap-replacement] \u7528 margin-right \u4e0e --last \u8868\u8fbe\u56fa\u5b9a\u95f4\u8ddd",
+    "[forbidden-property] \u672a\u4f7f\u7528 gap",
+    "[top-level-single-selector] \u672a\u4f7f\u7528\u540e\u4ee3\u6216\u5b50\u4ee3\u9009\u62e9\u5668",
+    "[check-public-less] \u901a\u8fc7",
+    "[stylelint] \u901a\u8fc7",
+    "[HARD] target_artifacts: passed",
+    "[HARD] check_public_less_exit_code: 0",
+    "[HARD] stylelint_exit_code: 0",
+    "[RUBRIC] bem_readability: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 2.00"
+  ],
+  "failed": [
+    "[single-card-fallback] TSX \u5fc5\u987b\u9488\u5bf9\u5355\u5361\u540c\u6302 entry-card--bar\uff0cLess \u5fc5\u987b\u5b9a\u4e49\u5176\u6a2a\u6761\u9ad8\u5ea6",
+    "[bem-modifier] TSX \u5fc5\u987b\u4ee5\u672b\u9879\u5224\u65ad\u4e3a entry-card \u540c\u6302 --last modifier"
+  ],
+  "returncode": 0,
+  "task_variant": "direct",
+  "rep": 1,
+  "execution": {
+    "model": "MiniMax-M3",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}

@@ -1,0 +1,25 @@
+tasks:
+  - name: bem-create
+    category: generic
+    description: Create a public Less BEM title, price, and disabled state without selector violations.
+  - name: list-spacing
+    category: generic
+    description: Replace list spacing with BEM last-item modifiers and margins.
+  - name: horizontal-layout
+    category: generic
+    description: Arrange two entrance cards in an equal-width horizontal row.
+  - name: text-truncation
+    category: generic
+    description: Implement single-line title truncation with Taro Text.
+  - name: line-height
+    category: generic
+    description: Repair non-pixel public Less line-height values.
+  - name: platform-condition
+    category: generic
+    description: Keep platform shadow behavior within lowercase conditional-compilation rules.
+  - name: equal-width-row
+    category: generic
+    description: Repair an equal-width card row and its single-card fallback.
+  - name: violation-repair
+    category: generic
+    description: Repair public Less selector, spacing, and line-height violations.

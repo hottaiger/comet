@@ -1,0 +1,27 @@
+{
+  "passed": [
+    "check-public-less: passed",
+    "stylelint: passed",
+    "list-spacing: no gap properties or pseudo selectors",
+    "last-item-margin: item spacing and --last reset are present",
+    "[HARD] target_artifacts: passed",
+    "[HARD] check_public_less_exit_code: 0",
+    "[HARD] stylelint_exit_code: 0",
+    "[RUBRIC] bem_readability: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 2.00"
+  ],
+  "failed": [
+    "modifier-attachment rule: map output must append vehicle-list__item--last to vehicle-list__item for the final item"
+  ],
+  "returncode": 0,
+  "task_variant": "list-spacing-c",
+  "rep": 3,
+  "execution": {
+    "model": "MiniMax-M3",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}

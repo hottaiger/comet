@@ -15,6 +15,7 @@ Usage:
     validators = task.load_validators()
 """
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -117,6 +118,10 @@ class TaskConfig:
     # Default treatments to test with this task
     default_treatments: list[str] = field(default_factory=list)
 
+    # Prompt variants declared in task metadata. The runner selects one variant
+    # per repetition; callers that omit task_variant retain the legacy behavior.
+    instruction_variants: list[str] = field(default_factory=list)
+
     # Template variables required for instruction.md
     template_required: list[str] = field(default_factory=list)
 
@@ -165,7 +170,7 @@ class Task:
     def default_treatments(self) -> list[str]:
         return self.config.default_treatments
 
-    def render_prompt(self, **kwargs: Any) -> str:
+    def render_prompt(self, task_variant: str | None = None, **kwargs: Any) -> str:
         """Render the instruction template with provided variables.
 
         Args:
@@ -180,7 +185,29 @@ class Task:
         missing = set(self.config.template_required) - set(kwargs.keys())
         if missing:
             raise KeyError(f"Missing required template variables: {missing}")
-        prompt = self.instruction_template.format(**kwargs)
+        template = self.instruction_template
+        if task_variant is not None:
+            if task_variant not in self.config.instruction_variants:
+                raise ValueError(
+                    f"Unknown task variant {task_variant!r}; "
+                    f"available: {self.config.instruction_variants}"
+                )
+            variants = {
+                match.group("name").strip(): match.group("body").strip()
+                for match in re.finditer(
+                    r"<!--\s*TASK_VARIANT:\s*(?P<name>[^\s>]+)\s*-->"
+                    r"\s*(?P<body>.*?)"
+                    r"(?=<!--\s*(?:END_TASK_VARIANT\s*-->|TASK_VARIANT:)|\Z)",
+                    template,
+                    flags=re.DOTALL,
+                )
+            }
+            if task_variant not in variants:
+                raise ValueError(
+                    f"Task variant marker not found for {task_variant!r} in {self.path / 'instruction.md'}"
+                )
+            template = variants[task_variant]
+        prompt = template.format(**kwargs)
         if self.config.evaluation.profile == "comet-workflow":
             return f"{COMET_WORKFLOW_INVOCATION_CONTRACT}\n\n{prompt}"
         return prompt
@@ -291,6 +318,7 @@ def load_task(name: str, tasks_dir: Path | None = None) -> Task:
         tags=metadata.get("tags", []),
         environment_description=environment.get("description", ""),
         default_treatments=metadata.get("default_treatments", []),
+        instruction_variants=metadata.get("instruction_variants", []),
         template_required=template.get("required", []),
         dockerfile=environment.get("dockerfile", "Dockerfile"),
         timeout_sec=environment.get("timeout_sec", 900),

@@ -1,0 +1,29 @@
+[metadata]
+name = "list-spacing"
+description = "Replace public Less list gap spacing with item margins and a co-mounted last-item modifier."
+difficulty = "easy"
+category = "generic"
+tags = ["less", "spacing", "modifier", "taro", "detail-less-bem"]
+default_treatments = ["CONTROL", "DETAIL_LESS_BEM"]
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+instruction_variants = ["list-spacing-a", "list-spacing-b", "list-spacing-c"]
+
+[environment]
+description = "Taro list fixture using Node 20.18.0, Python 3.11.9, and Stylelint 16.10.0."
+dockerfile = "environment/Dockerfile"
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+timeout_sec = 600
+
+[validation]
+test_scripts = ["test_list_spacing.py"]
+target_artifacts = ["src/vehicle-list.tsx", "src/vehicle-list.less"]
+timeout = 120
+
+[evaluation]
+profile = "detail-less-bem"
+required_skills = ["detail-less-bem"]
+expected_artifacts = ["src/vehicle-list.tsx", "src/vehicle-list.less"]
+require_skill_invocation = true
+
+[interaction]
+mode = "none"

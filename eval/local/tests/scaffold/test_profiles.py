@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from scaffold.python.paths import EVAL_ROOT
 from scaffold.python.profiles import (
     AUTHORING_SKILL_PROFILE,
     COMET_WORKFLOW_PROFILE,
@@ -12,6 +13,24 @@ from scaffold.python.profiles import (
     run_profile_rubric,
 )
 from scaffold.python.tasks import load_task
+
+
+DETAIL_LESS_BEM_TASKS = (
+    "bem-create",
+    "equal-width-row",
+    "horizontal-layout",
+    "line-height",
+    "list-spacing",
+    "platform-condition",
+    "text-truncation",
+    "violation-repair",
+)
+
+
+def _activate_detail_less_bem_suite(monkeypatch) -> None:
+    suite_root = EVAL_ROOT / "detail-less-bem" / "local"
+    monkeypatch.setenv("BENCH_SUITE_ROOT", str(suite_root))
+    monkeypatch.delenv("BENCH_TASKS_DIR", raising=False)
 
 
 def test_profile_registry_exposes_generic_and_comet_workflow():
@@ -44,6 +63,81 @@ def test_resolve_profile_name_uses_task_profile_by_default():
     task = load_task("comet-full-workflow")
 
     assert resolve_profile_name(task) == "comet-workflow"
+
+
+def test_custom_suite_registers_detail_less_bem_profile(monkeypatch):
+    _activate_detail_less_bem_suite(monkeypatch)
+
+    profile = get_profile("detail-less-bem")
+
+    assert profile.name == "detail-less-bem"
+    assert profile.rubric_dimensions == (
+        "bem_readability",
+        "jsx_less_alignment",
+        "layout_reasonableness",
+    )
+    assert "detail-less-bem" in list_profiles()
+
+
+def test_detail_less_bem_tasks_resolve_custom_profile(monkeypatch):
+    _activate_detail_less_bem_suite(monkeypatch)
+
+    for task_name in DETAIL_LESS_BEM_TASKS:
+        task = load_task(task_name)
+        assert resolve_profile_name(task) == "detail-less-bem"
+
+
+def test_detail_less_bem_profile_emits_hard_checks_and_two_point_rubric(
+    monkeypatch,
+    tmp_path: Path,
+):
+    _activate_detail_less_bem_suite(monkeypatch)
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    (source_dir / "card.tsx").write_text("export const Card = () => null")
+    (source_dir / "card.less").write_text(".card {}")
+    outputs = {
+        "completion": {
+            "passed": [
+                "check-public-less: passed",
+                "stylelint: passed",
+            ],
+            "failed": [],
+        }
+    }
+
+    passed, failed = run_profile_rubric("detail-less-bem", tmp_path, outputs)
+
+    assert failed == []
+    assert "[HARD] target_artifacts: passed" in passed
+    assert "[HARD] check_public_less_exit_code: 0" in passed
+    assert "[HARD] stylelint_exit_code: 0" in passed
+    assert any("[RUBRIC] bem_readability: 2.00" in item for item in passed)
+    assert any("[RUBRIC] jsx_less_alignment: 2.00" in item for item in passed)
+    assert any("[RUBRIC] layout_reasonableness: 2.00" in item for item in passed)
+
+
+def test_detail_less_bem_profile_fails_missing_evidence_without_inventing_scores(
+    monkeypatch,
+    tmp_path: Path,
+):
+    _activate_detail_less_bem_suite(monkeypatch)
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    (source_dir / "card.tsx").write_text("export const Card = () => null")
+    outputs = {
+        "completion": {
+            "passed": ["check-public-less: passed"],
+            "failed": ["stylelint rule failure: invalid selector"],
+        }
+    }
+
+    passed, failed = run_profile_rubric("detail-less-bem", tmp_path, outputs)
+
+    assert "[HARD] target_artifacts: missing src/**/*.less" in failed
+    assert "[HARD] stylelint_exit_code: expected 0, completion reported failure" in failed
+    assert any("[RUBRIC] bem_readability: 0.00" in item for item in passed)
+    assert any("hard-check proxy" in item for item in passed)
 
 
 def test_comet_profile_requires_comet_skill_invocation(tmp_path: Path):

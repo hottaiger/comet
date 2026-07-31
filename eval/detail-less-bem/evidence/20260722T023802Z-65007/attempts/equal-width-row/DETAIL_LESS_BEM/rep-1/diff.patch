@@ -1,0 +1,878 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -0,0 +1 @@
++Complete the assigned task in the provided workspace. Do not use external services.--- a/_eval_target_skills/detail-less-bem/SKILL.md
++++ b/_eval_target_skills/detail-less-bem/SKILL.md
+@@ -0,0 +1,173 @@
++---
++name: detail-less-bem
++description: Use when 在 detail-taro3 创建、修改或评审经 Taro 转换到微信小程序、H5、RN 的公共 Less、BEM、选择器或布局。
++---
++
++# Taro 三端公共 Less
++
++适用经 Taro 公共 Less 转换链服务微信小程序、H5、RN 的样式。目标是稳定生成三端可用代码。
++
++项目三端实测 > 项目构建与适配层文档 > Taro 文档 > 原生 RN 文档。
++
++## AI 执行顺序
++
++1. 读取关联 JSX/TSX、Less 与相邻模块，确认样式走公共转换链。
++2. 允许仅修改关联 JSX/TSX：补 Text、`numberOfLines`、BEM modifier。
++3. 每个需要公共样式的元素使用一个主 BEM 类；可同时挂测试、埋点或功能类。modifier 必须与基础类同挂，互斥 modifier 不可同挂。
++4. 只写顶层单选择器；非常用或不确定属性先查 [references/platform-style-compat.md](references/platform-style-compat.md)。
++5. 同一任务可多次调用本 Skill；全部关联改动完成后，基于最终 diff 统一验证一次。
++
++## 硬性禁止
++
++公共 `.less` 中不得使用：
++
++- `gap`、`row-gap`、`column-gap`。固定间距改用子元素 `margin`。
++- Less 嵌套，包括 `.parent { .child {} }`、`&--modifier`、`&__element`。
++- 展开后含空格或 `>` 的多段选择器，包括 `.parent .child`、`.parent > .child`、`&__ancestor &__descendant`。
++- 标签、ID、属性、伪类、伪元素选择器，如 `div`、`#id`、`[type="text"]`、`:hover`、`:first-child`、`:not()`、`::after`。
++- `float`。
++- 公共 Less 中的 `filter`、`backdrop-filter`、CSS 渐变、`background-image`。
++- 布局与单位：`position: fixed` / `sticky`、`calc()`、CSS 变量 `var()`、`vh` / `vw` / `em` / `rem`。
++- 视觉：`box-shadow`、`background` 简写、`outline`、`visibility: hidden`、`transition` / `animation` / `@keyframes`。
++- 文本：`text-overflow`、`white-space`、`word-break`、所有非 px 数值的 `line-height`。公共 `line-height` 必须写为 `24px`，禁止 `1.5`、`normal`、百分比与相对单位。
++- `border-style: none`。
++- `translateZ(0)` 等非常用 transform。
++- 将 `rpx` 作为 RN 公共样式的默认单位。
++
++条件编译只豁免属性兼容性，选择器与 BEM 规则仍全局生效。仅支持小写 `#ifdef`、`#ifndef`、`#endif`；单项差异用条件编译，多组样式或结构差异用端专属 Less 文件。逐属性支持情况见 [references/platform-style-compat.md](references/platform-style-compat.md)。
++
++## 必须遵守
++
++### BEM
++
++- 使用 `.block__element--modifier`，多单词使用 kebab-case。
++- 禁止双 `__`：将 `menu__item__link` 改为 `menu__link` 或独立 block。
++- modifier 必须与基础类同挂：
++
++```tsx
++<View className="vehicle-card__item vehicle-card__item--last" />
++```
++
++### 选择器与 Less
++
++- 每条规则必须是顶层单选择器。
++- 不依赖 DOM 层级表达状态；将状态编码到当前元素的 modifier 类。
++
++```less
++.vehicle-card {
++}
++
++.vehicle-card__title {
++}
++
++.vehicle-card--compact {
++}
++```
++
++### 文本
++
++1. 不得依赖 `View → Text` 的样式继承；最终渲染的 Text 必须显式获得样式，或来自受控统一 Text 组件。
++2. 所有文案必须包 `<Text>`，不得裸文本直接放 `View` 内。
++3. 截断与换行控制用 `Text` 的 `numberOfLines`，不用 `text-overflow` / `white-space`。
++
++### 布局与属性
++
++- 横向 flex 必须同时声明 `display: flex` 和 `flex-direction: row`。
++- `width: 100%` 与横向 padding 同用时必须声明 `box-sizing: border-box`。
++- `z-index` 仅对同一父级下的兄弟节点生效且需配合定位；优先调整 JSX 渲染顺序表达层级。
++- 子元素不得溢出父容器边界做视觉设计（RN Android `overflow: visible` 不生效）。
++- 隐藏边框使用 `border-width: 0` 或 `border-color: transparent`。
++- `border-style` 仅使用 `solid`、`dotted`、`dashed`。
++- 重要图片使用 Image 组件。
++- 渐变使用 `LinearGradient` 组件。
++
++## 固定间距替代 `gap`
++
++优先把间距放在重复子元素上，最后一项通过 modifier 清零。禁止用 `:last-child`。
++
++```less
++.vehicle-list {
++  display: flex;
++  flex-direction: column;
++}
++
++.vehicle-list__item {
++  margin-bottom: 12px;
++}
++
++.vehicle-list__item--last {
++  margin-bottom: 0;
++}
++```
++
++```tsx
++{list.map((item, index) => (
++  <View
++    key={item.id}
++    className={`vehicle-list__item${
++      index === list.length - 1 ? ' vehicle-list__item--last' : ''
++    }`}
++  />
++))}
++```
++
++横向列表使用 `margin-right` 与 `--last`。内部留白使用父元素 `padding`。仅在表达“分配剩余空间”时使用 `justify-content: space-between`，不得把它当作固定 `gap` 替代。
++
++## AI 决策表
++
++| 需求 | 使用 | 禁止 |
++|---|---|---|
++| 固定兄弟间距 | 子元素 margin + `--last` | `gap`、伪类 |
++| 元素内部留白 | padding | 空 spacer 文本 |
++| 元素状态 | 基础类 + modifier | 后代选择器 |
++| 横向排列 | flex + `flex-direction: row` | 依赖 RN 默认方向 |
++| 文本颜色/字号 | 直接挂 `Text` 的类 | 写在父 `View` 靠继承 |
++| 单行截断省略 | `Text` 的 `numberOfLines={1}` | `text-overflow`、`white-space` |
++| 吸顶/悬浮元素 | 页面级 `absolute` 或端能力 | `position: fixed` / `sticky` |
++| 阴影 | 分端 `elevation` / `shadow-*` 或设计降级 | 公共样式 `box-shadow` |
++| 动效 | RN `Animated` / 分端方案 | CSS `transition` / `animation` |
++| 动态尺寸计算 | flex 分配或 JS 计算 | `calc()` |
++| 渐变 | `LinearGradient` | CSS gradient |
++| 重要图片 | Image 组件 | `background-image` |
++| 隐藏边框 | `border-width: 0` | `border-style: none` |
++
++## 参考目录
++
++命中场景或拿不准属性时再读取对应文件，不要把内容写回本文件：
++
++| 参考 | 何时读 |
++|---|---|
++| [references/platform-style-compat.md](references/platform-style-compat.md) | 属性级兼容速查：使用任何非常用属性前、评审样式 diff 时 |
++| [references/entry-row-cards.md](references/entry-row-cards.md) | 同排等宽布局：同排、等宽、等高或缺席回退时 |
++
++新增场景配方时：在 `references/` 加一个文件，此表加一行。
++
++## 验证
++
++运行：
++
++```bash
++node .agents/skills/detail-less-bem/scripts/check-public-less.mjs [本次修改的-less-文件]
++git diff --check
++npx stylelint path/to/index.less
++```
++
++不传文件时，校验脚本检查当前 Git diff 中新增或修改的 `.less`。脚本检查 Less、BEM、条件编译与禁用属性；Text、`numberOfLines`、modifier 同挂由人工检查。
++
++普通颜色或类名调整：校验脚本、`git diff --check`、定向 stylelint。公共 Less 属性、布局或单位变更：补受影响端构建。尺寸、间距、横竖排、文本截断、层叠、渐变或图片变更：补三端页面视觉验证。兼容表修改：构建微信小程序、H5、RN，并三端页面验证。
++
++校验失败后必须修复并重复执行；无法修复时报告文件、行号、规则与阻塞原因。
++
++## 输出前自检
++
++- [ ] 不含 `gap`、`row-gap`、`column-gap`
++- [ ] 不含 Less 嵌套、`&` 拼接、后代或子代选择器
++- [ ] 不含 `:not()` 及任何伪类
++- [ ] 所有类名符合 BEM，modifier 与基础类同挂
++- [ ] 横向 flex 显式声明 `flex-direction: row`
++- [ ] 文案均包 `Text`，最终 Text 显式获得样式，截断用 `numberOfLines`
++- [ ] 不含 `fixed` / `sticky`、`calc()`、`var()`、`vh` / `vw`、`box-shadow`、`transition` / `animation`
++- [ ] 无 RN 不支持的滤镜、CSS 渐变、背景图或边框写法
++- [ ] `width: 100%` + padding 已补 `box-sizing: border-box`
++- [ ] 拿不准的属性已对照 `references/platform-style-compat.md` 确认
++- [ ] 已运行校验脚本、`git diff --check` 和定向 stylelint
+--- a/_eval_target_skills/detail-less-bem/agents/openai.yaml
++++ b/_eval_target_skills/detail-less-bem/agents/openai.yaml
+@@ -0,0 +1,4 @@
++interface:
++  display_name: "detail Less BEM"
++  short_description: "detail-taro3 三端 Less 与 BEM 硬约束"
++  default_prompt: "Use $detail-less-bem to create or review detail-taro3 multi-platform Less without gap, nested selectors, or RN-incompatible styles."
+--- a/_eval_target_skills/detail-less-bem/references/entry-row-cards.md
++++ b/_eval_target_skills/detail-less-bem/references/entry-row-cards.md
+@@ -0,0 +1,63 @@
++# 同排等宽布局参考
++
++## 适用条件
++
++同一行放 N 个（常见 2 个）等宽等高的入口卡片；任一卡片可因业务条件缺席，缺席时剩余入口回退为整行形态（横条或独占卡）。典型实例：详情页金融入口 + 置换入口同排。
++
++同一 block 因此存在**互斥形态**（如整行横条 `--bar` 与同排卡片 `--entry-card`），形态由 JSX 分支决定，每种形态都有自己的正向 modifier。
++
++## JSX 结构
++
++```tsx
++<View className="block__entry-row">
++  <View className={`block${isPaired ? ' block--entry-card' : ' block--bar'}`} />
++</View>
++```
++
++## Less
++
++```less
++/* 行容器：只管方向与对齐，不管间距 */
++.block__entry-row {
++  width: 100%;
++  display: flex;
++  flex-direction: row;
++  align-items: stretch;
++}
++
++/* 卡片形态：等分 + 宽度下限 + 固定高 */
++.block--entry-card {
++  flex: 1;
++  min-width: 187px;
++  height: 112px;
++  margin-right: 16px; /* 末位卡片不加间距 */
++  overflow: hidden;
++  box-sizing: border-box;
++}
++
++/* 整行形态：与卡片形态互斥，显式命名 */
++.block--bar {
++  height: 48px;
++}
++```
++
++```
++
++## 缺席回退
++
++卡片缺席时由 JSX 选择 `block--bar`，不使用 `:not()` 或后代选择器表达回退状态。
++
++## 三端注意事项
++
++按布局意图查表选路由；「禁止路由」列的写法 H5 常能跑，RN 静默失效。
++
++| 布局意图 | 三端兼容路由 | 禁止路由 |
++|---|---|---|
++| 两卡同排等宽 | 行容器 flex row + **每卡** `flex: 1` + `min-width` | 只写行容器，依赖卡片默认宽度（RN 下各自占满整行） |
++| 卡片间距 | 首卡 `margin-right`，多卡用每卡 margin + `--last` 清零 | `gap`；`space-between` 当固定间距用 |
++| 同 block 互斥形态 | 每种形态一个正向 modifier，JSX 分支显式同挂 | `:not(.--x)` 表达「非某形态」；默认类 + 形态类覆盖 |
++| 子元素随形态变化 | 子元素自身挂 `--modifier`（如 `__icon--entry-card`） | 后代选择器 `.block--x .block__icon` |
++| 同排卡片等高 | 行容器 `align-items: stretch` + 卡片显式 `height` | 依赖内容撑高（各端字体/行高差异导致不齐） |
++| 卡片渐变背景 | `LinearGradient` 组件包裹内容 | CSS `linear-gradient` |
++| 三方组件尺寸（如 `AtIcon` 的 `fontSize`） | 内联 `style` + px 转换函数 | Less 选择器试图命中三方组件内部节点 |
++| 内联 `style` 迁 Less（CSS 化） | 顶层 BEM + modifier 承接原条件逻辑 | 把条件逻辑翻译成 `:not()` / 后代选择器 |
+--- a/_eval_target_skills/detail-less-bem/references/platform-style-compat.md
++++ b/_eval_target_skills/detail-less-bem/references/platform-style-compat.md
+@@ -0,0 +1,33 @@
++# Taro 三端公共样式兼容表
++
++验证环境：以当前项目 Taro 编译链和微信小程序、H5、RN 实测为准。
++
++裁决优先级：项目三端实测 > 项目构建与适配层文档 > Taro 文档 > 原生 RN 文档。
++
++| 规则 | 三端路由 |
++|---|---|
++| 固定兄弟间距 | 子元素 margin + `--last` 清零 |
++| 横向排列 | `display: flex` + `flex-direction: row` |
++| `width: 100%` + 横向 padding | 显式 `box-sizing: border-box` |
++| 文本样式 | 最终 Text 显式获得样式，或来自统一 Text 封装 |
++| `line-height` | 仅使用 px 数值，例如 `24px` |
++| 单行/多行截断 | Text `numberOfLines` |
++| 吸顶/悬浮 | 页面级 `absolute` 或端能力 |
++| 阴影 | 端专属能力或设计降级 |
++| 渐变 | `LinearGradient` |
++| 重要图片 | Image 组件 |
++| 动态尺寸 | flex 分配或 JS 计算 |
++
++公共 Less 禁止 `gap`、组合选择器、伪类、嵌套、`&` 拼接和所有主 Skill 列出的禁用属性。端专属属性仅可写在端专属文件、`TARO_ENV` 分支或 `#ifdef` / `#ifndef` 条件编译块中。
++
++条件编译仅支持小写 `rn`、`h5`、`weapp`：
++
++```less
++/* #ifndef rn */
++.vehicle-card__shadow {
++  box-shadow: 0 2px 4px #000;
++}
++/* #endif */
++```
++
++可用空格指定多个平台，例如 `/* #ifdef h5 weapp */`。不使用 `#if` 或 `#else`。
+--- a/_eval_target_skills/detail-less-bem/scripts/check-public-less.mjs
++++ b/_eval_target_skills/detail-less-bem/scripts/check-public-less.mjs
+@@ -0,0 +1,201 @@
++#!/usr/bin/env node
++
++import { execFileSync } from 'node:child_process';
++import { existsSync, readFileSync } from 'node:fs';
++import path from 'node:path';
++import process from 'node:process';
++
++const PLATFORMS = new Set(['rn', 'h5', 'weapp']);
++const FORBIDDEN_PROPERTIES = new Set([
++  'gap',
++  'row-gap',
++  'column-gap',
++  'float',
++  'filter',
++  'backdrop-filter',
++  'background-image',
++  'background',
++  'outline',
++  'visibility',
++  'transition',
++  'animation',
++  'text-overflow',
++  'white-space',
++  'word-break',
++]);
++const BEM_SELECTOR = /^\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;
++
++function parseCondition(line, lineNumber) {
++  const match = line.match(/^\s*\/\*\s*#(ifdef|ifndef)\s+([^*]+?)\s*\*\/\s*$/);
++  if (!match) return null;
++
++  const platforms = match[2].trim().split(/\s+/);
++  const invalidPlatform = platforms.find((platform) => !PLATFORMS.has(platform));
++  if (invalidPlatform) {
++    return {
++      issue: {
++        file: '',
++        line: lineNumber,
++        rule: 'platform-condition',
++        message: `条件编译平台必须使用小写 rn、h5、weapp，当前为 ${invalidPlatform}`,
++      },
++    };
++  }
++  return { type: match[1], platforms };
++}
++
++function getIncludedPlatforms(conditionStack) {
++  let included = new Set(PLATFORMS);
++  for (const condition of conditionStack) {
++    if (condition.type === 'ifdef') {
++      included = new Set([...included].filter((platform) => condition.platforms.includes(platform)));
++    } else {
++      included = new Set([...included].filter((platform) => !condition.platforms.includes(platform)));
++    }
++  }
++  return included;
++}
++
++function createIssue(file, line, rule, message) {
++  return { file, line, rule, message };
++}
++
++function isForbiddenDeclaration(property, value) {
++  if (FORBIDDEN_PROPERTIES.has(property)) return true;
++  if (property === 'position' && /\b(?:fixed|sticky)\b/.test(value)) return true;
++  if (property === 'border-style' && /\bnone\b/.test(value)) return true;
++  if (property === 'transform' && /translateZ\s*\(/i.test(value)) return true;
++  if (property === 'line-height' && !/^-?\d+(?:\.\d+)?px$/i.test(value)) return true;
++  if (/\b(?:calc|var)\s*\(/.test(value)) return true;
++  if (/\b\d+(?:\.\d+)?(?:vh|vw|em|rem|rpx)\b/.test(value)) return true;
++  return false;
++}
++
++export function validateLess(source, file = '<input>') {
++  const issues = [];
++  const conditionStack = [];
++  const ruleStack = [];
++  const lines = source.split(/\r?\n/);
++
++  for (let index = 0; index < lines.length; index += 1) {
++    const lineNumber = index + 1;
++    const line = lines[index];
++    const trimmed = line.trim();
++
++    const condition = parseCondition(line, lineNumber);
++    if (condition) {
++      if (condition.issue) {
++        issues.push({ ...condition.issue, file });
++      } else {
++        conditionStack.push(condition);
++      }
++      continue;
++    }
++    if (/^\s*\/\*\s*#endif\s*\*\/\s*$/.test(line)) {
++      if (!conditionStack.pop()) {
++        issues.push(createIssue(file, lineNumber, 'platform-condition', '#endif 没有匹配的条件编译开始标记'));
++      }
++      continue;
++    }
++    if (/^\s*\/\*\s*#(?:if|else)\b/.test(line)) {
++      issues.push(createIssue(file, lineNumber, 'platform-condition', 'Less 条件编译仅支持 #ifdef、#ifndef、#endif'));
++      continue;
++    }
++    if (/^@keyframes\b/.test(trimmed)) {
++      issues.push(createIssue(file, lineNumber, 'forbidden-property', '@keyframes 不可用于公共 Less'));
++      continue;
++    }
++
++    const selectorMatch = trimmed.match(/^(.+?)\s*\{\s*$/);
++    if (selectorMatch) {
++      const selector = selectorMatch[1].trim();
++      if (ruleStack.length > 0 || !BEM_SELECTOR.test(selector)) {
++        issues.push(
++          createIssue(
++            file,
++            lineNumber,
++            ruleStack.length > 0 ? 'top-level-single-selector' : 'bem-selector',
++            `只允许顶层单个 BEM 类选择器，当前为 ${selector}`,
++          ),
++        );
++      }
++      ruleStack.push({ line: lineNumber, selector, declarations: [], includesRn: getIncludedPlatforms(conditionStack).has('rn') });
++      continue;
++    }
++
++    const declaration = trimmed.match(/^([a-z-]+)\s*:\s*([^;]+);?\s*$/i);
++    if (declaration && ruleStack.length > 0) {
++      const property = declaration[1].toLowerCase();
++      const value = declaration[2].trim();
++      const rule = ruleStack.at(-1);
++      rule.declarations.push({ property, value, line: lineNumber });
++
++      const includesRn = getIncludedPlatforms(conditionStack).has('rn');
++      if (includesRn && property === 'line-height' && !/^-?\d+(?:\.\d+)?px$/i.test(value)) {
++        issues.push(createIssue(file, lineNumber, 'line-height-px', '公共 Less 的 line-height 必须使用 px 数值'));
++      } else if (includesRn && isForbiddenDeclaration(property, value)) {
++        issues.push(createIssue(file, lineNumber, 'forbidden-property', `${property}: ${value} 不可用于三端公共 Less`));
++      }
++      continue;
++    }
++
++    if (trimmed === '}') {
++      const rule = ruleStack.pop();
++      if (!rule) {
++        issues.push(createIssue(file, lineNumber, 'syntax', '存在未匹配的 }'));
++        continue;
++      }
++      if (rule.declarations.length === 0) {
++        issues.push(createIssue(file, rule.line, 'empty-rule', `${rule.selector} 为空规则`));
++      }
++      const properties = new Map(rule.declarations.map((declaration) => [declaration.property, declaration.value]));
++      const hasHorizontalPadding = ['padding', 'padding-left', 'padding-right', 'padding-inline', 'padding-inline-start', 'padding-inline-end'].some((property) => properties.has(property));
++      if (rule.includesRn && properties.get('width') === '100%' && hasHorizontalPadding && properties.get('box-sizing') !== 'border-box') {
++        issues.push(createIssue(file, rule.line, 'width-padding-box-sizing', 'width: 100% 与横向 padding 同用时必须声明 box-sizing: border-box'));
++      }
++    }
++  }
++
++  for (const rule of ruleStack) {
++    issues.push(createIssue(file, rule.line, 'syntax', `${rule.selector} 缺少结束 }`));
++  }
++  if (conditionStack.length > 0) {
++    issues.push(createIssue(file, lines.length, 'platform-condition', '条件编译块缺少 #endif'));
++  }
++  return issues;
++}
++
++function changedLessFiles() {
++  try {
++    return execFileSync('git', ['diff', '--name-only', '--diff-filter=ACMR', '--', '*.less'], { encoding: 'utf8' })
++      .split(/\r?\n/)
++      .filter(Boolean);
++  } catch {
++    return [];
++  }
++}
++
++function main() {
++  const files = process.argv.slice(2);
++  const targets = files.length > 0 ? files : changedLessFiles();
++  if (targets.length === 0) {
++    console.log('未发现本次修改的 Less 文件。');
++    return;
++  }
++
++  const issues = targets.flatMap((file) => {
++    if (!existsSync(file)) return [createIssue(file, 0, 'file', '文件不存在')];
++    return validateLess(readFileSync(file, 'utf8'), path.normalize(file));
++  });
++  if (issues.length === 0) {
++    console.log(`PASS ${targets.length} 个 Less 文件`);
++    return;
++  }
++
++  for (const issue of issues) {
++    console.error(`${issue.file}:${issue.line} [${issue.rule}] ${issue.message}`);
++  }
++  process.exitCode = 1;
++}
++
++if (import.meta.url === `file://${process.argv[1]}`) main();
+--- a/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs
++++ b/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs
+@@ -0,0 +1,125 @@
++import assert from 'node:assert/strict';
++import test from 'node:test';
++
++import { validateLess } from '../scripts/check-public-less.mjs';
++
++const validate = (source) => validateLess(source, 'fixture.less');
++
++test('accepts a top-level BEM selector and a compliant layout rule', () => {
++  assert.deepEqual(
++    validate(`
++.vehicle-card__title--compact {
++  width: 100%;
++  padding-left: 12px;
++  padding-right: 12px;
++  box-sizing: border-box;
++}
++`),
++    [],
++  );
++});
++
++test('rejects forbidden public properties', () => {
++  const issues = validate(`
++.vehicle-card {
++  gap: 12px;
++}
++`);
++
++  assert.equal(issues.length, 1);
++  assert.match(issues[0].message, /gap/);
++  assert.equal(issues[0].line, 3);
++});
++
++test('rejects nested and compound selectors', () => {
++  const issues = validate(`
++.vehicle-card {
++  .vehicle-card__title {
++    color: #111;
++  }
++}
++`);
++
++  assert.ok(issues.some((issue) => issue.rule === 'top-level-single-selector'));
++});
++
++test('rejects pseudo selectors, non-BEM selectors, and empty rules', () => {
++  const issues = validate(`
++.vehicle-card:hover {
++  color: #111;
++}
++
++.vehicle-card__title__label {
++  color: #111;
++}
++
++.vehicle-card__empty {
++}
++`);
++
++  assert.ok(issues.some((issue) => issue.rule === 'bem-selector'));
++  assert.ok(issues.some((issue) => issue.rule === 'bem-selector'));
++  assert.ok(issues.some((issue) => issue.rule === 'empty-rule'));
++});
++
++test('allows a non-RN property inside a lowercase #ifndef rn block', () => {
++  assert.deepEqual(
++    validate(`
++.vehicle-card {
++  /* #ifndef rn */
++  box-shadow: 0 2px 4px #000;
++  /* #endif */
++}
++`),
++    [],
++  );
++});
++
++test('allows multi-platform style conditions and rejects uppercase platform names', () => {
++  const valid = validate(`
++.vehicle-card {
++  /* #ifdef h5 weapp */
++  position: fixed;
++  /* #endif */
++}
++`);
++  const invalid = validate(`
++.vehicle-card {
++  /* #ifdef RN */
++  color: #111;
++  /* #endif */
++}
++`);
++
++  assert.deepEqual(valid, []);
++  assert.ok(invalid.some((issue) => issue.rule === 'platform-condition'));
++});
++
++test('requires border-box for width 100 percent with horizontal padding', () => {
++  const issues = validate(`
++.vehicle-card {
++  width: 100%;
++  padding-left: 12px;
++}
++`);
++
++  assert.ok(issues.some((issue) => issue.rule === 'width-padding-box-sizing'));
++});
++
++test('requires a px value for public line-height', () => {
++  const issues = validate(`
++.vehicle-card__title {
++  line-height: 1.5;
++}
++
++.vehicle-card__subtitle {
++  line-height: normal;
++}
++
++.vehicle-card__caption {
++  line-height: 120%;
++}
++`);
++
++  assert.equal(issues.filter((issue) => issue.rule === 'line-height-px').length, 3);
++});
+--- a/_test_context.json
++++ b/_test_context.json
+@@ -0,0 +1 @@
++{"run_id": "9a11a8c6-62ca-4e47-a7a1-f2241dee2f79", "treatment_name": "DETAIL_LESS_BEM", "events": {"tool_calls": [{"tool": "Bash", "input": {"command": "ls /workspace", "description": "List workspace contents"}, "output": "CLAUDE.md\nDockerfile\n_eval_target_skills\nscripts\nsrc"}, {"tool": "Bash", "input": {"command": "ls /workspace/src", "description": "List src contents"}, "output": "EqualWidthRow.tsx\nequal-width-row.less"}, {"tool": "Read", "input": {"file_path": "/workspace/src/equal-width-row.less"}, "output": "1\t.entry-row {\n2\t  display: flex;\n3\t  flex-direction: row;\n4\t  gap: 12px;\n5\t}\n6\t\n7\t.entry-row .entry-card {\n8\t  flex: 1;\n9\t  height: 112px;\n10\t}\n11\t\n12\t.entry-card__title {\n13\t  color: #222222;\n14\t  font-size: 16px;\n15\t  line-height: 24px;\n16\t}\n17\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/EqualWidthRow.tsx"}, "output": "1\timport { Text, View } from '@tarojs/components';\n2\timport './equal-width-row.less';\n3\t\n4\ttype EqualWidthRowProps = {\n5\t  hasTradeIn: boolean;\n6\t};\n7\t\n8\texport function EqualWidthRow({ hasTradeIn }: EqualWidthRowProps) {\n9\t  const entries = hasTradeIn ? ['\u91d1\u878d\u65b9\u6848', '\u7f6e\u6362\u4f30\u4ef7'] : ['\u91d1\u878d\u65b9\u6848'];\n10\t  return (\n11\t    <View className=\"entry-row\">\n12\t      {entries.map((entry) => (\n13\t        <View key={entry} className=\"entry-card\">\n14\t          <Text className=\"entry-card__title\">{entry}</Text>\n15\t        </View>\n16\t      ))}\n17\t    </View>\n18\t  );\n19\t}\n20\t"}, {"tool": "Bash", "input": {"command": "ls /workspace/scripts /workspace/_eval_target_skills 2>/dev/null", "description": "List scripts and eval target skills"}, "output": "/workspace/_eval_target_skills:\ndetail-less-bem\n\n/workspace/scripts:\ncheck-public-less.mjs"}, {"tool": "Read", "input": {"file_path": "/workspace/scripts/check-public-less.mjs"}, "output": "1\t#!/usr/bin/env node\n2\t\n3\timport { execFileSync } from 'node:child_process';\n4\timport { existsSync, readFileSync } from 'node:fs';\n5\timport path from 'node:path';\n6\timport process from 'node:process';\n7\t\n8\tconst PLATFORMS = new Set(['rn', 'h5', 'weapp']);\n9\tconst FORBIDDEN_PROPERTIES = new Set([\n10\t  'gap',\n11\t  'row-gap',\n12\t  'column-gap',\n13\t  'float',\n14\t  'filter',\n15\t  'backdrop-filter',\n16\t  'background-image',\n17\t  'background',\n18\t  'outline',\n19\t  'visibility',\n20\t  'transition',\n21\t  'animation',\n22\t  'text-overflow',\n23\t  'white-space',\n24\t  'word-break',\n25\t]);\n26\tconst BEM_SELECTOR = /^\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;\n27\t\n28\tfunction parseCondition(line, lineNumber) {\n29\t  const match = line.match(/^\\s*\\/\\*\\s*#(ifdef|ifndef)\\s+([^*]+?)\\s*\\*\\/\\s*$/);\n30\t  if (!match) return null;\n31\t\n32\t  const platforms = match[2].trim().split(/\\s+/);\n33\t  const invalidPlatform = platforms.find((platform) => !PLATFORMS.has(platform));\n34\t  if (invalidPlatform) {\n35\t    return {\n36\t      issue: {\n37\t        file: '',\n38\t        line: lineNumber,\n39\t        rule: 'platform-condition',\n40\t        message: `\u6761\u4ef6\u7f16\u8bd1\u5e73\u53f0\u5fc5\u987b\u4f7f\u7528\u5c0f\u5199 rn\u3001h5\u3001weapp\uff0c\u5f53\u524d\u4e3a ${invalidPlatform}`,\n41\t      },\n42\t    };\n43\t  }\n44\t  return { type: match[1], platforms };\n45\t}\n46\t\n47\tfunction getIncludedPlatforms(conditionStack) {\n48\t  let included = new Set(PLATFORMS);\n49\t  for (const condition of conditionStack) {\n50\t    if (condition.type === 'ifdef') {\n51\t      included = new Set([...included].filter((platform) => condition.platforms.includes(platform)));\n52\t    } else {\n53\t      included = new Set([...included].filter((platform) => !condition.platforms.includes(platform)));\n54\t    }\n55\t  }\n56\t  return included;\n57\t}\n58\t\n59\tfunction createIssue(file, line, rule, message) {\n60\t  return { file, line, rule, message };\n61\t}\n62\t\n63\tfunction isForbiddenDeclaration(property, value) {\n64\t  if (FORBIDDEN_PROPERTIES.has(property)) return true;\n65\t  if (property === 'position' && /\\b(?:fixed|sticky)\\b/.test(value)) return true;\n66\t  if (property === 'border-style' && /\\bnone\\b/.test(value)) return true;\n67\t  if (property === 'transform' && /translateZ\\s*\\(/i.test(value)) return true;\n68\t  if (property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) return true;\n69\t  if (/\\b(?:calc|var)\\s*\\(/.test(value)) return true;\n70\t  if (/\\b\\d+(?:\\.\\d+)?(?:vh|vw|em|rem|rpx)\\b/.test(value)) return true;\n71\t  return false;\n72\t}\n73\t\n74\texport function validateLess(source, file = '<input>') {\n75\t  const issues = [];\n76\t  const conditionStack = [];\n77\t  const ruleStack = [];\n78\t  const lines = source.split(/\\r?\\n/);\n79\t\n80\t  for (let index = 0; index < lines.length; index += 1) {\n81\t    const lineNumber = index + 1;\n82\t    const line = lines[index];\n83\t    const trimmed = line.trim();\n84\t\n85\t    const condition = parseCondition(line, lineNumber);\n86\t    if (condition) {\n87\t      if (condition.issue) {\n88\t        issues.push({ ...condition.issue, file });\n89\t      } else {\n90\t        conditionStack.push(condition);\n91\t      }\n92\t      continue;\n93\t    }\n94\t    if (/^\\s*\\/\\*\\s*#endif\\s*\\*\\/\\s*$/.test(line)) {\n95\t      if (!conditionStack.pop()) {\n96\t        issues.push(createIssue(file, lineNumber, 'platform-condition', '#endif \u6ca1\u6709\u5339\u914d\u7684\u6761\u4ef6\u7f16\u8bd1\u5f00\u59cb\u6807\u8bb0'));\n97\t      }\n98\t      continue;\n99\t    }\n100\t    if (/^\\s*\\/\\*\\s*#(?:if|else)\\b/.test(line)) {\n101\t      issues.push(createIssue(file, lineNumber, 'platform-condition', 'Less \u6761\u4ef6\u7f16\u8bd1\u4ec5\u652f\u6301 #ifdef\u3001#ifndef\u3001#endif'));\n102\t      continue;\n103\t    }\n104\t    if (/^@keyframes\\b/.test(trimmed)) {\n105\t      issues.push(createIssue(file, lineNumber, 'forbidden-property', '@keyframes \u4e0d\u53ef\u7528\u4e8e\u516c\u5171 Less'));\n106\t      continue;\n107\t    }\n108\t\n109\t    const selectorMatch = trimmed.match(/^(.+?)\\s*\\{\\s*$/);\n110\t    if (selectorMatch) {\n111\t      const selector = selectorMatch[1].trim();\n112\t      if (ruleStack.length > 0 || !BEM_SELECTOR.test(selector)) {\n113\t        issues.push(\n114\t          createIssue(\n115\t            file,\n116\t            lineNumber,\n117\t            ruleStack.length > 0 ? 'top-level-single-selector' : 'bem-selector',\n118\t            `\u53ea\u5141\u8bb8\u9876\u5c42\u5355\u4e2a BEM \u7c7b\u9009\u62e9\u5668\uff0c\u5f53\u524d\u4e3a ${selector}`,\n119\t          ),\n120\t        );\n121\t      }\n122\t      ruleStack.push({ line: lineNumber, selector, declarations: [], includesRn: getIncludedPlatforms(conditionStack).has('rn') });\n123\t      continue;\n124\t    }\n125\t\n126\t    const declaration = trimmed.match(/^([a-z-]+)\\s*:\\s*([^;]+);?\\s*$/i);\n127\t    if (declaration && ruleStack.length > 0) {\n128\t      const property = declaration[1].toLowerCase();\n129\t      const value = declaration[2].trim();\n130\t      const rule = ruleStack.at(-1);\n131\t      rule.declarations.push({ property, value, line: lineNumber });\n132\t\n133\t      const includesRn = getIncludedPlatforms(conditionStack).has('rn');\n134\t      if (includesRn && property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) {\n135\t        issues.push(createIssue(file, lineNumber, 'line-height-px', '\u516c\u5171 Less \u7684 line-height \u5fc5\u987b\u4f7f\u7528 px \u6570\u503c'));\n136\t      } else if (includesRn && isForbiddenDeclaration(property, value)) {\n137\t        issues.push(createIssue(file, lineNumber, 'forbidden-property', `${property}: ${value} \u4e0d\u53ef\u7528\u4e8e\u4e09\u7aef\u516c\u5171 Less`));\n138\t      }\n139\t      continue;\n140\t    }\n141\t\n142\t    if (trimmed === '}') {\n143\t      const rule = ruleStack.pop();\n144\t      if (!rule) {\n145\t        issues.push(createIssue(file, lineNumber, 'syntax', '\u5b58\u5728\u672a\u5339\u914d\u7684 }'));\n146\t        continue;\n147\t      }\n148\t      if (rule.declarations.length === 0) {\n149\t        issues.push(createIssue(file, rule.line, 'empty-rule', `${rule.selector} \u4e3a\u7a7a\u89c4\u5219`));\n150\t      }\n151\t      const properties = new Map(rule.declarations.map((declaration) => [declaration.property, declaration.value]));\n152\t      const hasHorizontalPadding = ['padding', 'padding-left', 'padding-right', 'padding-inline', 'padding-inline-start', 'padding-inline-end'].some((property) => properties.has(property));\n153\t      if (rule.includesRn && properties.get('width') === '100%' && hasHorizontalPadding && properties.get('box-sizing') !== 'border-box') {\n154\t        issues.push(createIssue(file, rule.line, 'width-padding-box-sizing', 'width: 100% \u4e0e\u6a2a\u5411 padding \u540c\u7528\u65f6\u5fc5\u987b\u58f0\u660e box-sizing: border-box'));\n155\t      }\n156\t    }\n157\t  }\n158\t\n159\t  for (const rule of ruleStack) {\n160\t    issues.push(createIssue(file, rule.line, 'syntax', `${rule.selector} \u7f3a\u5c11\u7ed3\u675f }`));\n161\t  }\n162\t  if (conditionStack.length > 0) {\n163\t    issues.push(createIssue(file, lines.length, 'platform-condition', '\u6761\u4ef6\u7f16\u8bd1\u5757\u7f3a\u5c11 #endif'));\n164\t  }\n165\t  return issues;\n166\t}\n167\t\n168\tfunction changedLessFiles() {\n169\t  try {\n170\t    return execFileSync('git', ['diff', '--name-only', '--diff-filter=ACMR', '--', '*.less'], { encoding: 'utf8' })\n171\t      .split(/\\r?\\n/)\n172\t      .filter(Boolean);\n173\t  } catch {\n174\t    return [];\n175\t  }\n176\t}\n177\t\n178\tfunction main() {\n179\t  const files = process.argv.slice(2);\n180\t  const targets = files.length > 0 ? files : changedLessFiles();\n181\t  if (targets.length === 0) {\n182\t    console.log('\u672a\u53d1\u73b0\u672c\u6b21\u4fee\u6539\u7684 Less \u6587\u4ef6\u3002');\n183\t    return;\n184\t  }\n185\t\n186\t  const issues = targets.flatMap((file) => {\n187\t    if (!existsSync(file)) return [createIssue(file, 0, 'file', '\u6587\u4ef6\u4e0d\u5b58\u5728')];\n188\t    return validateLess(readFileSync(file, 'utf8'), path.normalize(file));\n189\t  });\n190\t  if (issues.length === 0) {\n191\t    console.log(`PASS ${targets.length} \u4e2a Less \u6587\u4ef6`);\n192\t    return;\n193\t  }\n194\t\n195\t  for (const issue of issues) {\n196\t    console.error(`${issue.file}:${issue.line} [${issue.rule}] ${issue.message}`);\n197\t  }\n198\t  process.exitCode = 1;\n199\t}\n200\t\n201\tif (import.meta.url === `file://${process.argv[1]}`) main();\n202\t"}, {"tool": "Bash", "input": {"command": "ls /workspace/_eval_target_skills/detail-less-bem/", "description": "List detail-less-bem skill contents"}, "output": "SKILL.md\nagents\nreferences\nscripts\ntests"}, {"tool": "Read", "input": {"file_path": "/workspace/_eval_target_skills/detail-less-bem/SKILL.md"}, "output": "1\t---\n2\tname: detail-less-bem\n3\tdescription: Use when \u5728 detail-taro3 \u521b\u5efa\u3001\u4fee\u6539\u6216\u8bc4\u5ba1\u7ecf Taro \u8f6c\u6362\u5230\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u3001H5\u3001RN \u7684\u516c\u5171 Less\u3001BEM\u3001\u9009\u62e9\u5668\u6216\u5e03\u5c40\u3002\n4\t---\n5\t\n6\t# Taro \u4e09\u7aef\u516c\u5171 Less\n7\t\n8\t\u9002\u7528\u7ecf Taro \u516c\u5171 Less \u8f6c\u6362\u94fe\u670d\u52a1\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u3001H5\u3001RN \u7684\u6837\u5f0f\u3002\u76ee\u6807\u662f\u7a33\u5b9a\u751f\u6210\u4e09\u7aef\u53ef\u7528\u4ee3\u7801\u3002\n9\t\n10\t\u9879\u76ee\u4e09\u7aef\u5b9e\u6d4b > \u9879\u76ee\u6784\u5efa\u4e0e\u9002\u914d\u5c42\u6587\u6863 > Taro \u6587\u6863 > \u539f\u751f RN \u6587\u6863\u3002\n11\t\n12\t## AI \u6267\u884c\u987a\u5e8f\n13\t\n14\t1. \u8bfb\u53d6\u5173\u8054 JSX/TSX\u3001Less \u4e0e\u76f8\u90bb\u6a21\u5757\uff0c\u786e\u8ba4\u6837\u5f0f\u8d70\u516c\u5171\u8f6c\u6362\u94fe\u3002\n15\t2. \u5141\u8bb8\u4ec5\u4fee\u6539\u5173\u8054 JSX/TSX\uff1a\u8865 Text\u3001`numberOfLines`\u3001BEM modifier\u3002\n16\t3. \u6bcf\u4e2a\u9700\u8981\u516c\u5171\u6837\u5f0f\u7684\u5143\u7d20\u4f7f\u7528\u4e00\u4e2a\u4e3b BEM \u7c7b\uff1b\u53ef\u540c\u65f6\u6302\u6d4b\u8bd5\u3001\u57cb\u70b9\u6216\u529f\u80fd\u7c7b\u3002modifier \u5fc5\u987b\u4e0e\u57fa\u7840\u7c7b\u540c\u6302\uff0c\u4e92\u65a5 modifier \u4e0d\u53ef\u540c\u6302\u3002\n17\t4. \u53ea\u5199\u9876\u5c42\u5355\u9009\u62e9\u5668\uff1b\u975e\u5e38\u7528\u6216\u4e0d\u786e\u5b9a\u5c5e\u6027\u5148\u67e5 [references/platform-style-compat.md](references/platform-style-compat.md)\u3002\n18\t5. \u540c\u4e00\u4efb\u52a1\u53ef\u591a\u6b21\u8c03\u7528\u672c Skill\uff1b\u5168\u90e8\u5173\u8054\u6539\u52a8\u5b8c\u6210\u540e\uff0c\u57fa\u4e8e\u6700\u7ec8 diff \u7edf\u4e00\u9a8c\u8bc1\u4e00\u6b21\u3002\n19\t\n20\t## \u786c\u6027\u7981\u6b62\n21\t\n22\t\u516c\u5171 `.less` \u4e2d\u4e0d\u5f97\u4f7f\u7528\uff1a\n23\t\n24\t- `gap`\u3001`row-gap`\u3001`column-gap`\u3002\u56fa\u5b9a\u95f4\u8ddd\u6539\u7528\u5b50\u5143\u7d20 `margin`\u3002\n25\t- Less \u5d4c\u5957\uff0c\u5305\u62ec `.parent { .child {} }`\u3001`&--modifier`\u3001`&__element`\u3002\n26\t- \u5c55\u5f00\u540e\u542b\u7a7a\u683c\u6216 `>` \u7684\u591a\u6bb5\u9009\u62e9\u5668\uff0c\u5305\u62ec `.parent .child`\u3001`.parent > .child`\u3001`&__ancestor &__descendant`\u3002\n27\t- \u6807\u7b7e\u3001ID\u3001\u5c5e\u6027\u3001\u4f2a\u7c7b\u3001\u4f2a\u5143\u7d20\u9009\u62e9\u5668\uff0c\u5982 `div`\u3001`#id`\u3001`[type=\"text\"]`\u3001`:hover`\u3001`:first-child`\u3001`:not()`\u3001`::after`\u3002\n28\t- `float`\u3002\n29\t- \u516c\u5171 Less \u4e2d\u7684 `filter`\u3001`backdrop-filter`\u3001CSS \u6e10\u53d8\u3001`background-image`\u3002\n30\t- \u5e03\u5c40\u4e0e\u5355\u4f4d\uff1a`position: fixed` / `sticky`\u3001`calc()`\u3001CSS \u53d8\u91cf `var()`\u3001`vh` / `vw` / `em` / `rem`\u3002\n31\t- \u89c6\u89c9\uff1a`box-shadow`\u3001`background` \u7b80\u5199\u3001`outline`\u3001`visibility: hidden`\u3001`transition` / `animation` / `@keyframes`\u3002\n32\t- \u6587\u672c\uff1a`text-overflow`\u3001`white-space`\u3001`word-break`\u3001\u6240\u6709\u975e px \u6570\u503c\u7684 `line-height`\u3002\u516c\u5171 `line-height` \u5fc5\u987b\u5199\u4e3a `24px`\uff0c\u7981\u6b62 `1.5`\u3001`normal`\u3001\u767e\u5206\u6bd4\u4e0e\u76f8\u5bf9\u5355\u4f4d\u3002\n33\t- `border-style: none`\u3002\n34\t- `translateZ(0)` \u7b49\u975e\u5e38\u7528 transform\u3002\n35\t- \u5c06 `rpx` \u4f5c\u4e3a RN \u516c\u5171\u6837\u5f0f\u7684\u9ed8\u8ba4\u5355\u4f4d\u3002\n36\t\n37\t\u6761\u4ef6\u7f16\u8bd1\u53ea\u8c41\u514d\u5c5e\u6027\u517c\u5bb9\u6027\uff0c\u9009\u62e9\u5668\u4e0e BEM \u89c4\u5219\u4ecd\u5168\u5c40\u751f\u6548\u3002\u4ec5\u652f\u6301\u5c0f\u5199 `#ifdef`\u3001`#ifndef`\u3001`#endif`\uff1b\u5355\u9879\u5dee\u5f02\u7528\u6761\u4ef6\u7f16\u8bd1\uff0c\u591a\u7ec4\u6837\u5f0f\u6216\u7ed3\u6784\u5dee\u5f02\u7528\u7aef\u4e13\u5c5e Less \u6587\u4ef6\u3002\u9010\u5c5e\u6027\u652f\u6301\u60c5\u51b5\u89c1 [references/platform-style-compat.md](references/platform-style-compat.md)\u3002\n38\t\n39\t## \u5fc5\u987b\u9075\u5b88\n40\t\n41\t### BEM\n42\t\n43\t- \u4f7f\u7528 `.block__element--modifier`\uff0c\u591a\u5355\u8bcd\u4f7f\u7528 kebab-case\u3002\n44\t- \u7981\u6b62\u53cc `__`\uff1a\u5c06 `menu__item__link` \u6539\u4e3a `menu__link` \u6216\u72ec\u7acb block\u3002\n45\t- modifier \u5fc5\u987b\u4e0e\u57fa\u7840\u7c7b\u540c\u6302\uff1a\n46\t\n47\t```tsx\n48\t<View className=\"vehicle-card__item vehicle-card__item--last\" />\n49\t```\n50\t\n51\t### \u9009\u62e9\u5668\u4e0e Less\n52\t\n53\t- \u6bcf\u6761\u89c4\u5219\u5fc5\u987b\u662f\u9876\u5c42\u5355\u9009\u62e9\u5668\u3002\n54\t- \u4e0d\u4f9d\u8d56 DOM \u5c42\u7ea7\u8868\u8fbe\u72b6\u6001\uff1b\u5c06\u72b6\u6001\u7f16\u7801\u5230\u5f53\u524d\u5143\u7d20\u7684 modifier \u7c7b\u3002\n55\t\n56\t```less\n57\t.vehicle-card {\n58\t}\n59\t\n60\t.vehicle-card__title {\n61\t}\n62\t\n63\t.vehicle-card--compact {\n64\t}\n65\t```\n66\t\n67\t### \u6587\u672c\n68\t\n69\t1. \u4e0d\u5f97\u4f9d\u8d56 `View \u2192 Text` \u7684\u6837\u5f0f\u7ee7\u627f\uff1b\u6700\u7ec8\u6e32\u67d3\u7684 Text \u5fc5\u987b\u663e\u5f0f\u83b7\u5f97\u6837\u5f0f\uff0c\u6216\u6765\u81ea\u53d7\u63a7\u7edf\u4e00 Text \u7ec4\u4ef6\u3002\n70\t2. \u6240\u6709\u6587\u6848\u5fc5\u987b\u5305 `<Text>`\uff0c\u4e0d\u5f97\u88f8\u6587\u672c\u76f4\u63a5\u653e `View` \u5185\u3002\n71\t3. \u622a\u65ad\u4e0e\u6362\u884c\u63a7\u5236\u7528 `Text` \u7684 `numberOfLines`\uff0c\u4e0d\u7528 `text-overflow` / `white-space`\u3002\n72\t\n73\t### \u5e03\u5c40\u4e0e\u5c5e\u6027\n74\t\n75\t- \u6a2a\u5411 flex \u5fc5\u987b\u540c\u65f6\u58f0\u660e `display: flex` \u548c `flex-direction: row`\u3002\n76\t- `width: 100%` \u4e0e\u6a2a\u5411 padding \u540c\u7528\u65f6\u5fc5\u987b\u58f0\u660e `box-sizing: border-box`\u3002\n77\t- `z-index` \u4ec5\u5bf9\u540c\u4e00\u7236\u7ea7\u4e0b\u7684\u5144\u5f1f\u8282\u70b9\u751f\u6548\u4e14\u9700\u914d\u5408\u5b9a\u4f4d\uff1b\u4f18\u5148\u8c03\u6574 JSX \u6e32\u67d3\u987a\u5e8f\u8868\u8fbe\u5c42\u7ea7\u3002\n78\t- \u5b50\u5143\u7d20\u4e0d\u5f97\u6ea2\u51fa\u7236\u5bb9\u5668\u8fb9\u754c\u505a\u89c6\u89c9\u8bbe\u8ba1\uff08RN Android `overflow: visible` \u4e0d\u751f\u6548\uff09\u3002\n79\t- \u9690\u85cf\u8fb9\u6846\u4f7f\u7528 `border-width: 0` \u6216 `border-color: transparent`\u3002\n80\t- `border-style` \u4ec5\u4f7f\u7528 `solid`\u3001`dotted`\u3001`dashed`\u3002\n81\t- \u91cd\u8981\u56fe\u7247\u4f7f\u7528 Image \u7ec4\u4ef6\u3002\n82\t- \u6e10\u53d8\u4f7f\u7528 `LinearGradient` \u7ec4\u4ef6\u3002\n83\t\n84\t## \u56fa\u5b9a\u95f4\u8ddd\u66ff\u4ee3 `gap`\n85\t\n86\t\u4f18\u5148\u628a\u95f4\u8ddd\u653e\u5728\u91cd\u590d\u5b50\u5143\u7d20\u4e0a\uff0c\u6700\u540e\u4e00\u9879\u901a\u8fc7 modifier \u6e05\u96f6\u3002\u7981\u6b62\u7528 `:last-child`\u3002\n87\t\n88\t```less\n89\t.vehicle-list {\n90\t  display: flex;\n91\t  flex-direction: column;\n92\t}\n93\t\n94\t.vehicle-list__item {\n95\t  margin-bottom: 12px;\n96\t}\n97\t\n98\t.vehicle-list__item--last {\n99\t  margin-bottom: 0;\n100\t}\n101\t```\n102\t\n103\t```tsx\n104\t{list.map((item, index) => (\n105\t  <View\n106\t    key={item.id}\n107\t    className={`vehicle-list__item${\n108\t      index === list.length - 1 ? ' vehicle-list__item--last' : ''\n109\t    }`}\n110\t  />\n111\t))}\n112\t```\n113\t\n114\t\u6a2a\u5411\u5217\u8868\u4f7f\u7528 `margin-right` \u4e0e `--last`\u3002\u5185\u90e8\u7559\u767d\u4f7f\u7528\u7236\u5143\u7d20 `padding`\u3002\u4ec5\u5728\u8868\u8fbe\u201c\u5206\u914d\u5269\u4f59\u7a7a\u95f4\u201d\u65f6\u4f7f\u7528 `justify-content: space-between`\uff0c\u4e0d\u5f97\u628a\u5b83\u5f53\u4f5c\u56fa\u5b9a `gap` \u66ff\u4ee3\u3002\n115\t\n116\t## AI \u51b3\u7b56\u8868\n117\t\n118\t| \u9700\u6c42 | \u4f7f\u7528 | \u7981\u6b62 |\n119\t|---|---|---|\n120\t| \u56fa\u5b9a\u5144\u5f1f\u95f4\u8ddd | \u5b50\u5143\u7d20 margin + `--last` | `gap`\u3001\u4f2a\u7c7b |\n121\t| \u5143\u7d20\u5185\u90e8\u7559\u767d | padding | \u7a7a spacer \u6587\u672c |\n122\t| \u5143\u7d20\u72b6\u6001 | \u57fa\u7840\u7c7b + modifier | \u540e\u4ee3\u9009\u62e9\u5668 |\n123\t| \u6a2a\u5411\u6392\u5217 | flex + `flex-direction: row` | \u4f9d\u8d56 RN \u9ed8\u8ba4\u65b9\u5411 |\n124\t| \u6587\u672c\u989c\u8272/\u5b57\u53f7 | \u76f4\u63a5\u6302 `Text` \u7684\u7c7b | \u5199\u5728\u7236 `View` \u9760\u7ee7\u627f |\n125\t| \u5355\u884c\u622a\u65ad\u7701\u7565 | `Text` \u7684 `numberOfLines={1}` | `text-overflow`\u3001`white-space` |\n126\t| \u5438\u9876/\u60ac\u6d6e\u5143\u7d20 | \u9875\u9762\u7ea7 `absolute` \u6216\u7aef\u80fd\u529b | `position: fixed` / `sticky` |\n127\t| \u9634\u5f71 | \u5206\u7aef `elevation` / `shadow-*` \u6216\u8bbe\u8ba1\u964d\u7ea7 | \u516c\u5171\u6837\u5f0f `box-shadow` |\n128\t| \u52a8\u6548 | RN `Animated` / \u5206\u7aef\u65b9\u6848 | CSS `transition` / `animation` |\n129\t| \u52a8\u6001\u5c3a\u5bf8\u8ba1\u7b97 | flex \u5206\u914d\u6216 JS \u8ba1\u7b97 | `calc()` |\n130\t| \u6e10\u53d8 | `LinearGradient` | CSS gradient |\n131\t| \u91cd\u8981\u56fe\u7247 | Image \u7ec4\u4ef6 | `background-image` |\n132\t| \u9690\u85cf\u8fb9\u6846 | `border-width: 0` | `border-style: none` |\n133\t\n134\t## \u53c2\u8003\u76ee\u5f55\n135\t\n136\t\u547d\u4e2d\u573a\u666f\u6216\u62ff\u4e0d\u51c6\u5c5e\u6027\u65f6\u518d\u8bfb\u53d6\u5bf9\u5e94\u6587\u4ef6\uff0c\u4e0d\u8981\u628a\u5185\u5bb9\u5199\u56de\u672c\u6587\u4ef6\uff1a\n137\t\n138\t| \u53c2\u8003 | \u4f55\u65f6\u8bfb |\n139\t|---|---|\n140\t| [references/platform-style-compat.md](references/platform-style-compat.md) | \u5c5e\u6027\u7ea7\u517c\u5bb9\u901f\u67e5\uff1a\u4f7f\u7528\u4efb\u4f55\u975e\u5e38\u7528\u5c5e\u6027\u524d\u3001\u8bc4\u5ba1\u6837\u5f0f diff \u65f6 |\n141\t| [references/entry-row-cards.md](references/entry-row-cards.md) | \u540c\u6392\u7b49\u5bbd\u5e03\u5c40\uff1a\u540c\u6392\u3001\u7b49\u5bbd\u3001\u7b49\u9ad8\u6216\u7f3a\u5e2d\u56de\u9000\u65f6 |\n142\t\n143\t\u65b0\u589e\u573a\u666f\u914d\u65b9\u65f6\uff1a\u5728 `references/` \u52a0\u4e00\u4e2a\u6587\u4ef6\uff0c\u6b64\u8868\u52a0\u4e00\u884c\u3002\n144\t\n145\t## \u9a8c\u8bc1\n146\t\n147\t\u8fd0\u884c\uff1a\n148\t\n149\t```bash\n150\tnode .agents/skills/detail-less-bem/scripts/check-public-less.mjs [\u672c\u6b21\u4fee\u6539\u7684-less-\u6587\u4ef6]\n151\tgit diff --check\n152\tnpx stylelint path/to/index.less\n153\t```\n154\t\n155\t\u4e0d\u4f20\u6587\u4ef6\u65f6\uff0c\u6821\u9a8c\u811a\u672c\u68c0\u67e5\u5f53\u524d Git diff \u4e2d\u65b0\u589e\u6216\u4fee\u6539\u7684 `.less`\u3002\u811a\u672c\u68c0\u67e5 Less\u3001BEM\u3001\u6761\u4ef6\u7f16\u8bd1\u4e0e\u7981\u7528\u5c5e\u6027\uff1bText\u3001`numberOfLines`\u3001modifier \u540c\u6302\u7531\u4eba\u5de5\u68c0\u67e5\u3002\n156\t\n157\t\u666e\u901a\u989c\u8272\u6216\u7c7b\u540d\u8c03\u6574\uff1a\u6821\u9a8c\u811a\u672c\u3001`git diff --check`\u3001\u5b9a\u5411 stylelint\u3002\u516c\u5171 Less \u5c5e\u6027\u3001\u5e03\u5c40\u6216\u5355\u4f4d\u53d8\u66f4\uff1a\u8865\u53d7\u5f71\u54cd\u7aef\u6784\u5efa\u3002\u5c3a\u5bf8\u3001\u95f4\u8ddd\u3001\u6a2a\u7ad6\u6392\u3001\u6587\u672c\u622a\u65ad\u3001\u5c42\u53e0\u3001\u6e10\u53d8\u6216\u56fe\u7247\u53d8\u66f4\uff1a\u8865\u4e09\u7aef\u9875\u9762\u89c6\u89c9\u9a8c\u8bc1\u3002\u517c\u5bb9\u8868\u4fee\u6539\uff1a\u6784\u5efa\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u3001H5\u3001RN\uff0c\u5e76\u4e09\u7aef\u9875\u9762\u9a8c\u8bc1\u3002\n158\t\n159\t\u6821\u9a8c\u5931\u8d25\u540e\u5fc5\u987b\u4fee\u590d\u5e76\u91cd\u590d\u6267\u884c\uff1b\u65e0\u6cd5\u4fee\u590d\u65f6\u62a5\u544a\u6587\u4ef6\u3001\u884c\u53f7\u3001\u89c4\u5219\u4e0e\u963b\u585e\u539f\u56e0\u3002\n160\t\n161\t## \u8f93\u51fa\u524d\u81ea\u68c0\n162\t\n163\t- [ ] \u4e0d\u542b `gap`\u3001`row-gap`\u3001`column-gap`\n164\t- [ ] \u4e0d\u542b Less \u5d4c\u5957\u3001`&` \u62fc\u63a5\u3001\u540e\u4ee3\u6216\u5b50\u4ee3\u9009\u62e9\u5668\n165\t- [ ] \u4e0d\u542b `:not()` \u53ca\u4efb\u4f55\u4f2a\u7c7b\n166\t- [ ] \u6240\u6709\u7c7b\u540d\u7b26\u5408 BEM\uff0cmodifier \u4e0e\u57fa\u7840\u7c7b\u540c\u6302\n167\t- [ ] \u6a2a\u5411 flex \u663e\u5f0f\u58f0\u660e `flex-direction: row`\n168\t- [ ] \u6587\u6848\u5747\u5305 `Text`\uff0c\u6700\u7ec8 Text \u663e\u5f0f\u83b7\u5f97\u6837\u5f0f\uff0c\u622a\u65ad\u7528 `numberOfLines`\n169\t- [ ] \u4e0d\u542b `fixed` / `sticky`\u3001`calc()`\u3001`var()`\u3001`vh` / `vw`\u3001`box-shadow`\u3001`transition` / `animation`\n170\t- [ ] \u65e0 RN \u4e0d\u652f\u6301\u7684\u6ee4\u955c\u3001CSS \u6e10\u53d8\u3001\u80cc\u666f\u56fe\u6216\u8fb9\u6846\u5199\u6cd5\n171\t- [ ] `width: 100%` + padding \u5df2\u8865 `box-sizing: border-box`\n172\t- [ ] \u62ff\u4e0d\u51c6\u7684\u5c5e\u6027\u5df2\u5bf9\u7167 `references/platform-style-compat.md` \u786e\u8ba4\n173\t- [ ] \u5df2\u8fd0\u884c\u6821\u9a8c\u811a\u672c\u3001`git diff --check` \u548c\u5b9a\u5411 stylelint\n174\t"}, {"tool": "Read", "input": {"file_path": "/workspace/_eval_target_skills/detail-less-bem/references/entry-row-cards.md"}, "output": "1\t# \u540c\u6392\u7b49\u5bbd\u5e03\u5c40\u53c2\u8003\n2\t\n3\t## \u9002\u7528\u6761\u4ef6\n4\t\n5\t\u540c\u4e00\u884c\u653e N \u4e2a\uff08\u5e38\u89c1 2 \u4e2a\uff09\u7b49\u5bbd\u7b49\u9ad8\u7684\u5165\u53e3\u5361\u7247\uff1b\u4efb\u4e00\u5361\u7247\u53ef\u56e0\u4e1a\u52a1\u6761\u4ef6\u7f3a\u5e2d\uff0c\u7f3a\u5e2d\u65f6\u5269\u4f59\u5165\u53e3\u56de\u9000\u4e3a\u6574\u884c\u5f62\u6001\uff08\u6a2a\u6761\u6216\u72ec\u5360\u5361\uff09\u3002\u5178\u578b\u5b9e\u4f8b\uff1a\u8be6\u60c5\u9875\u91d1\u878d\u5165\u53e3 + \u7f6e\u6362\u5165\u53e3\u540c\u6392\u3002\n6\t\n7\t\u540c\u4e00 block \u56e0\u6b64\u5b58\u5728**\u4e92\u65a5\u5f62\u6001**\uff08\u5982\u6574\u884c\u6a2a\u6761 `--bar` \u4e0e\u540c\u6392\u5361\u7247 `--entry-card`\uff09\uff0c\u5f62\u6001\u7531 JSX \u5206\u652f\u51b3\u5b9a\uff0c\u6bcf\u79cd\u5f62\u6001\u90fd\u6709\u81ea\u5df1\u7684\u6b63\u5411 modifier\u3002\n8\t\n9\t## JSX \u7ed3\u6784\n10\t\n11\t```tsx\n12\t<View className=\"block__entry-row\">\n13\t  <View className={`block${isPaired ? ' block--entry-card' : ' block--bar'}`} />\n14\t</View>\n15\t```\n16\t\n17\t## Less\n18\t\n19\t```less\n20\t/* \u884c\u5bb9\u5668\uff1a\u53ea\u7ba1\u65b9\u5411\u4e0e\u5bf9\u9f50\uff0c\u4e0d\u7ba1\u95f4\u8ddd */\n21\t.block__entry-row {\n22\t  width: 100%;\n23\t  display: flex;\n24\t  flex-direction: row;\n25\t  align-items: stretch;\n26\t}\n27\t\n28\t/* \u5361\u7247\u5f62\u6001\uff1a\u7b49\u5206 + \u5bbd\u5ea6\u4e0b\u9650 + \u56fa\u5b9a\u9ad8 */\n29\t.block--entry-card {\n30\t  flex: 1;\n31\t  min-width: 187px;\n32\t  height: 112px;\n33\t  margin-right: 16px; /* \u672b\u4f4d\u5361\u7247\u4e0d\u52a0\u95f4\u8ddd */\n34\t  overflow: hidden;\n35\t  box-sizing: border-box;\n36\t}\n37\t\n38\t/* \u6574\u884c\u5f62\u6001\uff1a\u4e0e\u5361\u7247\u5f62\u6001\u4e92\u65a5\uff0c\u663e\u5f0f\u547d\u540d */\n39\t.block--bar {\n40\t  height: 48px;\n41\t}\n42\t```\n43\t\n44\t```\n45\t\n46\t## \u7f3a\u5e2d\u56de\u9000\n47\t\n48\t\u5361\u7247\u7f3a\u5e2d\u65f6\u7531 JSX \u9009\u62e9 `block--bar`\uff0c\u4e0d\u4f7f\u7528 `:not()` \u6216\u540e\u4ee3\u9009\u62e9\u5668\u8868\u8fbe\u56de\u9000\u72b6\u6001\u3002\n49\t\n50\t## \u4e09\u7aef\u6ce8\u610f\u4e8b\u9879\n51\t\n52\t\u6309\u5e03\u5c40\u610f\u56fe\u67e5\u8868\u9009\u8def\u7531\uff1b\u300c\u7981\u6b62\u8def\u7531\u300d\u5217\u7684\u5199\u6cd5 H5 \u5e38\u80fd\u8dd1\uff0cRN \u9759\u9ed8\u5931\u6548\u3002\n53\t\n54\t| \u5e03\u5c40\u610f\u56fe | \u4e09\u7aef\u517c\u5bb9\u8def\u7531 | \u7981\u6b62\u8def\u7531 |\n55\t|---|---|---|\n56\t| \u4e24\u5361\u540c\u6392\u7b49\u5bbd | \u884c\u5bb9\u5668 flex row + **\u6bcf\u5361** `flex: 1` + `min-width` | \u53ea\u5199\u884c\u5bb9\u5668\uff0c\u4f9d\u8d56\u5361\u7247\u9ed8\u8ba4\u5bbd\u5ea6\uff08RN \u4e0b\u5404\u81ea\u5360\u6ee1\u6574\u884c\uff09 |\n57\t| \u5361\u7247\u95f4\u8ddd | \u9996\u5361 `margin-right`\uff0c\u591a\u5361\u7528\u6bcf\u5361 margin + `--last` \u6e05\u96f6 | `gap`\uff1b`space-between` \u5f53\u56fa\u5b9a\u95f4\u8ddd\u7528 |\n58\t| \u540c block \u4e92\u65a5\u5f62\u6001 | \u6bcf\u79cd\u5f62\u6001\u4e00\u4e2a\u6b63\u5411 modifier\uff0cJSX \u5206\u652f\u663e\u5f0f\u540c\u6302 | `:not(.--x)` \u8868\u8fbe\u300c\u975e\u67d0\u5f62\u6001\u300d\uff1b\u9ed8\u8ba4\u7c7b + \u5f62\u6001\u7c7b\u8986\u76d6 |\n59\t| \u5b50\u5143\u7d20\u968f\u5f62\u6001\u53d8\u5316 | \u5b50\u5143\u7d20\u81ea\u8eab\u6302 `--modifier`\uff08\u5982 `__icon--entry-card`\uff09 | \u540e\u4ee3\u9009\u62e9\u5668 `.block--x .block__icon` |\n60\t| \u540c\u6392\u5361\u7247\u7b49\u9ad8 | \u884c\u5bb9\u5668 `align-items: stretch` + \u5361\u7247\u663e\u5f0f `height` | \u4f9d\u8d56\u5185\u5bb9\u6491\u9ad8\uff08\u5404\u7aef\u5b57\u4f53/\u884c\u9ad8\u5dee\u5f02\u5bfc\u81f4\u4e0d\u9f50\uff09 |\n61\t| \u5361\u7247\u6e10\u53d8\u80cc\u666f | `LinearGradient` \u7ec4\u4ef6\u5305\u88f9\u5185\u5bb9 | CSS `linear-gradient` |\n62\t| \u4e09\u65b9\u7ec4\u4ef6\u5c3a\u5bf8\uff08\u5982 `AtIcon` \u7684 `fontSize`\uff09 | \u5185\u8054 `style` + px \u8f6c\u6362\u51fd\u6570 | Less \u9009\u62e9\u5668\u8bd5\u56fe\u547d\u4e2d\u4e09\u65b9\u7ec4\u4ef6\u5185\u90e8\u8282\u70b9 |\n63\t| \u5185\u8054 `style` \u8fc1 Less\uff08CSS \u5316\uff09 | \u9876\u5c42 BEM + modifier \u627f\u63a5\u539f\u6761\u4ef6\u903b\u8f91 | \u628a\u6761\u4ef6\u903b\u8f91\u7ffb\u8bd1\u6210 `:not()` / \u540e\u4ee3\u9009\u62e9\u5668 |\n64\t"}, {"tool": "Bash", "input": {"command": "ls /workspace/_eval_target_skills/detail-less-bem/scripts/ /workspace/_eval_target_skills/detail-less-bem/tests/ 2>/dev/null", "description": "List scripts and tests"}, "output": "/workspace/_eval_target_skills/detail-less-bem/scripts/:\ncheck-public-less.mjs\n\n/workspace/_eval_target_skills/detail-less-bem/tests/:\ncheck-public-less.test.mjs"}, {"tool": "TaskCreate", "input": {"subject": "Rewrite equal-width-row.less with BEM + modifiers", "description": "Replace gap with margin-right on cards, add --last modifier to zero last margin, add --bar modifier for single-entry bar fallback. Row container has display:flex + flex-direction:row.", "activeForm": "Rewriting equal-width-row.less"}, "output": "Task #1 created successfully: Rewrite equal-width-row.less with BEM + modifiers"}, {"tool": "TaskCreate", "input": {"subject": "Update EqualWidthRow.tsx to use modifiers", "description": "Wire up entry-card--last and entry-card--bar modifiers in JSX based on hasTradeIn.", "activeForm": "Updating EqualWidthRow.tsx"}, "output": "Task #2 created successfully: Update EqualWidthRow.tsx to use modifiers"}, {"tool": "TaskCreate", "input": {"subject": "Run checker and stylelint", "description": "Run node scripts/check-public-less.mjs and stylelint on the modified files.", "activeForm": "Running checker and stylelint"}, "output": "Task #3 created successfully: Run checker and stylelint"}, {"tool": "Read", "input": {"file_path": "/workspace/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs"}, "output": "1\timport assert from 'node:assert/strict';\n2\timport test from 'node:test';\n3\t\n4\timport { validateLess } from '../scripts/check-public-less.mjs';\n5\t\n6\tconst validate = (source) => validateLess(source, 'fixture.less');\n7\t\n8\ttest('accepts a top-level BEM selector and a compliant layout rule', () => {\n9\t  assert.deepEqual(\n10\t    validate(`\n11\t.vehicle-card__title--compact {\n12\t  width: 100%;\n13\t  padding-left: 12px;\n14\t  padding-right: 12px;\n15\t  box-sizing: border-box;\n16\t}\n17\t`),\n18\t    [],\n19\t  );\n20\t});\n21\t\n22\ttest('rejects forbidden public properties', () => {\n23\t  const issues = validate(`\n24\t.vehicle-card {\n25\t  gap: 12px;\n26\t}\n27\t`);\n28\t\n29\t  assert.equal(issues.length, 1);\n30\t  assert.match(issues[0].message, /gap/);\n31\t  assert.equal(issues[0].line, 3);\n32\t});\n33\t\n34\ttest('rejects nested and compound selectors', () => {\n35\t  const issues = validate(`\n36\t.vehicle-card {\n37\t  .vehicle-card__title {\n38\t    color: #111;\n39\t  }\n40\t}\n41\t`);\n42\t\n43\t  assert.ok(issues.some((issue) => issue.rule === 'top-level-single-selector'));\n44\t});\n45\t\n46\ttest('rejects pseudo selectors, non-BEM selectors, and empty rules', () => {\n47\t  const issues = validate(`\n48\t.vehicle-card:hover {\n49\t  color: #111;\n50\t}\n51\t\n52\t.vehicle-card__title__label {\n53\t  color: #111;\n54\t}\n55\t\n56\t.vehicle-card__empty {\n57\t}\n58\t`);\n59\t\n60\t  assert.ok(issues.some((issue) => issue.rule === 'bem-selector'));\n61\t  assert.ok(issues.some((issue) => issue.rule === 'bem-selector'));\n62\t  assert.ok(issues.some((issue) => issue.rule === 'empty-rule'));\n63\t});\n64\t\n65\ttest('allows a non-RN property inside a lowercase #ifndef rn block', () => {\n66\t  assert.deepEqual(\n67\t    validate(`\n68\t.vehicle-card {\n69\t  /* #ifndef rn */\n70\t  box-shadow: 0 2px 4px #000;\n71\t  /* #endif */\n72\t}\n73\t`),\n74\t    [],\n75\t  );\n76\t});\n77\t\n78\ttest('allows multi-platform style conditions and rejects uppercase platform names', () => {\n79\t  const valid = validate(`\n80\t.vehicle-card {\n81\t  /* #ifdef h5 weapp */\n82\t  position: fixed;\n83\t  /* #endif */\n84\t}\n85\t`);\n86\t  const invalid = validate(`\n87\t.vehicle-card {\n88\t  /* #ifdef RN */\n89\t  color: #111;\n90\t  /* #endif */\n91\t}\n92\t`);\n93\t\n94\t  assert.deepEqual(valid, []);\n95\t  assert.ok(invalid.some((issue) => issue.rule === 'platform-condition'));\n96\t});\n97\t\n98\ttest('requires border-box for width 100 percent with horizontal padding', () => {\n99\t  const issues = validate(`\n100\t.vehicle-card {\n101\t  width: 100%;\n102\t  padding-left: 12px;\n103\t}\n104\t`);\n105\t\n106\t  assert.ok(issues.some((issue) => issue.rule === 'width-padding-box-sizing'));\n107\t});\n108\t\n109\ttest('requires a px value for public line-height', () => {\n110\t  const issues = validate(`\n111\t.vehicle-card__title {\n112\t  line-height: 1.5;\n113\t}\n114\t\n115\t.vehicle-card__subtitle {\n116\t  line-height: normal;\n117\t}\n118\t\n119\t.vehicle-card__caption {\n120\t  line-height: 120%;\n121\t}\n122\t`);\n123\t\n124\t  assert.equal(issues.filter((issue) => issue.rule === 'line-height-px').length, 3);\n125\t});\n126\t"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "in_progress"}, "output": "Updated task #1 status"}, {"tool": "Write", "input": {"file_path": "/workspace/src/equal-width-row.less", "content": ".entry-row {\n  display: flex;\n  flex-direction: row;\n}\n\n.entry-card {\n  flex: 1;\n  height: 112px;\n  margin-right: 12px;\n}\n\n.entry-card--last {\n  margin-right: 0;\n}\n\n.entry-card--bar {\n  height: 48px;\n}\n\n.entry-card__title {\n  color: #222222;\n  font-size: 16px;\n  line-height: 24px;\n}"}, "output": "The file /workspace/src/equal-width-row.less has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "completed"}, "output": "Updated task #1 status"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "in_progress"}, "output": "Updated task #2 status"}, {"tool": "Write", "input": {"file_path": "/workspace/src/EqualWidthRow.tsx", "content": "import { Text, View } from '@tarojs/components';\nimport './equal-width-row.less';\n\ntype EqualWidthRowProps = {\n  hasTradeIn: boolean;\n};\n\nexport function EqualWidthRow({ hasTradeIn }: EqualWidthRowProps) {\n  if (hasTradeIn) {\n    return (\n      <View className=\"entry-row\">\n        <View key=\"\u91d1\u878d\u65b9\u6848\" className=\"entry-card\">\n          <Text className=\"entry-card__title\">\u91d1\u878d\u65b9\u6848</Text>\n        </View>\n        <View key=\"\u7f6e\u6362\u4f30\u4ef7\" className=\"entry-card entry-card--last\">\n          <Text className=\"entry-card__title\">\u7f6e\u6362\u4f30\u4ef7</Text>\n        </View>\n      </View>\n    );\n  }\n  return (\n    <View className=\"entry-row\">\n      <View key=\"\u91d1\u878d\u65b9\u6848\" className=\"entry-card entry-card--bar entry-card--last\">\n        <Text className=\"entry-card__title\">\u91d1\u878d\u65b9\u6848</Text>\n      </View>\n    </View>\n  );\n}"}, "output": "The file /workspace/src/EqualWidthRow.tsx has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "completed"}, "output": "Updated task #2 status"}, {"tool": "TaskUpdate", "input": {"taskId": "3", "status": "in_progress"}, "output": "Updated task #3 status"}, {"tool": "Bash", "input": {"command": "node scripts/check-public-less.mjs src/equal-width-row.less", "description": "Run the less checker on the modified file"}, "output": "PASS 1 \u4e2a Less \u6587\u4ef6"}, {"tool": "Bash", "input": {"command": "npx --yes stylelint src/equal-width-row.less 2>&1 || true", "description": "Run stylelint on the less file"}, "output": "(Bash completed with no output)"}, {"tool": "Bash", "input": {"command": "npx --yes stylelint src/equal-width-row.less; echo \"exit=$?\"", "description": "Run stylelint and report exit code"}, "output": "exit=0"}, {"tool": "Bash", "input": {"command": "node --test _eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs 2>&1 | tail -30", "description": "Run the project's less-checker unit tests to confirm no regression"}, "output": "  ...\n# Subtest: allows a non-RN property inside a lowercase \\#ifndef rn block\nok 5 - allows a non-RN property inside a lowercase \\#ifndef rn block\n  ---\n  duration_ms: 0.222083\n  ...\n# Subtest: allows multi-platform style conditions and rejects uppercase platform names\nok 6 - allows multi-platform style conditions and rejects uppercase platform names\n  ---\n  duration_ms: 0.1505\n  ...\n# Subtest: requires border-box for width 100 percent with horizontal padding\nok 7 - requires border-box for width 100 percent with horizontal padding\n  ---\n  duration_ms: 0.110583\n  ...\n# Subtest: requires a px value for public line-height\nok 8 - requires a px value for public line-height\n  ---\n  duration_ms: 0.11\n  ...\n1..8\n# tests 8\n# suites 0\n# pass 8\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 33.741709"}, {"tool": "Read", "input": {"file_path": "/workspace/src/equal-width-row.less"}, "output": "1\t.entry-row {\n2\t  display: flex;\n3\t  flex-direction: row;\n4\t}\n5\t\n6\t.entry-card {\n7\t  flex: 1;\n8\t  height: 112px;\n9\t  margin-right: 12px;\n10\t}\n11\t\n12\t.entry-card--last {\n13\t  margin-right: 0;\n14\t}\n15\t\n16\t.entry-card--bar {\n17\t  height: 48px;\n18\t}\n19\t\n20\t.entry-card__title {\n21\t  color: #222222;\n22\t  font-size: 16px;\n23\t  line-height: 24px;\n24\t}"}, {"tool": "TaskUpdate", "input": {"taskId": "3", "status": "completed"}, "output": "Updated task #3 status"}], "files_read": ["/workspace/src/equal-width-row.less", "/workspace/src/EqualWidthRow.tsx", "/workspace/scripts/check-public-less.mjs", "/workspace/_eval_target_skills/detail-less-bem/SKILL.md", "/workspace/_eval_target_skills/detail-less-bem/references/entry-row-cards.md", "/workspace/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs", "/workspace/src/equal-width-row.less"], "files_created": ["/workspace/src/equal-width-row.less", "/workspace/src/EqualWidthRow.tsx"], "files_modified": [], "commands_run": ["ls /workspace", "ls /workspace/src", "ls /workspace/scripts /workspace/_eval_target_skills 2>/dev/null", "ls /workspace/_eval_target_skills/detail-less-bem/", "ls /workspace/_eval_target_skills/detail-less-bem/scripts/ /workspace/_eval_target_skills/detail-less-bem/tests/ 2>/dev/null", "node scripts/check-public-less.mjs src/equal-width-row.less", "npx --yes stylelint src/equal-width-row.less 2>&1 || true", "npx --yes stylelint src/equal-width-row.less; echo \"exit=$?\"", "node --test _eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs 2>&1 | tail -30"], "skills_invoked": [], "duration_seconds": 109.297, "num_turns": 28, "input_tokens": 31622, "output_tokens": 3124, "cache_read_input_tokens": 636800, "cache_creation_input_tokens": 0, "total_tokens": 671546, "total_cost_usd": 0.5574990000000001, "model_usage": {"MiniMax-M3": {"inputTokens": 32127, "outputTokens": 3136, "cacheReadInputTokens": 636928, "cacheCreationInputTokens": 0, "webSearchRequests": 0, "costUSD": 0.5574990000000001, "contextWindow": 200000, "maxOutputTokens": 32000}}, "profile": "detail-less-bem", "skill_sources": [{"name": "detail-less-bem", "source_type": "path", "path": "/Users/zhangshuo12/.agents/skills/detail-less-bem", "hash": "sha256:6fd7d5169d4e9b1930619904e77577edf4c410f9894ebaecd5bc68fbf48362ef"}], "eval_manifest": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "direct", "rep": 1, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}}, "profile": "detail-less-bem", "skill_sources": [{"name": "detail-less-bem", "source_type": "path", "path": "/Users/zhangshuo12/.agents/skills/detail-less-bem", "hash": "sha256:6fd7d5169d4e9b1930619904e77577edf4c410f9894ebaecd5bc68fbf48362ef"}], "eval_manifest": null, "required_skills": ["detail-less-bem"], "expected_artifacts": ["src/EqualWidthRow.tsx", "src/equal-width-row.less"], "require_skill_invocation": false, "rubric_criteria": [], "skill_package_path": "_eval_target_skills/detail-less-bem", "generated_node_skills": [], "route_conformance_task": null, "route_conformance_expected_node_order": [], "baseline_treatments": [], "quality_gates": {}, "required_output_schemas": [], "expected_evidence": [], "draft_hash": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "direct", "rep": 1, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}, "target_artifacts": ["src/EqualWidthRow.tsx", "src/equal-width-row.less"]}--- a/_test_results.json
++++ b/_test_results.json
+@@ -0,0 +1 @@
++{"passed": ["[horizontal-flex] entry-row \u663e\u5f0f\u6a2a\u5411 flex", "[equal-width] entry-card \u4f7f\u7528 flex: 1", "[gap-replacement] \u7528 margin-right \u4e0e --last \u8868\u8fbe\u56fa\u5b9a\u95f4\u8ddd", "[forbidden-property] \u672a\u4f7f\u7528 gap", "[top-level-single-selector] \u672a\u4f7f\u7528\u540e\u4ee3\u6216\u5b50\u4ee3\u9009\u62e9\u5668", "[check-public-less] \u901a\u8fc7", "[stylelint] \u901a\u8fc7"], "failed": ["[single-card-fallback] TSX \u5fc5\u987b\u9488\u5bf9\u5355\u5361\u540c\u6302 entry-card--bar\uff0cLess \u5fc5\u987b\u5b9a\u4e49\u5176\u6a2a\u6761\u9ad8\u5ea6", "[bem-modifier] TSX \u5fc5\u987b\u4ee5\u672b\u9879\u5224\u65ad\u4e3a entry-card \u540c\u6302 --last modifier"]}--- a/comet_checks.py
++++ b/comet_checks.py
+@@ -0,0 +1,187 @@
++"""Shared comet-workflow validation checks for eval tasks.
++
++Each comet task validator imports :func:`run_comet_checks` to get the four
++generic checks (openspec artifacts, comet state, workflow phases, tests written)
++and appends its own task-specific checks. All checks run inside Docker and emit
++results via the standard ``_test_results.json`` protocol.
++
++A check is a dict ``{"check": <name>, "status": "passed"|"failed", "message": ...}``.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++WORKSPACE = Path("/workspace")
++RESULTS_FILE = "_test_results.json"
++
++
++def _passed(name: str, message: str = "") -> dict:
++    return {"check": name, "status": "passed", "message": message}
++
++
++def _failed(name: str, message: str) -> dict:
++    return {"check": name, "status": "failed", "message": message}
++
++
++def check_openspec_artifacts() -> dict:
++    """proposal.md + tasks.md exist in a change dir (active or archived)."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("openspec_artifacts", "openspec/changes/ directory not found")
++
++    candidates: list[Path] = []
++    for d in changes_dir.iterdir():
++        if not d.is_dir():
++            continue
++        if d.name == "archive":
++            candidates.extend(s for s in d.iterdir() if s.is_dir())
++        else:
++            candidates.append(d)
++
++    if not candidates:
++        return _failed("openspec_artifacts", "No change directories found")
++
++    for change_dir in candidates:
++        if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++            return _passed("openspec_artifacts", f"found in {change_dir.name}")
++
++    return _failed("openspec_artifacts", f"proposal.md/tasks.md not found together (checked {len(candidates)} dirs)")
++
++
++def check_comet_state() -> dict:
++    """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("comet_state", "openspec/changes/ not found")
++
++    # Search active + archived change dirs for .comet.yaml.
++    state_files: list[Path] = []
++    for root, _dirs, files in os_walk(changes_dir):
++        for f in files:
++            if f == ".comet.yaml":
++                state_files.append(Path(root) / f)
++
++    if not state_files:
++        archive_dir = changes_dir / "archive"
++        if archive_dir.exists():
++            for change_dir in archive_dir.iterdir():
++                if not change_dir.is_dir():
++                    continue
++                if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++                    return _passed("comet_state", "phase=archived")
++        return _failed("comet_state", "No .comet.yaml found under openspec/changes/")
++
++    # Read the first one and check it has a recognised phase.
++    try:
++        text = state_files[0].read_text(errors="ignore")
++    except OSError:
++        return _failed("comet_state", f"Cannot read {state_files[0]}")
++
++    m = re.search(r"^phase:\s*(\S+)", text, re.MULTILINE)
++    if not m:
++        return _failed("comet_state", "No 'phase:' field in .comet.yaml")
++    phase = m.group(1)
++    valid = {"open", "design", "build", "verify", "archive", "archived"}
++    if phase not in valid:
++        return _failed("comet_state", f"Unrecognised phase: {phase}")
++    return _passed("comet_state", f"phase={phase}")
++
++
++def check_workflow_phases() -> dict:
++    """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
++    evidence = 0
++    found: list[str] = []
++
++    # Phase 1 (open): proposal/tasks
++    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
++        evidence += 1; found.append("open")
++    # Phase 2 (design): design.md or docs/superpowers/specs/
++    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
++        evidence += 1; found.append("design")
++    # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
++    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
++        evidence += 1; found.append("build")
++    # Phase 4 (verify): verification report or docs/superpowers/reports/
++    if (
++        _glob_exists("openspec/changes/**/verification.md")
++        or _glob_exists("openspec/changes/**/verification-report.md")
++        or _glob_exists("docs/superpowers/reports/*.md")
++    ):
++        evidence += 1; found.append("verify")
++    # Phase 5 (archive): openspec/changes/archive/
++    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
++        evidence += 1; found.append("archive")
++
++    if evidence >= 4:
++        return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")
++    if evidence >= 2:
++        return _failed("workflow_phases", f"Only {evidence}/5 phases evidenced ({','.join(found)})")
++    return _failed("workflow_phases", f"Only {evidence}/5 phases ({','.join(found)})")
++
++
++def check_tests_written() -> dict:
++    """The agent wrote or extended tests (test_*.py with real assertions)."""
++    test_files = list(WORKSPACE.glob("test_*.py")) + list(WORKSPACE.glob("**/test_*.py"))
++    # Filter out the validator itself and scaffold copies.
++    test_files = [f for f in test_files if "scaffold" not in str(f) and "validation" not in str(f)]
++    has_assert = False
++    for tf in test_files:
++        try:
++            if "assert" in tf.read_text(errors="ignore").lower():
++                has_assert = True
++                break
++        except OSError:
++            continue
++    if has_assert:
++        return _passed("tests_written", f"{len(test_files)} test file(s) with assertions")
++    if test_files:
++        return _failed("tests_written", f"{len(test_files)} test file(s) but none with assertions")
++    return _failed("tests_written", "No test files written by the agent")
++
++
++def run_comet_checks() -> list[dict]:
++    """Run all four generic comet-workflow checks."""
++    return [
++        check_openspec_artifacts(),
++        check_comet_state(),
++        check_workflow_phases(),
++        check_tests_written(),
++    ]
++
++
++def write_results(results: list[dict]) -> None:
++    """Write the combined results to _test_results.json and print a summary."""
++    out = {"checks": results}
++    results_path = WORKSPACE / RESULTS_FILE
++    try:
++        results_path.write_text(json.dumps(out))
++    except OSError:
++        pass
++    failed = [r for r in results if r["status"] == "failed"]
++    for r in results:
++        status = "✓" if r["status"] == "passed" else "✗"
++        print(f"  {status} {r['check']}: {r.get('message', '')}")
++    print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")
++    if failed:
++        import sys
++        sys.exit(1)
++
++
++# --- helpers ---------------------------------------------------------------
++
++def os_walk(root: Path):
++    """os.walk that tolerates permission errors."""
++    import os
++    for dirpath, dirnames, filenames in os.walk(root):
++        yield dirpath, dirnames, filenames
++
++
++def _glob_exists(pattern: str) -> bool:
++    """True if any file matches the glob pattern under WORKSPACE."""
++    try:
++        return any(WORKSPACE.glob(pattern))
++    except Exception:
++        return False
+--- a/src/EqualWidthRow.tsx
++++ b/src/EqualWidthRow.tsx
+@@ -6,14 +6,23 @@
+ };
+ 
+ export function EqualWidthRow({ hasTradeIn }: EqualWidthRowProps) {
+-  const entries = hasTradeIn ? ['金融方案', '置换估价'] : ['金融方案'];
++  if (hasTradeIn) {
++    return (
++      <View className="entry-row">
++        <View key="金融方案" className="entry-card">
++          <Text className="entry-card__title">金融方案</Text>
++        </View>
++        <View key="置换估价" className="entry-card entry-card--last">
++          <Text className="entry-card__title">置换估价</Text>
++        </View>
++      </View>
++    );
++  }
+   return (
+     <View className="entry-row">
+-      {entries.map((entry) => (
+-        <View key={entry} className="entry-card">
+-          <Text className="entry-card__title">{entry}</Text>
+-        </View>
+-      ))}
++      <View key="金融方案" className="entry-card entry-card--bar entry-card--last">
++        <Text className="entry-card__title">金融方案</Text>
++      </View>
+     </View>
+   );
+-}
++}--- a/src/equal-width-row.less
++++ b/src/equal-width-row.less
+@@ -1,16 +1,24 @@
+ .entry-row {
+   display: flex;
+   flex-direction: row;
+-  gap: 12px;
+ }
+ 
+-.entry-row .entry-card {
++.entry-card {
+   flex: 1;
+   height: 112px;
++  margin-right: 12px;
++}
++
++.entry-card--last {
++  margin-right: 0;
++}
++
++.entry-card--bar {
++  height: 48px;
+ }
+ 
+ .entry-card__title {
+   color: #222222;
+   font-size: 16px;
+   line-height: 24px;
+-}
++}

@@ -1,0 +1,212 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -0,0 +1 @@
++Complete the assigned task in the provided workspace. Do not use external services.--- a/_test_context.json
++++ b/_test_context.json
+@@ -0,0 +1 @@
++{"run_id": "71f797c1-4c16-4b6f-9ead-525292822028", "treatment_name": "CONTROL", "events": {"tool_calls": [{"tool": "Read", "input": {"file_path": "/workspace/src/platform-condition.less", "limit": 2000, "offset": 0, "pages": ""}, "output": "<tool_use_error>Invalid pages parameter: \"\". Use formats like \"1-5\", \"3\", or \"10-20\". Pages are 1-indexed.</tool_use_error>"}, {"tool": "Bash", "input": {"command": "find /workspace -maxdepth 3 -type f -not -path '*/node_modules/*' -print", "description": "List workspace files for checker discovery", "timeout": 120000, "run_in_background": false, "dangerouslyDisableSandbox": false}, "output": "/workspace/Dockerfile\n/workspace/.stylelintrc.json\n/workspace/CLAUDE.md\n/workspace/.claude/CLAUDE.md\n/workspace/scripts/check-public-less.mjs\n/workspace/src/PlatformCondition.tsx\n/workspace/src/platform-condition.less"}, {"tool": "Read", "input": {"file_path": "/workspace/src/platform-condition.less", "limit": 2000, "offset": 0, "pages": "1"}, "output": "0\t/* #ifdef RN */\n1\t.platform-card {\n2\t  padding: 16px;\n3\t  box-shadow: 0 2px 8px #0000001a;\n4\t}\n5\t/* #endif */\n6\t\n7\t.platform-card__title {\n8\t  color: #222222;\n9\t  font-size: 16px;\n10\t  line-height: 24px;\n11\t}\n12\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/PlatformCondition.tsx", "limit": 2000, "offset": 0, "pages": "1"}, "output": "0\timport { Text, View } from '@tarojs/components';\n1\timport './platform-condition.less';\n2\t\n3\texport function PlatformCondition() {\n4\t  return (\n5\t    <View className=\"platform-card\">\n6\t      <Text className=\"platform-card__title\">\u8f66\u8f86\u670d\u52a1</Text>\n7\t    </View>\n8\t  );\n9\t}\n10\t"}, {"tool": "Read", "input": {"file_path": "/workspace/scripts/check-public-less.mjs", "limit": 2000, "offset": 0, "pages": "1"}, "output": "0\t#!/usr/bin/env node\n1\t\n2\timport { execFileSync } from 'node:child_process';\n3\timport { existsSync, readFileSync } from 'node:fs';\n4\timport path from 'node:path';\n5\timport process from 'node:process';\n6\t\n7\tconst PLATFORMS = new Set(['rn', 'h5', 'weapp']);\n8\tconst FORBIDDEN_PROPERTIES = new Set([\n9\t  'gap',\n10\t  'row-gap',\n11\t  'column-gap',\n12\t  'float',\n13\t  'filter',\n14\t  'backdrop-filter',\n15\t  'background-image',\n16\t  'background',\n17\t  'outline',\n18\t  'visibility',\n19\t  'transition',\n20\t  'animation',\n21\t  'text-overflow',\n22\t  'white-space',\n23\t  'word-break',\n24\t]);\n25\tconst BEM_SELECTOR = /^\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;\n26\t\n27\tfunction parseCondition(line, lineNumber) {\n28\t  const match = line.match(/^\\s*\\/\\*\\s*#(ifdef|ifndef)\\s+([^*]+?)\\s*\\*\\/\\s*$/);\n29\t  if (!match) return null;\n30\t\n31\t  const platforms = match[2].trim().split(/\\s+/);\n32\t  const invalidPlatform = platforms.find((platform) => !PLATFORMS.has(platform));\n33\t  if (invalidPlatform) {\n34\t    return {\n35\t      issue: {\n36\t        file: '',\n37\t        line: lineNumber,\n38\t        rule: 'platform-condition',\n39\t        message: `\u6761\u4ef6\u7f16\u8bd1\u5e73\u53f0\u5fc5\u987b\u4f7f\u7528\u5c0f\u5199 rn\u3001h5\u3001weapp\uff0c\u5f53\u524d\u4e3a ${invalidPlatform}`,\n40\t      },\n41\t    };\n42\t  }\n43\t  return { type: match[1], platforms };\n44\t}\n45\t\n46\tfunction getIncludedPlatforms(conditionStack) {\n47\t  let included = new Set(PLATFORMS);\n48\t  for (const condition of conditionStack) {\n49\t    if (condition.type === 'ifdef') {\n50\t      included = new Set([...included].filter((platform) => condition.platforms.includes(platform)));\n51\t    } else {\n52\t      included = new Set([...included].filter((platform) => !condition.platforms.includes(platform)));\n53\t    }\n54\t  }\n55\t  return included;\n56\t}\n57\t\n58\tfunction createIssue(file, line, rule, message) {\n59\t  return { file, line, rule, message };\n60\t}\n61\t\n62\tfunction isForbiddenDeclaration(property, value) {\n63\t  if (FORBIDDEN_PROPERTIES.has(property)) return true;\n64\t  if (property === 'position' && /\\b(?:fixed|sticky)\\b/.test(value)) return true;\n65\t  if (property === 'border-style' && /\\bnone\\b/.test(value)) return true;\n66\t  if (property === 'transform' && /translateZ\\s*\\(/i.test(value)) return true;\n67\t  if (property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) return true;\n68\t  if (/\\b(?:calc|var)\\s*\\(/.test(value)) return true;\n69\t  if (/\\b\\d+(?:\\.\\d+)?(?:vh|vw|em|rem|rpx)\\b/.test(value)) return true;\n70\t  return false;\n71\t}\n72\t\n73\texport function validateLess(source, file = '<input>') {\n74\t  const issues = [];\n75\t  const conditionStack = [];\n76\t  const ruleStack = [];\n77\t  const lines = source.split(/\\r?\\n/);\n78\t\n79\t  for (let index = 0; index < lines.length; index += 1) {\n80\t    const lineNumber = index + 1;\n81\t    const line = lines[index];\n82\t    const trimmed = line.trim();\n83\t\n84\t    const condition = parseCondition(line, lineNumber);\n85\t    if (condition) {\n86\t      if (condition.issue) {\n87\t        issues.push({ ...condition.issue, file });\n88\t      } else {\n89\t        conditionStack.push(condition);\n90\t      }\n91\t      continue;\n92\t    }\n93\t    if (/^\\s*\\/\\*\\s*#endif\\s*\\*\\/\\s*$/.test(line)) {\n94\t      if (!conditionStack.pop()) {\n95\t        issues.push(createIssue(file, lineNumber, 'platform-condition', '#endif \u6ca1\u6709\u5339\u914d\u7684\u6761\u4ef6\u7f16\u8bd1\u5f00\u59cb\u6807\u8bb0'));\n96\t      }\n97\t      continue;\n98\t    }\n99\t    if (/^\\s*\\/\\*\\s*#(?:if|else)\\b/.test(line)) {\n100\t      issues.push(createIssue(file, lineNumber, 'platform-condition', 'Less \u6761\u4ef6\u7f16\u8bd1\u4ec5\u652f\u6301 #ifdef\u3001#ifndef\u3001#endif'));\n101\t      continue;\n102\t    }\n103\t    if (/^@keyframes\\b/.test(trimmed)) {\n104\t      issues.push(createIssue(file, lineNumber, 'forbidden-property', '@keyframes \u4e0d\u53ef\u7528\u4e8e\u516c\u5171 Less'));\n105\t      continue;\n106\t    }\n107\t\n108\t    const selectorMatch = trimmed.match(/^(.+?)\\s*\\{\\s*$/);\n109\t    if (selectorMatch) {\n110\t      const selector = selectorMatch[1].trim();\n111\t      if (ruleStack.length > 0 || !BEM_SELECTOR.test(selector)) {\n112\t        issues.push(\n113\t          createIssue(\n114\t            file,\n115\t            lineNumber,\n116\t            ruleStack.length > 0 ? 'top-level-single-selector' : 'bem-selector',\n117\t            `\u53ea\u5141\u8bb8\u9876\u5c42\u5355\u4e2a BEM \u7c7b\u9009\u62e9\u5668\uff0c\u5f53\u524d\u4e3a ${selector}`,\n118\t          ),\n119\t        );\n120\t      }\n121\t      ruleStack.push({ line: lineNumber, selector, declarations: [], includesRn: getIncludedPlatforms(conditionStack).has('rn') });\n122\t      continue;\n123\t    }\n124\t\n125\t    const declaration = trimmed.match(/^([a-z-]+)\\s*:\\s*([^;]+);?\\s*$/i);\n126\t    if (declaration && ruleStack.length > 0) {\n127\t      const property = declaration[1].toLowerCase();\n128\t      const value = declaration[2].trim();\n129\t      const rule = ruleStack.at(-1);\n130\t      rule.declarations.push({ property, value, line: lineNumber });\n131\t\n132\t      const includesRn = getIncludedPlatforms(conditionStack).has('rn');\n133\t      if (includesRn && property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) {\n134\t        issues.push(createIssue(file, lineNumber, 'line-height-px', '\u516c\u5171 Less \u7684 line-height \u5fc5\u987b\u4f7f\u7528 px \u6570\u503c'));\n135\t      } else if (includesRn && isForbiddenDeclaration(property, value)) {\n136\t        issues.push(createIssue(file, lineNumber, 'forbidden-property', `${property}: ${value} \u4e0d\u53ef\u7528\u4e8e\u4e09\u7aef\u516c\u5171 Less`));\n137\t      }\n138\t      continue;\n139\t    }\n140\t\n141\t    if (trimmed === '}') {\n142\t      const rule = ruleStack.pop();\n143\t      if (!rule) {\n144\t        issues.push(createIssue(file, lineNumber, 'syntax', '\u5b58\u5728\u672a\u5339\u914d\u7684 }'));\n145\t        continue;\n146\t      }\n147\t      if (rule.declarations.length === 0) {\n148\t        issues.push(createIssue(file, rule.line, 'empty-rule', `${rule.selector} \u4e3a\u7a7a\u89c4\u5219`));\n149\t      }\n150\t      const properties = new Map(rule.declarations.map((declaration) => [declaration.property, declaration.value]));\n151\t      const hasHorizontalPadding = ['padding', 'padding-left', 'padding-right', 'padding-inline', 'padding-inline-start', 'padding-inline-end'].some((property) => properties.has(property));\n152\t      if (rule.includesRn && properties.get('width') === '100%' && hasHorizontalPadding && properties.get('box-sizing') !== 'border-box') {\n153\t        issues.push(createIssue(file, rule.line, 'width-padding-box-sizing', 'width: 100% \u4e0e\u6a2a\u5411 padding \u540c\u7528\u65f6\u5fc5\u987b\u58f0\u660e box-sizing: border-box'));\n154\t      }\n155\t    }\n156\t  }\n157\t\n158\t  for (const rule of ruleStack) {\n159\t    issues.push(createIssue(file, rule.line, 'syntax', `${rule.selector} \u7f3a\u5c11\u7ed3\u675f }`));\n160\t  }\n161\t  if (conditionStack.length > 0) {\n162\t    issues.push(createIssue(file, lines.length, 'platform-condition', '\u6761\u4ef6\u7f16\u8bd1\u5757\u7f3a\u5c11 #endif'));\n163\t  }\n164\t  return issues;\n165\t}\n166\t\n167\tfunction changedLessFiles() {\n168\t  try {\n169\t    return execFileSync('git', ['diff', '--name-only', '--diff-filter=ACMR', '--', '*.less'], { encoding: 'utf8' })\n170\t      .split(/\\r?\\n/)\n171\t      .filter(Boolean);\n172\t  } catch {\n173\t    return [];\n174\t  }\n175\t}\n176\t\n177\tfunction main() {\n178\t  const files = process.argv.slice(2);\n179\t  const targets = files.length > 0 ? files : changedLessFiles();\n180\t  if (targets.length === 0) {\n181\t    console.log('\u672a\u53d1\u73b0\u672c\u6b21\u4fee\u6539\u7684 Less \u6587\u4ef6\u3002');\n182\t    return;\n183\t  }\n184\t\n185\t  const issues = targets.flatMap((file) => {\n186\t    if (!existsSync(file)) return [createIssue(file, 0, 'file', '\u6587\u4ef6\u4e0d\u5b58\u5728')];\n187\t    return validateLess(readFileSync(file, 'utf8'), path.normalize(file));\n188\t  });\n189\t  if (issues.length === 0) {\n190\t    console.log(`PASS ${targets.length} \u4e2a Less \u6587\u4ef6`);\n191\t    return;\n192\t  }\n193\t\n194\t  for (const issue of issues) {\n195\t    console.error(`${issue.file}:${issue.line} [${issue.rule}] ${issue.message}`);\n196\t  }\n197\t  process.exitCode = 1;\n198\t}\n199\t\n200\tif (import.meta.url === `file://${process.argv[1]}`) main();\n201\t"}, {"tool": "Read", "input": {"file_path": "/workspace/.stylelintrc.json", "limit": 2000, "offset": 0, "pages": "1"}, "output": "0\t{\n1\t  \"rules\": {\n2\t    \"block-no-empty\": true,\n3\t    \"color-no-invalid-hex\": true,\n4\t    \"declaration-block-no-duplicate-properties\": true,\n5\t    \"property-no-unknown\": true,\n6\t    \"selector-class-pattern\": \"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$\",\n7\t    \"selector-max-id\": 0,\n8\t    \"selector-max-type\": 0\n9\t  }\n10\t}\n11\t"}, {"tool": "Edit", "input": {"replace_all": false, "file_path": "/workspace/src/platform-condition.less", "old_string": "/* #ifdef RN */\n.platform-card {\n  padding: 16px;\n  box-shadow: 0 2px 8px #0000001a;\n}\n/* #endif */\n", "new_string": ".platform-card {\n  padding: 16px;\n}\n\n/* #ifdef h5 */\n.platform-card {\n  box-shadow: 0 2px 8px #0000001a;\n}\n/* #endif */\n"}, "output": "The file /workspace/src/platform-condition.less has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "Bash", "input": {"command": "node scripts/check-public-less.mjs src/platform-condition.less", "description": "Run public Less checker", "timeout": 120000, "run_in_background": false, "dangerouslyDisableSandbox": false}, "output": "PASS 1 \u4e2a Less \u6587\u4ef6"}, {"tool": "Bash", "input": {"command": "npx --no-install stylelint src/platform-condition.less", "description": "Run stylelint on Less file", "timeout": 120000, "run_in_background": false, "dangerouslyDisableSandbox": false}, "output": "(Bash completed with no output)"}], "files_read": ["/workspace/src/platform-condition.less", "/workspace/src/platform-condition.less", "/workspace/src/PlatformCondition.tsx", "/workspace/scripts/check-public-less.mjs", "/workspace/.stylelintrc.json"], "files_created": [], "files_modified": ["/workspace/src/platform-condition.less"], "commands_run": ["find /workspace -maxdepth 3 -type f -not -path '*/node_modules/*' -print", "node scripts/check-public-less.mjs src/platform-condition.less", "npx --no-install stylelint src/platform-condition.less"], "skills_invoked": [], "duration_seconds": 35.396, "num_turns": 10, "input_tokens": 45701, "output_tokens": 670, "cache_read_input_tokens": 56832, "cache_creation_input_tokens": 0, "total_tokens": 103203, "total_cost_usd": 0.27641000000000004, "model_usage": {"MiniMax-M3": {"inputTokens": 46171, "outputTokens": 683, "cacheReadInputTokens": 56960, "cacheCreationInputTokens": 0, "webSearchRequests": 0, "costUSD": 0.27641000000000004, "contextWindow": 200000, "maxOutputTokens": 32000}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "direct", "rep": 1, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "required_skills": ["detail-less-bem"], "expected_artifacts": ["src/PlatformCondition.tsx", "src/platform-condition.less"], "require_skill_invocation": false, "rubric_criteria": [], "skill_package_path": null, "generated_node_skills": [], "route_conformance_task": null, "route_conformance_expected_node_order": [], "baseline_treatments": [], "quality_gates": {}, "required_output_schemas": [], "expected_evidence": [], "draft_hash": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "direct", "rep": 1, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}, "target_artifacts": ["src/PlatformCondition.tsx", "src/platform-condition.less"]}--- a/_test_results.json
++++ b/_test_results.json
+@@ -0,0 +1 @@
++{"passed": ["[platform-condition] \u6761\u4ef6\u7f16\u8bd1\u6807\u8bb0\u4e0e\u5e73\u53f0\u540d\u5747\u4e3a\u5c0f\u5199", "[forbidden-property] box-shadow \u4ec5\u4f4d\u4e8e h5 \u6761\u4ef6\u5757", "[forbidden-property] rn \u6761\u4ef6\u5757\u65e0 box-shadow", "[bem-selector] TSX \u4fdd\u7559\u5e73\u53f0\u5361\u7247 BEM \u7c7b", "[check-public-less] \u901a\u8fc7", "[stylelint] \u901a\u8fc7"], "failed": []}--- a/comet_checks.py
++++ b/comet_checks.py
+@@ -0,0 +1,187 @@
++"""Shared comet-workflow validation checks for eval tasks.
++
++Each comet task validator imports :func:`run_comet_checks` to get the four
++generic checks (openspec artifacts, comet state, workflow phases, tests written)
++and appends its own task-specific checks. All checks run inside Docker and emit
++results via the standard ``_test_results.json`` protocol.
++
++A check is a dict ``{"check": <name>, "status": "passed"|"failed", "message": ...}``.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++WORKSPACE = Path("/workspace")
++RESULTS_FILE = "_test_results.json"
++
++
++def _passed(name: str, message: str = "") -> dict:
++    return {"check": name, "status": "passed", "message": message}
++
++
++def _failed(name: str, message: str) -> dict:
++    return {"check": name, "status": "failed", "message": message}
++
++
++def check_openspec_artifacts() -> dict:
++    """proposal.md + tasks.md exist in a change dir (active or archived)."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("openspec_artifacts", "openspec/changes/ directory not found")
++
++    candidates: list[Path] = []
++    for d in changes_dir.iterdir():
++        if not d.is_dir():
++            continue
++        if d.name == "archive":
++            candidates.extend(s for s in d.iterdir() if s.is_dir())
++        else:
++            candidates.append(d)
++
++    if not candidates:
++        return _failed("openspec_artifacts", "No change directories found")
++
++    for change_dir in candidates:
++        if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++            return _passed("openspec_artifacts", f"found in {change_dir.name}")
++
++    return _failed("openspec_artifacts", f"proposal.md/tasks.md not found together (checked {len(candidates)} dirs)")
++
++
++def check_comet_state() -> dict:
++    """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("comet_state", "openspec/changes/ not found")
++
++    # Search active + archived change dirs for .comet.yaml.
++    state_files: list[Path] = []
++    for root, _dirs, files in os_walk(changes_dir):
++        for f in files:
++            if f == ".comet.yaml":
++                state_files.append(Path(root) / f)
++
++    if not state_files:
++        archive_dir = changes_dir / "archive"
++        if archive_dir.exists():
++            for change_dir in archive_dir.iterdir():
++                if not change_dir.is_dir():
++                    continue
++                if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++                    return _passed("comet_state", "phase=archived")
++        return _failed("comet_state", "No .comet.yaml found under openspec/changes/")
++
++    # Read the first one and check it has a recognised phase.
++    try:
++        text = state_files[0].read_text(errors="ignore")
++    except OSError:
++        return _failed("comet_state", f"Cannot read {state_files[0]}")
++
++    m = re.search(r"^phase:\s*(\S+)", text, re.MULTILINE)
++    if not m:
++        return _failed("comet_state", "No 'phase:' field in .comet.yaml")
++    phase = m.group(1)
++    valid = {"open", "design", "build", "verify", "archive", "archived"}
++    if phase not in valid:
++        return _failed("comet_state", f"Unrecognised phase: {phase}")
++    return _passed("comet_state", f"phase={phase}")
++
++
++def check_workflow_phases() -> dict:
++    """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
++    evidence = 0
++    found: list[str] = []
++
++    # Phase 1 (open): proposal/tasks
++    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
++        evidence += 1; found.append("open")
++    # Phase 2 (design): design.md or docs/superpowers/specs/
++    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
++        evidence += 1; found.append("design")
++    # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
++    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
++        evidence += 1; found.append("build")
++    # Phase 4 (verify): verification report or docs/superpowers/reports/
++    if (
++        _glob_exists("openspec/changes/**/verification.md")
++        or _glob_exists("openspec/changes/**/verification-report.md")
++        or _glob_exists("docs/superpowers/reports/*.md")
++    ):
++        evidence += 1; found.append("verify")
++    # Phase 5 (archive): openspec/changes/archive/
++    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
++        evidence += 1; found.append("archive")
++
++    if evidence >= 4:
++        return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")
++    if evidence >= 2:
++        return _failed("workflow_phases", f"Only {evidence}/5 phases evidenced ({','.join(found)})")
++    return _failed("workflow_phases", f"Only {evidence}/5 phases ({','.join(found)})")
++
++
++def check_tests_written() -> dict:
++    """The agent wrote or extended tests (test_*.py with real assertions)."""
++    test_files = list(WORKSPACE.glob("test_*.py")) + list(WORKSPACE.glob("**/test_*.py"))
++    # Filter out the validator itself and scaffold copies.
++    test_files = [f for f in test_files if "scaffold" not in str(f) and "validation" not in str(f)]
++    has_assert = False
++    for tf in test_files:
++        try:
++            if "assert" in tf.read_text(errors="ignore").lower():
++                has_assert = True
++                break
++        except OSError:
++            continue
++    if has_assert:
++        return _passed("tests_written", f"{len(test_files)} test file(s) with assertions")
++    if test_files:
++        return _failed("tests_written", f"{len(test_files)} test file(s) but none with assertions")
++    return _failed("tests_written", "No test files written by the agent")
++
++
++def run_comet_checks() -> list[dict]:
++    """Run all four generic comet-workflow checks."""
++    return [
++        check_openspec_artifacts(),
++        check_comet_state(),
++        check_workflow_phases(),
++        check_tests_written(),
++    ]
++
++
++def write_results(results: list[dict]) -> None:
++    """Write the combined results to _test_results.json and print a summary."""
++    out = {"checks": results}
++    results_path = WORKSPACE / RESULTS_FILE
++    try:
++        results_path.write_text(json.dumps(out))
++    except OSError:
++        pass
++    failed = [r for r in results if r["status"] == "failed"]
++    for r in results:
++        status = "✓" if r["status"] == "passed" else "✗"
++        print(f"  {status} {r['check']}: {r.get('message', '')}")
++    print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")
++    if failed:
++        import sys
++        sys.exit(1)
++
++
++# --- helpers ---------------------------------------------------------------
++
++def os_walk(root: Path):
++    """os.walk that tolerates permission errors."""
++    import os
++    for dirpath, dirnames, filenames in os.walk(root):
++        yield dirpath, dirnames, filenames
++
++
++def _glob_exists(pattern: str) -> bool:
++    """True if any file matches the glob pattern under WORKSPACE."""
++    try:
++        return any(WORKSPACE.glob(pattern))
++    except Exception:
++        return False
+--- a/src/platform-condition.less
++++ b/src/platform-condition.less
+@@ -1,6 +1,9 @@
+-/* #ifdef RN */
+ .platform-card {
+   padding: 16px;
++}
++
++/* #ifdef h5 */
++.platform-card {
+   box-shadow: 0 2px 8px #0000001a;
+ }
+ /* #endif */

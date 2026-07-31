@@ -1,5 +1,6 @@
 """Unit tests for comet eval treatment loading."""
 
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -8,10 +9,11 @@ from scaffold.python.treatments import (
     TreatmentConfig,
     build_treatment_skills,
     list_treatments,
+    load_treatment,
     load_treatments,
     load_treatments_yaml,
 )
-from scaffold.python.paths import get_skills_dir
+from scaffold.python.paths import EVAL_ROOT, get_skills_dir
 
 
 BASIC_TREATMENT_YAML = """
@@ -242,3 +244,78 @@ def test_comet_full_040_beta_dependency_paths_are_loadable():
 
 def test_list_treatments_is_sorted_for_stable_cli_output():
     assert list_treatments() == ["COMET_FULL_039", "COMET_FULL_040_BETA", "CONTROL"]
+
+
+def test_custom_suite_loads_top_level_toml_treatments(monkeypatch):
+    suite_root = EVAL_ROOT / "detail-less-bem" / "local"
+    monkeypatch.setenv("BENCH_SUITE_ROOT", str(suite_root))
+    monkeypatch.delenv("BENCH_TREATMENTS_DIR", raising=False)
+
+    treatments = load_treatments()
+
+    assert set(treatments) == {"CONTROL", "DETAIL_LESS_BEM"}
+    expected_execution = {
+            "model": "MiniMax-M3",
+        "system_prompt": (
+            "Complete the assigned task in the provided workspace. "
+            "Do not use external services."
+        ),
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": (
+            "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+        ),
+        "timeout_sec": 600,
+        "tool_permissions": ["filesystem-write", "shell"],
+    }
+    assert treatments["CONTROL"].execution == expected_execution
+    assert treatments["DETAIL_LESS_BEM"].execution == expected_execution
+    assert treatments["CONTROL"].skills == []
+    assert treatments["DETAIL_LESS_BEM"].skills == [
+        {
+            "name": "detail-less-bem",
+            "source": "path",
+            "path": "/Users/zhangshuo12/.agents/skills/detail-less-bem",
+            "integrity": ["SKILL.md", "references", "scripts", "tests"],
+        }
+    ]
+
+
+def test_custom_suite_treatments_can_be_loaded_explicitly(monkeypatch):
+    suite_root = EVAL_ROOT / "detail-less-bem" / "local"
+    monkeypatch.setenv("BENCH_SUITE_ROOT", str(suite_root))
+    monkeypatch.delenv("BENCH_TREATMENTS_DIR", raising=False)
+
+    control = load_treatment("CONTROL")
+    detail_less_bem = load_treatment("DETAIL_LESS_BEM")
+
+    assert control.skills == {}
+    assert set(detail_less_bem.skills) == {"detail-less-bem"}
+    assert detail_less_bem.skills["detail-less-bem"]["source"]["source_type"] == "path"
+
+
+def test_detail_less_bem_profile_declares_hard_checks_and_scored_rubric():
+    profile_path = (
+        EVAL_ROOT
+        / "detail-less-bem"
+        / "local"
+        / "profiles"
+        / "detail-less-bem.toml"
+    )
+
+    with profile_path.open("rb") as profile_file:
+        profile = tomllib.load(profile_file)
+
+    assert profile["hard_checks"] == {
+        "target_artifacts": ["src/**/*.tsx", "src/**/*.less"],
+        "check_public_less_exit_code": 0,
+        "stylelint_exit_code": 0,
+    }
+    assert [item["name"] for item in profile["rubric"]] == [
+        "bem_readability",
+        "jsx_less_alignment",
+        "layout_reasonableness",
+    ]
+    assert all(
+        item["min_score"] == 0 and item["max_score"] == 2
+        for item in profile["rubric"]
+    )

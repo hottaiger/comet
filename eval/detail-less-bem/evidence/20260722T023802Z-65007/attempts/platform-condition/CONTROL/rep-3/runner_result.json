@@ -1,0 +1,27 @@
+{
+  "passed": [
+    "[platform-condition] \u6761\u4ef6\u7f16\u8bd1\u6807\u8bb0\u4e0e\u5e73\u53f0\u540d\u5747\u4e3a\u5c0f\u5199",
+    "[forbidden-property] box-shadow \u4ec5\u4f4d\u4e8e h5 \u6761\u4ef6\u5757",
+    "[forbidden-property] rn \u6761\u4ef6\u5757\u65e0 box-shadow",
+    "[bem-selector] TSX \u4fdd\u7559\u5e73\u53f0\u5361\u7247 BEM \u7c7b",
+    "[check-public-less] \u901a\u8fc7",
+    "[stylelint] \u901a\u8fc7",
+    "[HARD] target_artifacts: passed",
+    "[HARD] check_public_less_exit_code: 0",
+    "[HARD] stylelint_exit_code: 0",
+    "[RUBRIC] bem_readability: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 2.00"
+  ],
+  "failed": [],
+  "returncode": 0,
+  "task_variant": "repair",
+  "rep": 3,
+  "execution": {
+    "model": "MiniMax-M3",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}

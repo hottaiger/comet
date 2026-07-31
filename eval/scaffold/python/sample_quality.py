@@ -275,7 +275,13 @@ def infer_sample_quality(
     if hard:
         return hard
 
-    soft = _soft_noise(text, failure_attribution, events, has_result)
+    # Stream-JSON trajectories embed tool schemas and model metadata.  Those
+    # strings legitimately contain words such as "auth", "network", and
+    # "container", so only stderr and validator failures are reliable evidence
+    # of an outer failure after a result event exists.
+    soft = _soft_noise(
+        _text_parts(stderr, checks_failed), failure_attribution, events, has_result
+    )
     if soft:
         return soft
 

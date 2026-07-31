@@ -1,0 +1,262 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -0,0 +1 @@
++Complete the assigned task in the provided workspace. Do not use external services.--- a/_test_context.json
++++ b/_test_context.json
+@@ -0,0 +1 @@
++{"run_id": "223a4c3b-104a-4982-9cb2-876339f33b6d", "treatment_name": "CONTROL", "events": {"tool_calls": [{"tool": "TaskCreate", "input": {"subject": "\u68c0\u67e5 vehicle-summary \u73b0\u6709\u5b9e\u73b0", "description": "\u8bfb\u53d6 TSX\u3001Less\u3001\u9879\u76ee\u811a\u672c\u53ca\u76f8\u5173\u6837\u5f0f\u7ea6\u675f\uff0c\u660e\u786e\u6240\u9700\u6539\u52a8\u3002", "activeForm": "\u6b63\u5728\u68c0\u67e5 vehicle-summary \u5b9e\u73b0"}, "output": "Task #1 created successfully: \u68c0\u67e5 vehicle-summary \u73b0\u6709\u5b9e\u73b0"}, {"tool": "TaskCreate", "input": {"subject": "\u91cd\u6784 TSX \u4e0e Less", "description": "\u6309\u8981\u6c42\u7edf\u4e00 vehicle-summary BEM \u547d\u540d\uff0c\u5e76\u786e\u4fdd\u6807\u9898\u548c\u4ef7\u683c\u4f7f\u7528\u663e\u5f0f\u6837\u5f0f Text\u3002", "activeForm": "\u6b63\u5728\u91cd\u6784 TSX \u4e0e Less"}, "output": "Task #2 created successfully: \u91cd\u6784 TSX \u4e0e Less"}, {"tool": "TaskCreate", "input": {"subject": "\u6821\u9a8c\u6837\u5f0f\u89c4\u5219\u4e0e Stylelint", "description": "\u8fd0\u884c\u9002\u7528\u6d4b\u8bd5\u3001\u516c\u5171\u6837\u5f0f\u89c4\u5219\u6821\u9a8c\u53ca Stylelint\uff0c\u786e\u8ba4\u6700\u7ec8\u5b9e\u73b0\u5408\u89c4\u3002", "activeForm": "\u6b63\u5728\u6821\u9a8c\u6837\u5f0f\u4e0e Stylelint"}, "output": "Task #3 created successfully: \u6821\u9a8c\u6837\u5f0f\u89c4\u5219\u4e0e Stylelint"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "in_progress"}, "output": "Updated task #1 status"}, {"tool": "Bash", "input": {"command": "ls /workspace/src/vehicle-summary 2>/dev/null && echo '---' && ls /workspace/src 2>/dev/null | head -50", "description": "List vehicle-summary directory and src"}, "output": "Exit code 2"}, {"tool": "Bash", "input": {"command": "ls /workspace", "description": "List workspace root"}, "output": "CLAUDE.md\nDockerfile\nscripts\nsrc"}, {"tool": "Bash", "input": {"command": "ls /workspace/src && echo '---' && ls /workspace/scripts", "description": "List src and scripts"}, "output": "vehicle-summary.less\nvehicle-summary.tsx\n---\ncheck-public-less.mjs"}, {"tool": "Read", "input": {"file_path": "/workspace/src/vehicle-summary.tsx"}, "output": "1\timport { Text, View } from '@tarojs/components';\n2\t\n3\timport './vehicle-summary.less';\n4\t\n5\ttype VehicleSummaryProps = {\n6\t  disabled: boolean;\n7\t  price: string;\n8\t  title: string;\n9\t};\n10\t\n11\texport function VehicleSummary({ disabled, price, title }: VehicleSummaryProps) {\n12\t  return (\n13\t    <View className={disabled ? 'summary disabled' : 'summary'}>\n14\t      <Text className=\"summary-title\">{title}</Text>\n15\t      <Text className=\"summary-price\">{price}</Text>\n16\t    </View>\n17\t  );\n18\t}\n19\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/vehicle-summary.less"}, "output": "1\t.summary {\n2\t  padding: 16px;\n3\t}\n4\t\n5\t.summary-title {\n6\t  color: #1f1f1f;\n7\t  font-size: 28px;\n8\t  line-height: 36px;\n9\t}\n10\t\n11\t.summary-price {\n12\t  color: #d4380d;\n13\t  font-size: 32px;\n14\t  line-height: 40px;\n15\t}\n16\t\n17\t.disabled {\n18\t  opacity: 0.5;\n19\t}\n20\t"}, {"tool": "Read", "input": {"file_path": "/workspace/scripts/check-public-less.mjs"}, "output": "1\t#!/usr/bin/env node\n2\timport { existsSync, readFileSync } from 'node:fs';\n3\t\n4\tconst BEM = /^\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;\n5\tconst FORBIDDEN = new Set(['gap', 'row-gap', 'column-gap', 'float', 'filter', 'backdrop-filter', 'background-image', 'background', 'outline', 'visibility', 'transition', 'animation', 'text-overflow', 'white-space', 'word-break']);\n6\t\n7\texport function validateLess(source, file = '<input>') {\n8\t  const issues = [];\n9\t  const stack = [];\n10\t  source.split(/\\r?\\n/).forEach((line, index) => {\n11\t    const lineNumber = index + 1;\n12\t    const trimmed = line.trim();\n13\t    const selector = trimmed.match(/^(.+?)\\s*\\{$/);\n14\t    if (selector) {\n15\t      const value = selector[1].trim();\n16\t      if (stack.length || !BEM.test(value)) issues.push(`${file}:${lineNumber} [top-level-single-selector] invalid selector: ${value}`);\n17\t      stack.push({ lineNumber, declarations: [] });\n18\t      return;\n19\t    }\n20\t    const declaration = trimmed.match(/^([a-z-]+)\\s*:\\s*([^;]+);?$/i);\n21\t    if (declaration && stack.length) {\n22\t      const property = declaration[1].toLowerCase();\n23\t      const value = declaration[2].trim();\n24\t      stack.at(-1).declarations.push(property);\n25\t      if (FORBIDDEN.has(property)) issues.push(`${file}:${lineNumber} [forbidden-property] ${property} is forbidden`);\n26\t      if (property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) issues.push(`${file}:${lineNumber} [line-height-px] line-height must use px`);\n27\t      return;\n28\t    }\n29\t    if (trimmed === '}') {\n30\t      const rule = stack.pop();\n31\t      if (!rule) issues.push(`${file}:${lineNumber} [syntax] unmatched closing brace`);\n32\t      else if (!rule.declarations.length) issues.push(`${file}:${rule.lineNumber} [empty-rule] empty rule`);\n33\t    }\n34\t  });\n35\t  for (const rule of stack) issues.push(`${file}:${rule.lineNumber} [syntax] missing closing brace`);\n36\t  return issues;\n37\t}\n38\t\n39\tconst files = process.argv.slice(2);\n40\tif (!files.length) {\n41\t  console.error('[file] provide at least one Less file');\n42\t  process.exitCode = 1;\n43\t} else {\n44\t  const issues = files.flatMap((file) => existsSync(file) ? validateLess(readFileSync(file, 'utf8'), file) : [`${file}:0 [file] file not found`]);\n45\t  if (issues.length) {\n46\t    console.error(issues.join('\\n'));\n47\t    process.exitCode = 1;\n48\t  } else console.log(`PASS ${files.length} Less file(s)`);\n49\t}\n50\t\n51\t"}, {"tool": "Read", "input": {"file_path": "/workspace/CLAUDE.md"}, "output": "1\tComplete the assigned task in the provided workspace. Do not use external services."}, {"tool": "Read", "input": {"file_path": "/workspace/Dockerfile"}, "output": "1\tFROM python:3.11.9-slim-bookworm AS python-runtime\n2\t\n3\t# environment_image_tag=detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0\n4\tFROM node:20.18.0-bookworm-slim\n5\t\n6\tARG CLAUDE_CODE_VERSION=2.1.205\n7\t\n8\tWORKDIR /workspace\n9\t\n10\tCOPY --from=python-runtime /usr/local /usr/local\n11\tRUN apt-get update && apt-get install -y --no-install-recommends \\\n12\t    libbz2-1.0 libexpat1 libffi8 libgdbm6 liblzma5 libncursesw6 \\\n13\t    libreadline8 libsqlite3-0 libssl3 zlib1g && \\\n14\t    rm -rf /var/lib/apt/lists/* && \\\n15\t    pip install --no-cache-dir pytest==8.3.3 && \\\n16\t    npm install --global stylelint@16.10.0 @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}\n17\t\n18\tCOPY .stylelintrc.json /workspace/.stylelintrc.json\n19\tCOPY scripts /workspace/scripts\n20\tCOPY src /workspace/src\n21\t\n22\tCMD [\"bash\"]\n23\t"}, {"tool": "Bash", "input": {"command": "ls -la /workspace", "description": "List all workspace files including hidden"}, "output": "total 16\ndrwx------ 8  501 dialout  256 Jul 22 02:38 .\ndrwxr-xr-x 1 root root    4096 Jul 22 02:38 ..\ndrwxr-xr-x 3  501 dialout   96 Jul 22 02:38 .claude\n-rw-r--r-- 1  501 dialout  411 Jul 21 15:55 .stylelintrc.json\n-rw-r--r-- 1  501 dialout   83 Jul 22 02:38 CLAUDE.md\n-rw-r--r-- 1  501 dialout  754 Jul 22 00:46 Dockerfile\ndrwxr-xr-x 3  501 dialout   96 Jul 21 15:55 scripts\ndrwxr-xr-x 4  501 dialout  128 Jul 21 15:55 src"}, {"tool": "Bash", "input": {"command": "find /workspace -name '.stylelintrc*' -not -path '*/node_modules/*' 2>/dev/null", "description": "Find stylelint config"}, "output": "/workspace/.stylelintrc.json"}, {"tool": "Read", "input": {"file_path": "/workspace/.stylelintrc.json"}, "output": "1\t{\n2\t  \"rules\": {\n3\t    \"max-nesting-depth\": 0,\n4\t    \"property-disallowed-list\": [\"gap\", \"row-gap\", \"column-gap\"],\n5\t    \"selector-class-pattern\": \"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$\",\n6\t    \"selector-max-compound-selectors\": 1,\n7\t    \"selector-max-id\": 0,\n8\t    \"selector-max-type\": 0,\n9\t    \"selector-max-attribute\": 0,\n10\t    \"selector-max-pseudo-class\": 0\n11\t  }\n12\t}\n13\t\n14\t"}, {"tool": "Bash", "input": {"command": "ls -la /workspace/src /workspace/scripts", "description": "Inspect src and scripts directories"}, "output": "/workspace/scripts:\ntotal 4\ndrwxr-xr-x 3 501 dialout   96 Jul 21 15:55 .\ndrwx------ 8 501 dialout  256 Jul 22 02:38 ..\n-rw-r--r-- 1 501 dialout 2341 Jul 21 15:55 check-public-less.mjs\n\n/workspace/src:\ntotal 8\ndrwxr-xr-x 4 501 dialout 128 Jul 21 15:55 .\ndrwx------ 8 501 dialout 256 Jul 22 02:38 ..\n-rw-r--r-- 1 501 dialout 217 Jul 21 16:08 vehicle-summary.less\n-rw-r--r-- 1 501 dialout 455 Jul 21 16:08 vehicle-summary.tsx"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "completed"}, "output": "Updated task #1 status"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "in_progress"}, "output": "Updated task #2 status"}, {"tool": "Write", "input": {"file_path": "/workspace/src/vehicle-summary.less", "content": ".vehicle-summary {\n  padding: 16px;\n}\n\n.vehicle-summary__title {\n  color: #1f1f1f;\n  font-size: 28px;\n  line-height: 36px;\n}\n\n.vehicle-summary__price {\n  color: #d4380d;\n  font-size: 32px;\n  line-height: 40px;\n}\n\n.vehicle-summary--disabled {\n  opacity: 0.5;\n}\n"}, "output": "The file /workspace/src/vehicle-summary.less has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "Write", "input": {"file_path": "/workspace/src/vehicle-summary.tsx", "content": "import type { CSSProperties } from 'react';\nimport { Text, View } from '@tarojs/components';\n\nimport './vehicle-summary.less';\n\ntype VehicleSummaryProps = {\n  disabled: boolean;\n  price: string;\n  title: string;\n};\n\nconst titleStyle: CSSProperties = {\n  color: '#1f1f1f',\n  fontSize: '28px',\n  lineHeight: '36px',\n};\n\nconst priceStyle: CSSProperties = {\n  color: '#d4380d',\n  fontSize: '32px',\n  lineHeight: '40px',\n};\n\nexport function VehicleSummary({ disabled, price, title }: VehicleSummaryProps) {\n  const rootClass = disabled\n    ? 'vehicle-summary vehicle-summary--disabled'\n    : 'vehicle-summary';\n  return (\n    <View className={rootClass}>\n      <Text className=\"vehicle-summary__title\" style={titleStyle}>{title}</Text>\n      <Text className=\"vehicle-summary__price\" style={priceStyle}>{price}</Text>\n    </View>\n  );\n}\n"}, "output": "The file /workspace/src/vehicle-summary.tsx has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "completed"}, "output": "Updated task #2 status"}, {"tool": "TaskUpdate", "input": {"taskId": "3", "status": "in_progress"}, "output": "Updated task #3 status"}, {"tool": "Bash", "input": {"command": "node scripts/check-public-less.mjs src/vehicle-summary.less", "description": "Run public Less check on the new file"}, "output": "PASS 1 Less file(s)"}, {"tool": "Bash", "input": {"command": "command -v stylelint && stylelint --version 2>/dev/null || echo 'stylelint not found'", "description": "Check stylelint availability"}, "output": "/usr/local/bin/stylelint\n16.10.0"}, {"tool": "Bash", "input": {"command": "stylelint --config .stylelintrc.json src/vehicle-summary.less && echo 'STYLELINT PASS'", "description": "Run stylelint against the new Less file"}, "output": "STYLELINT PASS"}, {"tool": "Read", "input": {"file_path": "/workspace/src/vehicle-summary.less"}, "output": "1\t.vehicle-summary {\n2\t  padding: 16px;\n3\t}\n4\t\n5\t.vehicle-summary__title {\n6\t  color: #1f1f1f;\n7\t  font-size: 28px;\n8\t  line-height: 36px;\n9\t}\n10\t\n11\t.vehicle-summary__price {\n12\t  color: #d4380d;\n13\t  font-size: 32px;\n14\t  line-height: 40px;\n15\t}\n16\t\n17\t.vehicle-summary--disabled {\n18\t  opacity: 0.5;\n19\t}\n20\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/vehicle-summary.tsx"}, "output": "1\timport type { CSSProperties } from 'react';\n2\timport { Text, View } from '@tarojs/components';\n3\t\n4\timport './vehicle-summary.less';\n5\t\n6\ttype VehicleSummaryProps = {\n7\t  disabled: boolean;\n8\t  price: string;\n9\t  title: string;\n10\t};\n11\t\n12\tconst titleStyle: CSSProperties = {\n13\t  color: '#1f1f1f',\n14\t  fontSize: '28px',\n15\t  lineHeight: '36px',\n16\t};\n17\t\n18\tconst priceStyle: CSSProperties = {\n19\t  color: '#d4380d',\n20\t  fontSize: '32px',\n21\t  lineHeight: '40px',\n22\t};\n23\t\n24\texport function VehicleSummary({ disabled, price, title }: VehicleSummaryProps) {\n25\t  const rootClass = disabled\n26\t    ? 'vehicle-summary vehicle-summary--disabled'\n27\t    : 'vehicle-summary';\n28\t  return (\n29\t    <View className={rootClass}>\n30\t      <Text className=\"vehicle-summary__title\" style={titleStyle}>{title}</Text>\n31\t      <Text className=\"vehicle-summary__price\" style={priceStyle}>{price}</Text>\n32\t    </View>\n33\t  );\n34\t}\n35\t"}, {"tool": "TaskUpdate", "input": {"taskId": "3", "status": "completed"}, "output": "Updated task #3 status"}], "files_read": ["/workspace/src/vehicle-summary.tsx", "/workspace/src/vehicle-summary.less", "/workspace/scripts/check-public-less.mjs", "/workspace/CLAUDE.md", "/workspace/Dockerfile", "/workspace/.stylelintrc.json", "/workspace/src/vehicle-summary.less", "/workspace/src/vehicle-summary.tsx"], "files_created": ["/workspace/src/vehicle-summary.less", "/workspace/src/vehicle-summary.tsx"], "files_modified": [], "commands_run": ["ls /workspace/src/vehicle-summary 2>/dev/null && echo '---' && ls /workspace/src 2>/dev/null | head -50", "ls /workspace", "ls /workspace/src && echo '---' && ls /workspace/scripts", "ls -la /workspace", "find /workspace -name '.stylelintrc*' -not -path '*/node_modules/*' 2>/dev/null", "ls -la /workspace/src /workspace/scripts", "node scripts/check-public-less.mjs src/vehicle-summary.less", "command -v stylelint && stylelint --version 2>/dev/null || echo 'stylelint not found'", "stylelint --config .stylelintrc.json src/vehicle-summary.less && echo 'STYLELINT PASS'"], "skills_invoked": [], "duration_seconds": 187.873, "num_turns": 29, "input_tokens": 63745, "output_tokens": 9278, "cache_read_input_tokens": 352920, "cache_creation_input_tokens": 0, "total_tokens": 425943, "total_cost_usd": 0.7300289999999999, "model_usage": {"MiniMax-M3": {"inputTokens": 64251, "outputTokens": 9290, "cacheReadInputTokens": 353048, "cacheCreationInputTokens": 0, "webSearchRequests": 0, "costUSD": 0.7300289999999999, "contextWindow": 200000, "maxOutputTokens": 32000}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "bem-create-b", "rep": 2, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "required_skills": ["detail-less-bem"], "expected_artifacts": ["src/vehicle-summary.tsx", "src/vehicle-summary.less"], "require_skill_invocation": true, "rubric_criteria": [], "skill_package_path": null, "generated_node_skills": [], "route_conformance_task": null, "route_conformance_expected_node_order": [], "baseline_treatments": [], "quality_gates": {}, "required_output_schemas": [], "expected_evidence": [], "draft_hash": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "bem-create-b", "rep": 2, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}, "target_artifacts": ["src/vehicle-summary.tsx", "src/vehicle-summary.less"]}--- a/_test_results.json
++++ b/_test_results.json
+@@ -0,0 +1 @@
++{"passed": ["check-public-less: passed", "stylelint: passed", "bem-create: one vehicle-summary BEM namespace", "text-class: title and price use explicit Text styling"], "failed": ["modifier-attachment rule: vehicle-summary--disabled must be co-mounted with vehicle-summary on the root View"]}--- a/comet_checks.py
++++ b/comet_checks.py
+@@ -0,0 +1,187 @@
++"""Shared comet-workflow validation checks for eval tasks.
++
++Each comet task validator imports :func:`run_comet_checks` to get the four
++generic checks (openspec artifacts, comet state, workflow phases, tests written)
++and appends its own task-specific checks. All checks run inside Docker and emit
++results via the standard ``_test_results.json`` protocol.
++
++A check is a dict ``{"check": <name>, "status": "passed"|"failed", "message": ...}``.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++WORKSPACE = Path("/workspace")
++RESULTS_FILE = "_test_results.json"
++
++
++def _passed(name: str, message: str = "") -> dict:
++    return {"check": name, "status": "passed", "message": message}
++
++
++def _failed(name: str, message: str) -> dict:
++    return {"check": name, "status": "failed", "message": message}
++
++
++def check_openspec_artifacts() -> dict:
++    """proposal.md + tasks.md exist in a change dir (active or archived)."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("openspec_artifacts", "openspec/changes/ directory not found")
++
++    candidates: list[Path] = []
++    for d in changes_dir.iterdir():
++        if not d.is_dir():
++            continue
++        if d.name == "archive":
++            candidates.extend(s for s in d.iterdir() if s.is_dir())
++        else:
++            candidates.append(d)
++
++    if not candidates:
++        return _failed("openspec_artifacts", "No change directories found")
++
++    for change_dir in candidates:
++        if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++            return _passed("openspec_artifacts", f"found in {change_dir.name}")
++
++    return _failed("openspec_artifacts", f"proposal.md/tasks.md not found together (checked {len(candidates)} dirs)")
++
++
++def check_comet_state() -> dict:
++    """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("comet_state", "openspec/changes/ not found")
++
++    # Search active + archived change dirs for .comet.yaml.
++    state_files: list[Path] = []
++    for root, _dirs, files in os_walk(changes_dir):
++        for f in files:
++            if f == ".comet.yaml":
++                state_files.append(Path(root) / f)
++
++    if not state_files:
++        archive_dir = changes_dir / "archive"
++        if archive_dir.exists():
++            for change_dir in archive_dir.iterdir():
++                if not change_dir.is_dir():
++                    continue
++                if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++                    return _passed("comet_state", "phase=archived")
++        return _failed("comet_state", "No .comet.yaml found under openspec/changes/")
++
++    # Read the first one and check it has a recognised phase.
++    try:
++        text = state_files[0].read_text(errors="ignore")
++    except OSError:
++        return _failed("comet_state", f"Cannot read {state_files[0]}")
++
++    m = re.search(r"^phase:\s*(\S+)", text, re.MULTILINE)
++    if not m:
++        return _failed("comet_state", "No 'phase:' field in .comet.yaml")
++    phase = m.group(1)
++    valid = {"open", "design", "build", "verify", "archive", "archived"}
++    if phase not in valid:
++        return _failed("comet_state", f"Unrecognised phase: {phase}")
++    return _passed("comet_state", f"phase={phase}")
++
++
++def check_workflow_phases() -> dict:
++    """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
++    evidence = 0
++    found: list[str] = []
++
++    # Phase 1 (open): proposal/tasks
++    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
++        evidence += 1; found.append("open")
++    # Phase 2 (design): design.md or docs/superpowers/specs/
++    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
++        evidence += 1; found.append("design")
++    # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
++    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
++        evidence += 1; found.append("build")
++    # Phase 4 (verify): verification report or docs/superpowers/reports/
++    if (
++        _glob_exists("openspec/changes/**/verification.md")
++        or _glob_exists("openspec/changes/**/verification-report.md")
++        or _glob_exists("docs/superpowers/reports/*.md")
++    ):
++        evidence += 1; found.append("verify")
++    # Phase 5 (archive): openspec/changes/archive/
++    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
++        evidence += 1; found.append("archive")
++
++    if evidence >= 4:
++        return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")
++    if evidence >= 2:
++        return _failed("workflow_phases", f"Only {evidence}/5 phases evidenced ({','.join(found)})")
++    return _failed("workflow_phases", f"Only {evidence}/5 phases ({','.join(found)})")
++
++
++def check_tests_written() -> dict:
++    """The agent wrote or extended tests (test_*.py with real assertions)."""
++    test_files = list(WORKSPACE.glob("test_*.py")) + list(WORKSPACE.glob("**/test_*.py"))
++    # Filter out the validator itself and scaffold copies.
++    test_files = [f for f in test_files if "scaffold" not in str(f) and "validation" not in str(f)]
++    has_assert = False
++    for tf in test_files:
++        try:
++            if "assert" in tf.read_text(errors="ignore").lower():
++                has_assert = True
++                break
++        except OSError:
++            continue
++    if has_assert:
++        return _passed("tests_written", f"{len(test_files)} test file(s) with assertions")
++    if test_files:
++        return _failed("tests_written", f"{len(test_files)} test file(s) but none with assertions")
++    return _failed("tests_written", "No test files written by the agent")
++
++
++def run_comet_checks() -> list[dict]:
++    """Run all four generic comet-workflow checks."""
++    return [
++        check_openspec_artifacts(),
++        check_comet_state(),
++        check_workflow_phases(),
++        check_tests_written(),
++    ]
++
++
++def write_results(results: list[dict]) -> None:
++    """Write the combined results to _test_results.json and print a summary."""
++    out = {"checks": results}
++    results_path = WORKSPACE / RESULTS_FILE
++    try:
++        results_path.write_text(json.dumps(out))
++    except OSError:
++        pass
++    failed = [r for r in results if r["status"] == "failed"]
++    for r in results:
++        status = "✓" if r["status"] == "passed" else "✗"
++        print(f"  {status} {r['check']}: {r.get('message', '')}")
++    print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")
++    if failed:
++        import sys
++        sys.exit(1)
++
++
++# --- helpers ---------------------------------------------------------------
++
++def os_walk(root: Path):
++    """os.walk that tolerates permission errors."""
++    import os
++    for dirpath, dirnames, filenames in os.walk(root):
++        yield dirpath, dirnames, filenames
++
++
++def _glob_exists(pattern: str) -> bool:
++    """True if any file matches the glob pattern under WORKSPACE."""
++    try:
++        return any(WORKSPACE.glob(pattern))
++    except Exception:
++        return False
+--- a/src/vehicle-summary.less
++++ b/src/vehicle-summary.less
+@@ -1,19 +1,19 @@
+-.summary {
++.vehicle-summary {
+   padding: 16px;
+ }
+ 
+-.summary-title {
++.vehicle-summary__title {
+   color: #1f1f1f;
+   font-size: 28px;
+   line-height: 36px;
+ }
+ 
+-.summary-price {
++.vehicle-summary__price {
+   color: #d4380d;
+   font-size: 32px;
+   line-height: 40px;
+ }
+ 
+-.disabled {
++.vehicle-summary--disabled {
+   opacity: 0.5;
+ }
+--- a/src/vehicle-summary.tsx
++++ b/src/vehicle-summary.tsx
+@@ -1,3 +1,4 @@
++import type { CSSProperties } from 'react';
+ import { Text, View } from '@tarojs/components';
+ 
+ import './vehicle-summary.less';
+@@ -8,11 +9,26 @@
+   title: string;
+ };
+ 
++const titleStyle: CSSProperties = {
++  color: '#1f1f1f',
++  fontSize: '28px',
++  lineHeight: '36px',
++};
++
++const priceStyle: CSSProperties = {
++  color: '#d4380d',
++  fontSize: '32px',
++  lineHeight: '40px',
++};
++
+ export function VehicleSummary({ disabled, price, title }: VehicleSummaryProps) {
++  const rootClass = disabled
++    ? 'vehicle-summary vehicle-summary--disabled'
++    : 'vehicle-summary';
+   return (
+-    <View className={disabled ? 'summary disabled' : 'summary'}>
+-      <Text className="summary-title">{title}</Text>
+-      <Text className="summary-price">{price}</Text>
++    <View className={rootClass}>
++      <Text className="vehicle-summary__title" style={titleStyle}>{title}</Text>
++      <Text className="vehicle-summary__price" style={priceStyle}>{price}</Text>
+     </View>
+   );
+ }

@@ -1,0 +1,1 @@
+{"passed": ["check-public-less: passed", "stylelint: passed", "list-spacing: no gap properties or pseudo selectors", "last-item-margin: item spacing and --last reset are present", "modifier-attachment: last modifier is co-mounted with item base class"], "failed": []}

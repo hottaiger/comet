@@ -1,0 +1,1 @@
+{"passed": ["check-public-less: passed", "stylelint: passed", "bem-create: one vehicle-summary BEM namespace", "text-class: title and price use explicit Text styling"], "failed": ["modifier-attachment rule: vehicle-summary--disabled must be co-mounted with vehicle-summary on the root View"]}

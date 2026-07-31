@@ -1,0 +1,26 @@
+{
+  "passed": [
+    "[horizontal-flex-row] explicit row flex layout",
+    "[equal-width-cards] cards use flex: 1",
+    "[last-card-modifier] final card co-mounts base class and --last modifier",
+    "[public-less-checker] passed",
+    "[stylelint] passed",
+    "[HARD] target_artifacts: passed",
+    "[HARD] check_public_less_exit_code: 0",
+    "[HARD] stylelint_exit_code: 0",
+    "[RUBRIC] bem_readability: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 2.00"
+  ],
+  "failed": [],
+  "returncode": 0,
+  "task_variant": "direct",
+  "rep": 1,
+  "execution": {
+    "model": "MiniMax-M3",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}

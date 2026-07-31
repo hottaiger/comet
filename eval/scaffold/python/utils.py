@@ -1,8 +1,12 @@
 """Python utilities - thin wrappers around shell scripts."""
-import json, os, random, shutil, subprocess, time
+import json
+import os
+import random
+import shutil
+import subprocess
+import time
 from pathlib import Path
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
 from scaffold.python.paths import EVAL_ROOT, get_suite_root
 
 TEST_CONTEXT_FILE = os.environ.get("BENCH_TEST_CONTEXT", "_test_context.json")
@@ -141,7 +145,10 @@ def _docker_run_script(mode, test_dir, script_name, timeout=120, args=None):
     try:
         cmd = [mode, str(test_dir), script_name] + (args or [])
         result = run_shell("docker.sh", *cmd, timeout=timeout, check=False)
-        return result.returncode == 0, result.stdout
+        output = result.stdout
+        if result.stderr:
+            output += ("\n" if output else "") + result.stderr
+        return result.returncode == 0, output
     except subprocess.TimeoutExpired:
         return False, f"Timeout ({timeout}s)"
     except Exception as e:
@@ -165,7 +172,6 @@ def run_claude_in_docker(test_dir, prompt, timeout=300, model=None):
         return subprocess.CompletedProcess(cmd, 124, "", f"Timeout after {timeout}s")
 
 def _copy_scaffold_to_docker(test_dir):
-    scaffold_root = SCAFFOLD_PYTHON_DIR.parent
     scaffold_dir = test_dir / "scaffold"
     scaffold_dir.mkdir(parents=True, exist_ok=True)
     (scaffold_dir / "__init__.py").touch()

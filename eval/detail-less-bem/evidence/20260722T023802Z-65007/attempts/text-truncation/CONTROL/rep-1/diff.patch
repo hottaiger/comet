@@ -1,0 +1,227 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -0,0 +1 @@
++Complete the assigned task in the provided workspace. Do not use external services.--- a/_test_context.json
++++ b/_test_context.json
+@@ -0,0 +1 @@
++{"run_id": "f488f08d-94f8-4b53-b5e5-46eafbc834bc", "treatment_name": "CONTROL", "events": {"tool_calls": [{"tool": "Read", "input": {"file_path": "/workspace/src/ArticleTitle.tsx", "limit": 2000, "offset": 0, "pages": ""}, "output": "<tool_use_error>Invalid pages parameter: \"\". Use formats like \"1-5\", \"3\", or \"10-20\". Pages are 1-indexed.</tool_use_error>"}, {"tool": "Read", "input": {"file_path": "/workspace/src/article-title.less", "limit": 2000, "offset": 0, "pages": ""}, "output": "<tool_use_error>Invalid pages parameter: \"\". Use formats like \"1-5\", \"3\", or \"10-20\". Pages are 1-indexed.</tool_use_error>"}, {"tool": "Read", "input": {"file_path": "/workspace/src/ArticleTitle.tsx", "limit": 2000, "offset": 0, "pages": "1"}, "output": "0\timport { View } from '@tarojs/components';\n1\timport './article-title.less';\n2\t\n3\texport function ArticleTitle() {\n4\t  return <View className=\"article-title\">\u7279\u522b\u957f\u7684\u8f66\u8f86\u6807\u9898\u9700\u8981\u5728\u4e00\u884c\u5185\u5c55\u793a</View>;\n5\t}\n6\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/article-title.less", "limit": 2000, "offset": 0, "pages": "1"}, "output": "0\t.article-title {\n1\t  overflow: hidden;\n2\t  text-overflow: ellipsis;\n3\t  white-space: nowrap;\n4\t  color: #222222;\n5\t  font-size: 28px;\n6\t  line-height: 40px;\n7\t}\n8\t"}, {"tool": "Bash", "input": {"command": "ls -la /workspace && find /workspace -maxdepth 2 -type f -not -path '*/node_modules/*' -print", "description": "List project files", "timeout": 120000, "run_in_background": false, "dangerouslyDisableSandbox": false}, "output": "total 16\ndrwx------ 8  501 dialout  256 Jul 22 03:34 .\ndrwxr-xr-x 1 root root    4096 Jul 22 03:34 ..\ndrwxr-xr-x 3  501 dialout   96 Jul 22 03:34 .claude\n-rw-r--r-- 1  501 dialout  268 Jul 21 15:57 .stylelintrc.json\n-rw-r--r-- 1  501 dialout   83 Jul 22 03:34 CLAUDE.md\n-rw-r--r-- 1  501 dialout  896 Jul 22 02:31 Dockerfile\ndrwxr-xr-x 3  501 dialout   96 Jul 21 15:57 scripts\ndrwxr-xr-x 4  501 dialout  128 Jul 21 15:57 src\n/workspace/Dockerfile\n/workspace/.stylelintrc.json\n/workspace/CLAUDE.md\n/workspace/.claude/CLAUDE.md\n/workspace/scripts/check-public-less.mjs\n/workspace/src/ArticleTitle.tsx\n/workspace/src/article-title.less"}, {"tool": "Read", "input": {"file_path": "/workspace/scripts/check-public-less.mjs", "limit": 2000, "offset": 0, "pages": "1"}, "output": "0\t#!/usr/bin/env node\n1\timport { readFileSync } from 'node:fs';\n2\timport process from 'node:process';\n3\t\n4\tconst forbidden = new Set(['gap', 'row-gap', 'column-gap', 'float', 'filter', 'backdrop-filter', 'background', 'background-image', 'box-shadow', 'outline', 'text-overflow', 'white-space', 'word-break', 'transition', 'animation']);\n5\tconst bem = /^\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;\n6\t\n7\tfunction issue(file, line, rule, message) { return `${file}:${line} [${rule}] ${message}`; }\n8\tfunction validate(file) {\n9\t  const errors = [];\n10\t  const lines = readFileSync(file, 'utf8').split(/\\r?\\n/);\n11\t  let depth = 0;\n12\t  for (let index = 0; index < lines.length; index += 1) {\n13\t    const line = lines[index].trim();\n14\t    const number = index + 1;\n15\t    const selector = line.match(/^(.+?)\\s*\\{$/);\n16\t    if (selector) {\n17\t      if (depth > 0) errors.push(issue(file, number, 'top-level-single-selector', '\u516c\u5171 Less \u4e0d\u5141\u8bb8\u5d4c\u5957\u89c4\u5219'));\n18\t      if (!bem.test(selector[1].trim())) errors.push(issue(file, number, 'bem-selector', '\u9009\u62e9\u5668\u5fc5\u987b\u662f\u5355\u4e2a BEM \u7c7b'));\n19\t      depth += 1;\n20\t      continue;\n21\t    }\n22\t    if (line === '}') { depth -= 1; if (depth < 0) errors.push(issue(file, number, 'syntax', '\u5b58\u5728\u672a\u5339\u914d\u7684 }')); continue; }\n23\t    const declaration = line.match(/^([a-z-]+)\\s*:\\s*([^;]+);?$/i);\n24\t    if (!declaration) continue;\n25\t    const property = declaration[1].toLowerCase();\n26\t    const value = declaration[2].trim();\n27\t    if (forbidden.has(property)) errors.push(issue(file, number, 'forbidden-property', `${property} \u4e0d\u5141\u8bb8\u7528\u4e8e\u516c\u5171 Less`));\n28\t    if (property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) errors.push(issue(file, number, 'line-height-px', 'line-height \u5fc5\u987b\u4e3a px \u6570\u503c'));\n29\t    if (/\\b(?:calc|var)\\s*\\(/.test(value) || /\\b\\d+(?:\\.\\d+)?(?:vh|vw|em|rem|rpx)\\b/.test(value)) errors.push(issue(file, number, 'forbidden-unit', '\u516c\u5171 Less \u4e0d\u5141\u8bb8\u8be5\u5355\u4f4d\u6216\u51fd\u6570'));\n30\t  }\n31\t  if (depth !== 0) errors.push(issue(file, lines.length, 'syntax', '\u89c4\u5219\u62ec\u53f7\u4e0d\u5339\u914d'));\n32\t  return errors;\n33\t}\n34\tconst files = process.argv.slice(2);\n35\tif (files.length === 0) { console.error('[file] \u5fc5\u987b\u63d0\u4f9b Less \u6587\u4ef6'); process.exit(1); }\n36\tconst errors = files.flatMap(validate);\n37\tif (errors.length) { console.error(errors.join('\\n')); process.exit(1); }\n38\tconsole.log(`PASS ${files.length} \u4e2a Less \u6587\u4ef6`);\n39\t"}, {"tool": "Edit", "input": {"replace_all": false, "file_path": "/workspace/src/ArticleTitle.tsx", "old_string": "import { View } from '@tarojs/components';\nimport './article-title.less';\n\nexport function ArticleTitle() {\n  return <View className=\"article-title\">\u7279\u522b\u957f\u7684\u8f66\u8f86\u6807\u9898\u9700\u8981\u5728\u4e00\u884c\u5185\u5c55\u793a</View>;\n}\n", "new_string": "import { Text, View } from '@tarojs/components';\nimport './article-title.less';\n\nexport function ArticleTitle() {\n  return (\n    <View className=\"article-title\">\n      <Text className=\"article-title__text\" numberOfLines={1}>\n        \u7279\u522b\u957f\u7684\u8f66\u8f86\u6807\u9898\u9700\u8981\u5728\u4e00\u884c\u5185\u5c55\u793a\n      </Text>\n    </View>\n  );\n}\n"}, "output": "The file /workspace/src/ArticleTitle.tsx has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "Edit", "input": {"replace_all": false, "file_path": "/workspace/src/article-title.less", "old_string": ".article-title {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  color: #222222;\n  font-size: 28px;\n  line-height: 40px;\n}\n", "new_string": ".article-title__text {\n  overflow: hidden;\n  color: #222222;\n  font-size: 28px;\n  line-height: 40px;\n}\n"}, "output": "The file /workspace/src/article-title.less has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "Skill", "input": {"args": "\u9a8c\u8bc1 src/ArticleTitle.tsx \u548c src/article-title.less \u7684\u5355\u884c\u6807\u9898\u622a\u65ad\u4fee\u590d\uff0c\u91cd\u70b9\u68c0\u67e5 Text numberOfLines={1}\u3001\u663e\u5f0f BEM \u7c7b\u4ee5\u53ca\u516c\u5171 Less \u7ea6\u675f\u3002", "skill": "verify"}, "output": "Launching skill: verify"}, {"tool": "Bash", "input": {"command": "find /workspace/.claude -maxdepth 4 -type f -print; find /workspace/src/.claude -maxdepth 4 -type f -print 2>/dev/null || true; find /workspace -maxdepth 2 -type f \\( -name 'package.json' -o -name 'README*' -o -name 'Makefile' \\) -print", "description": "Find verification skills and launch files", "timeout": 120000, "run_in_background": false, "dangerouslyDisableSandbox": false}, "output": "/workspace/.claude/CLAUDE.md"}, {"tool": "Bash", "input": {"command": "node /workspace/scripts/check-public-less.mjs /workspace/src/article-title.less", "description": "Validate public Less constraints", "timeout": 120000, "run_in_background": false, "dangerouslyDisableSandbox": false}, "output": "PASS 1 \u4e2a Less \u6587\u4ef6"}], "files_read": ["/workspace/src/ArticleTitle.tsx", "/workspace/src/article-title.less", "/workspace/src/ArticleTitle.tsx", "/workspace/src/article-title.less", "/workspace/scripts/check-public-less.mjs"], "files_created": [], "files_modified": ["/workspace/src/ArticleTitle.tsx", "/workspace/src/article-title.less"], "commands_run": ["ls -la /workspace && find /workspace -maxdepth 2 -type f -not -path '*/node_modules/*' -print", "find /workspace/.claude -maxdepth 4 -type f -print; find /workspace/src/.claude -maxdepth 4 -type f -print 2>/dev/null || true; find /workspace -maxdepth 2 -type f \\( -name 'package.json' -o -name 'README*' -o -name 'Makefile' \\) -print", "node /workspace/scripts/check-public-less.mjs /workspace/src/article-title.less"], "skills_invoked": ["verify"], "duration_seconds": 66.525, "num_turns": 13, "input_tokens": 47954, "output_tokens": 1465, "cache_read_input_tokens": 161792, "cache_creation_input_tokens": 0, "total_tokens": 211211, "total_cost_usd": 0.359985, "model_usage": {"MiniMax-M3": {"inputTokens": 48415, "outputTokens": 1478, "cacheReadInputTokens": 161920, "cacheCreationInputTokens": 0, "webSearchRequests": 0, "costUSD": 0.359985, "contextWindow": 200000, "maxOutputTokens": 32000}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "direct", "rep": 1, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "required_skills": [], "expected_artifacts": [], "require_skill_invocation": false, "rubric_criteria": [], "skill_package_path": null, "generated_node_skills": [], "route_conformance_task": null, "route_conformance_expected_node_order": [], "baseline_treatments": [], "quality_gates": {}, "required_output_schemas": [], "expected_evidence": [], "draft_hash": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "direct", "rep": 1, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}, "target_artifacts": ["src/ArticleTitle.tsx", "src/article-title.less"]}--- a/_test_results.json
++++ b/_test_results.json
+@@ -0,0 +1 @@
++{"passed": ["[text-number-of-lines] single-line Taro Text present", "[no-text-overflow] absent", "[no-white-space] absent", "[public-less-checker] passed", "[stylelint] passed"], "failed": []}--- a/comet_checks.py
++++ b/comet_checks.py
+@@ -0,0 +1,187 @@
++"""Shared comet-workflow validation checks for eval tasks.
++
++Each comet task validator imports :func:`run_comet_checks` to get the four
++generic checks (openspec artifacts, comet state, workflow phases, tests written)
++and appends its own task-specific checks. All checks run inside Docker and emit
++results via the standard ``_test_results.json`` protocol.
++
++A check is a dict ``{"check": <name>, "status": "passed"|"failed", "message": ...}``.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++WORKSPACE = Path("/workspace")
++RESULTS_FILE = "_test_results.json"
++
++
++def _passed(name: str, message: str = "") -> dict:
++    return {"check": name, "status": "passed", "message": message}
++
++
++def _failed(name: str, message: str) -> dict:
++    return {"check": name, "status": "failed", "message": message}
++
++
++def check_openspec_artifacts() -> dict:
++    """proposal.md + tasks.md exist in a change dir (active or archived)."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("openspec_artifacts", "openspec/changes/ directory not found")
++
++    candidates: list[Path] = []
++    for d in changes_dir.iterdir():
++        if not d.is_dir():
++            continue
++        if d.name == "archive":
++            candidates.extend(s for s in d.iterdir() if s.is_dir())
++        else:
++            candidates.append(d)
++
++    if not candidates:
++        return _failed("openspec_artifacts", "No change directories found")
++
++    for change_dir in candidates:
++        if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++            return _passed("openspec_artifacts", f"found in {change_dir.name}")
++
++    return _failed("openspec_artifacts", f"proposal.md/tasks.md not found together (checked {len(candidates)} dirs)")
++
++
++def check_comet_state() -> dict:
++    """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("comet_state", "openspec/changes/ not found")
++
++    # Search active + archived change dirs for .comet.yaml.
++    state_files: list[Path] = []
++    for root, _dirs, files in os_walk(changes_dir):
++        for f in files:
++            if f == ".comet.yaml":
++                state_files.append(Path(root) / f)
++
++    if not state_files:
++        archive_dir = changes_dir / "archive"
++        if archive_dir.exists():
++            for change_dir in archive_dir.iterdir():
++                if not change_dir.is_dir():
++                    continue
++                if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++                    return _passed("comet_state", "phase=archived")
++        return _failed("comet_state", "No .comet.yaml found under openspec/changes/")
++
++    # Read the first one and check it has a recognised phase.
++    try:
++        text = state_files[0].read_text(errors="ignore")
++    except OSError:
++        return _failed("comet_state", f"Cannot read {state_files[0]}")
++
++    m = re.search(r"^phase:\s*(\S+)", text, re.MULTILINE)
++    if not m:
++        return _failed("comet_state", "No 'phase:' field in .comet.yaml")
++    phase = m.group(1)
++    valid = {"open", "design", "build", "verify", "archive", "archived"}
++    if phase not in valid:
++        return _failed("comet_state", f"Unrecognised phase: {phase}")
++    return _passed("comet_state", f"phase={phase}")
++
++
++def check_workflow_phases() -> dict:
++    """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
++    evidence = 0
++    found: list[str] = []
++
++    # Phase 1 (open): proposal/tasks
++    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
++        evidence += 1; found.append("open")
++    # Phase 2 (design): design.md or docs/superpowers/specs/
++    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
++        evidence += 1; found.append("design")
++    # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
++    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
++        evidence += 1; found.append("build")
++    # Phase 4 (verify): verification report or docs/superpowers/reports/
++    if (
++        _glob_exists("openspec/changes/**/verification.md")
++        or _glob_exists("openspec/changes/**/verification-report.md")
++        or _glob_exists("docs/superpowers/reports/*.md")
++    ):
++        evidence += 1; found.append("verify")
++    # Phase 5 (archive): openspec/changes/archive/
++    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
++        evidence += 1; found.append("archive")
++
++    if evidence >= 4:
++        return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")
++    if evidence >= 2:
++        return _failed("workflow_phases", f"Only {evidence}/5 phases evidenced ({','.join(found)})")
++    return _failed("workflow_phases", f"Only {evidence}/5 phases ({','.join(found)})")
++
++
++def check_tests_written() -> dict:
++    """The agent wrote or extended tests (test_*.py with real assertions)."""
++    test_files = list(WORKSPACE.glob("test_*.py")) + list(WORKSPACE.glob("**/test_*.py"))
++    # Filter out the validator itself and scaffold copies.
++    test_files = [f for f in test_files if "scaffold" not in str(f) and "validation" not in str(f)]
++    has_assert = False
++    for tf in test_files:
++        try:
++            if "assert" in tf.read_text(errors="ignore").lower():
++                has_assert = True
++                break
++        except OSError:
++            continue
++    if has_assert:
++        return _passed("tests_written", f"{len(test_files)} test file(s) with assertions")
++    if test_files:
++        return _failed("tests_written", f"{len(test_files)} test file(s) but none with assertions")
++    return _failed("tests_written", "No test files written by the agent")
++
++
++def run_comet_checks() -> list[dict]:
++    """Run all four generic comet-workflow checks."""
++    return [
++        check_openspec_artifacts(),
++        check_comet_state(),
++        check_workflow_phases(),
++        check_tests_written(),
++    ]
++
++
++def write_results(results: list[dict]) -> None:
++    """Write the combined results to _test_results.json and print a summary."""
++    out = {"checks": results}
++    results_path = WORKSPACE / RESULTS_FILE
++    try:
++        results_path.write_text(json.dumps(out))
++    except OSError:
++        pass
++    failed = [r for r in results if r["status"] == "failed"]
++    for r in results:
++        status = "✓" if r["status"] == "passed" else "✗"
++        print(f"  {status} {r['check']}: {r.get('message', '')}")
++    print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")
++    if failed:
++        import sys
++        sys.exit(1)
++
++
++# --- helpers ---------------------------------------------------------------
++
++def os_walk(root: Path):
++    """os.walk that tolerates permission errors."""
++    import os
++    for dirpath, dirnames, filenames in os.walk(root):
++        yield dirpath, dirnames, filenames
++
++
++def _glob_exists(pattern: str) -> bool:
++    """True if any file matches the glob pattern under WORKSPACE."""
++    try:
++        return any(WORKSPACE.glob(pattern))
++    except Exception:
++        return False
+--- a/src/ArticleTitle.tsx
++++ b/src/ArticleTitle.tsx
+@@ -1,6 +1,12 @@
+-import { View } from '@tarojs/components';
++import { Text, View } from '@tarojs/components';
+ import './article-title.less';
+ 
+ export function ArticleTitle() {
+-  return <View className="article-title">特别长的车辆标题需要在一行内展示</View>;
++  return (
++    <View className="article-title">
++      <Text className="article-title__text" numberOfLines={1}>
++        特别长的车辆标题需要在一行内展示
++      </Text>
++    </View>
++  );
+ }
+--- a/src/article-title.less
++++ b/src/article-title.less
+@@ -1,7 +1,5 @@
+-.article-title {
++.article-title__text {
+   overflow: hidden;
+-  text-overflow: ellipsis;
+-  white-space: nowrap;
+   color: #222222;
+   font-size: 28px;
+   line-height: 40px;

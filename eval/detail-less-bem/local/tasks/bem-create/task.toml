@@ -1,0 +1,29 @@
+[metadata]
+name = "bem-create"
+description = "Create public Less BEM styling for title, price, and a co-mounted disabled state."
+difficulty = "easy"
+category = "generic"
+tags = ["less", "bem", "taro", "detail-less-bem"]
+default_treatments = ["CONTROL", "DETAIL_LESS_BEM"]
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+instruction_variants = ["bem-create-a", "bem-create-b", "bem-create-c"]
+
+[environment]
+description = "Taro TSX and public Less fixture using Node 20.18.0, Python 3.11.9, and Stylelint 16.10.0."
+dockerfile = "environment/Dockerfile"
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+timeout_sec = 600
+
+[validation]
+test_scripts = ["test_bem_create.py"]
+target_artifacts = ["src/vehicle-summary.tsx", "src/vehicle-summary.less"]
+timeout = 120
+
+[evaluation]
+profile = "detail-less-bem"
+required_skills = ["detail-less-bem"]
+expected_artifacts = ["src/vehicle-summary.tsx", "src/vehicle-summary.less"]
+require_skill_invocation = true
+
+[interaction]
+mode = "none"

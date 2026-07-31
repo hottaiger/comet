@@ -1,0 +1,16 @@
+name = "DETAIL_LESS_BEM"
+description = "Inject the detail-less-bem skill from its local source package."
+
+[[skills]]
+name = "detail-less-bem"
+source = "path"
+path = "/Users/zhangshuo12/.agents/skills/detail-less-bem"
+integrity = ["SKILL.md", "references", "scripts", "tests"]
+
+[execution]
+model = "MiniMax-M3"
+system_prompt = "Complete the assigned task in the provided workspace. Do not use external services."
+repository_snapshot = "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371"
+container_image = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+timeout_sec = 600
+tool_permissions = ["filesystem-write", "shell"]

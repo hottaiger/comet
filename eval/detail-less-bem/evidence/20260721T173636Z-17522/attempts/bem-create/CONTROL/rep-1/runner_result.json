@@ -1,0 +1,24 @@
+{
+  "passed": [
+    "[HARD] target_artifacts: passed",
+    "[RUBRIC] bem_readability: 0.00 - hard-check proxy 1/4 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 0.00 - hard-check proxy 1/4 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 0.00 - hard-check proxy 1/4 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 0.00"
+  ],
+  "failed": [
+    "Test execution error (test_bem_create.py): No JSON output. success=False, output=",
+    "[HARD] check_public_less_exit_code: no completion evidence",
+    "[HARD] stylelint_exit_code: no completion evidence",
+    "[HARD] build_exit_code: no completion evidence"
+  ],
+  "returncode": 1,
+  "task_variant": "bem-create-a",
+  "rep": 1,
+  "execution": {
+    "model": "claude-sonnet-4-20250514",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}

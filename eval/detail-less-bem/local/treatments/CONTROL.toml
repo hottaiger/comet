@@ -1,0 +1,11 @@
+name = "CONTROL"
+description = "No skills baseline for the detail Less BEM benchmark."
+skills = []
+
+[execution]
+model = "MiniMax-M3"
+system_prompt = "Complete the assigned task in the provided workspace. Do not use external services."
+repository_snapshot = "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371"
+container_image = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+timeout_sec = 600
+tool_permissions = ["filesystem-write", "shell"]

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "attempt_id": "equal-width-row__CONTROL__rep-3",
+  "task": "equal-width-row",
+  "treatment": "CONTROL",
+  "rep": 3,
+  "variant": "repair",
+  "status": "excluded",
+  "hard_pass": null,
+  "failed_rules": [
+    "Test execution error (test_equal_width_row.py)",
+    "check_public_less_exit_code",
+    "stylelint_exit_code",
+    "build_exit_code"
+  ],
+  "soft_score": null,
+  "started_at": "2026-07-21T17:50:16.642823+00:00",
+  "completed_at": "2026-07-21T17:50:22.763919+00:00",
+  "duration_seconds": 6.121,
+  "exit_code": 1,
+  "command": [
+    "/Users/zhangshuo12/Documents/my-project/comet/eval/.venv/bin/pytest",
+    "local/tests/tasks/test_tasks.py",
+    "--task=equal-width-row",
+    "--treatment=CONTROL",
+    "--count=1",
+    "--interaction-mode=none",
+    "-rs",
+    "-q"
+  ],
+  "execution": {
+    "model": "MiniMax-M3",
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+    "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+    "timeout_sec": 600,
+    "tool_permissions": [
+      "filesystem-write",
+      "shell"
+    ]
+  },
+  "paths": {
+    "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/stdout.log",
+    "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/stderr.log",
+    "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/pytest.log",
+    "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/diff.patch",
+    "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/agent_trajectory.jsonl",
+    "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/_test_results.json",
+    "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/runner_result.json",
+    "raw_logs": [
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/stdout.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/stderr.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T174855Z-52768/attempts/equal-width-row/CONTROL/rep-3/pytest.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/artifacts/equal-width-row-control-r3_rep1/claude/comet_checks.py",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/artifacts/equal-width-row-control-r3_rep1/claude/scripts/check-public-less.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/artifacts/equal-width-row-control-r3_rep1/claude/src/EqualWidthRow.tsx",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/artifacts/equal-width-row-control-r3_rep1/claude/src/equal-width-row.less",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/artifacts/equal-width-row-control-r3_rep1/execution/comet_checks_error.txt",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/events/equal_width_row_CONTROL_r3_rep1.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/metadata.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/raw/equal_width_row_CONTROL_r3_rep1_stderr.txt",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/raw/equal_width_row_CONTROL_r3_rep1_stdout.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/reports/equal_width_row_CONTROL_r3_rep1_report.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_015016/summary.md"
+    ]
+  },
+  "sample_quality": {
+    "status": "excluded",
+    "reason_code": "network_failure",
+    "reason": "Network failure interrupted evaluation",
+    "include_in_analysis": false,
+    "confidence": "high",
+    "evidence": [
+      "#0 building with \"desktop-linux\" instance using docker driver\n\n#1 [internal] load build definition from Dockerfile\n#1 transferring dockerfile: 711B done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for d"
+    ]
+  },
+  "exclusion_reason": "network_failure"
+}

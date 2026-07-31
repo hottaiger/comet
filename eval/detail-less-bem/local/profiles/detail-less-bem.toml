@@ -1,0 +1,40 @@
+name = "detail-less-bem"
+description = "Hard validation and qualitative scoring for detail Less BEM tasks."
+
+[hard_checks]
+target_artifacts = ["src/**/*.tsx", "src/**/*.less"]
+check_public_less_exit_code = 0
+stylelint_exit_code = 0
+
+[[rubric]]
+name = "bem_readability"
+description = "BEM names and modifier relationships are clear and readable."
+min_score = 0
+max_score = 2
+
+[rubric.levels]
+"0" = "BEM structure is invalid or difficult to follow."
+"1" = "BEM structure is mostly readable with minor ambiguity."
+"2" = "BEM structure is consistent, explicit, and easy to follow."
+
+[[rubric]]
+name = "jsx_less_alignment"
+description = "JSX class usage and Less selectors describe the same component structure."
+min_score = 0
+max_score = 2
+
+[rubric.levels]
+"0" = "JSX classes and Less selectors conflict or leave required styles disconnected."
+"1" = "JSX and Less mostly align with small naming or modifier inconsistencies."
+"2" = "JSX classes and Less selectors align completely, including modifiers."
+
+[[rubric]]
+name = "layout_reasonableness"
+description = "The resulting layout preserves the requested hierarchy, spacing, and behavior."
+min_score = 0
+max_score = 2
+
+[rubric.levels]
+"0" = "Layout is broken or materially contradicts the requested behavior."
+"1" = "Layout is usable but has minor hierarchy or spacing issues."
+"2" = "Layout is coherent and fully matches the requested behavior."

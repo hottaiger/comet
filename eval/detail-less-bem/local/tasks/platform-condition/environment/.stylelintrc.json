@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "block-no-empty": true,
+    "color-no-invalid-hex": true,
+    "declaration-block-no-duplicate-properties": true,
+    "property-no-unknown": true,
+    "selector-class-pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$",
+    "selector-max-id": 0,
+    "selector-max-type": 0
+  }
+}

@@ -1,0 +1,813 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -0,0 +1 @@
++Complete the assigned task in the provided workspace. Do not use external services.--- a/_eval_target_skills/detail-less-bem/SKILL.md
++++ b/_eval_target_skills/detail-less-bem/SKILL.md
+@@ -0,0 +1,173 @@
++---
++name: detail-less-bem
++description: Use when 在 detail-taro3 创建、修改或评审经 Taro 转换到微信小程序、H5、RN 的公共 Less、BEM、选择器或布局。
++---
++
++# Taro 三端公共 Less
++
++适用经 Taro 公共 Less 转换链服务微信小程序、H5、RN 的样式。目标是稳定生成三端可用代码。
++
++项目三端实测 > 项目构建与适配层文档 > Taro 文档 > 原生 RN 文档。
++
++## AI 执行顺序
++
++1. 读取关联 JSX/TSX、Less 与相邻模块，确认样式走公共转换链。
++2. 允许仅修改关联 JSX/TSX：补 Text、`numberOfLines`、BEM modifier。
++3. 每个需要公共样式的元素使用一个主 BEM 类；可同时挂测试、埋点或功能类。modifier 必须与基础类同挂，互斥 modifier 不可同挂。
++4. 只写顶层单选择器；非常用或不确定属性先查 [references/platform-style-compat.md](references/platform-style-compat.md)。
++5. 同一任务可多次调用本 Skill；全部关联改动完成后，基于最终 diff 统一验证一次。
++
++## 硬性禁止
++
++公共 `.less` 中不得使用：
++
++- `gap`、`row-gap`、`column-gap`。固定间距改用子元素 `margin`。
++- Less 嵌套，包括 `.parent { .child {} }`、`&--modifier`、`&__element`。
++- 展开后含空格或 `>` 的多段选择器，包括 `.parent .child`、`.parent > .child`、`&__ancestor &__descendant`。
++- 标签、ID、属性、伪类、伪元素选择器，如 `div`、`#id`、`[type="text"]`、`:hover`、`:first-child`、`:not()`、`::after`。
++- `float`。
++- 公共 Less 中的 `filter`、`backdrop-filter`、CSS 渐变、`background-image`。
++- 布局与单位：`position: fixed` / `sticky`、`calc()`、CSS 变量 `var()`、`vh` / `vw` / `em` / `rem`。
++- 视觉：`box-shadow`、`background` 简写、`outline`、`visibility: hidden`、`transition` / `animation` / `@keyframes`。
++- 文本：`text-overflow`、`white-space`、`word-break`、所有非 px 数值的 `line-height`。公共 `line-height` 必须写为 `24px`，禁止 `1.5`、`normal`、百分比与相对单位。
++- `border-style: none`。
++- `translateZ(0)` 等非常用 transform。
++- 将 `rpx` 作为 RN 公共样式的默认单位。
++
++条件编译只豁免属性兼容性，选择器与 BEM 规则仍全局生效。仅支持小写 `#ifdef`、`#ifndef`、`#endif`；单项差异用条件编译，多组样式或结构差异用端专属 Less 文件。逐属性支持情况见 [references/platform-style-compat.md](references/platform-style-compat.md)。
++
++## 必须遵守
++
++### BEM
++
++- 使用 `.block__element--modifier`，多单词使用 kebab-case。
++- 禁止双 `__`：将 `menu__item__link` 改为 `menu__link` 或独立 block。
++- modifier 必须与基础类同挂：
++
++```tsx
++<View className="vehicle-card__item vehicle-card__item--last" />
++```
++
++### 选择器与 Less
++
++- 每条规则必须是顶层单选择器。
++- 不依赖 DOM 层级表达状态；将状态编码到当前元素的 modifier 类。
++
++```less
++.vehicle-card {
++}
++
++.vehicle-card__title {
++}
++
++.vehicle-card--compact {
++}
++```
++
++### 文本
++
++1. 不得依赖 `View → Text` 的样式继承；最终渲染的 Text 必须显式获得样式，或来自受控统一 Text 组件。
++2. 所有文案必须包 `<Text>`，不得裸文本直接放 `View` 内。
++3. 截断与换行控制用 `Text` 的 `numberOfLines`，不用 `text-overflow` / `white-space`。
++
++### 布局与属性
++
++- 横向 flex 必须同时声明 `display: flex` 和 `flex-direction: row`。
++- `width: 100%` 与横向 padding 同用时必须声明 `box-sizing: border-box`。
++- `z-index` 仅对同一父级下的兄弟节点生效且需配合定位；优先调整 JSX 渲染顺序表达层级。
++- 子元素不得溢出父容器边界做视觉设计（RN Android `overflow: visible` 不生效）。
++- 隐藏边框使用 `border-width: 0` 或 `border-color: transparent`。
++- `border-style` 仅使用 `solid`、`dotted`、`dashed`。
++- 重要图片使用 Image 组件。
++- 渐变使用 `LinearGradient` 组件。
++
++## 固定间距替代 `gap`
++
++优先把间距放在重复子元素上，最后一项通过 modifier 清零。禁止用 `:last-child`。
++
++```less
++.vehicle-list {
++  display: flex;
++  flex-direction: column;
++}
++
++.vehicle-list__item {
++  margin-bottom: 12px;
++}
++
++.vehicle-list__item--last {
++  margin-bottom: 0;
++}
++```
++
++```tsx
++{list.map((item, index) => (
++  <View
++    key={item.id}
++    className={`vehicle-list__item${
++      index === list.length - 1 ? ' vehicle-list__item--last' : ''
++    }`}
++  />
++))}
++```
++
++横向列表使用 `margin-right` 与 `--last`。内部留白使用父元素 `padding`。仅在表达“分配剩余空间”时使用 `justify-content: space-between`，不得把它当作固定 `gap` 替代。
++
++## AI 决策表
++
++| 需求 | 使用 | 禁止 |
++|---|---|---|
++| 固定兄弟间距 | 子元素 margin + `--last` | `gap`、伪类 |
++| 元素内部留白 | padding | 空 spacer 文本 |
++| 元素状态 | 基础类 + modifier | 后代选择器 |
++| 横向排列 | flex + `flex-direction: row` | 依赖 RN 默认方向 |
++| 文本颜色/字号 | 直接挂 `Text` 的类 | 写在父 `View` 靠继承 |
++| 单行截断省略 | `Text` 的 `numberOfLines={1}` | `text-overflow`、`white-space` |
++| 吸顶/悬浮元素 | 页面级 `absolute` 或端能力 | `position: fixed` / `sticky` |
++| 阴影 | 分端 `elevation` / `shadow-*` 或设计降级 | 公共样式 `box-shadow` |
++| 动效 | RN `Animated` / 分端方案 | CSS `transition` / `animation` |
++| 动态尺寸计算 | flex 分配或 JS 计算 | `calc()` |
++| 渐变 | `LinearGradient` | CSS gradient |
++| 重要图片 | Image 组件 | `background-image` |
++| 隐藏边框 | `border-width: 0` | `border-style: none` |
++
++## 参考目录
++
++命中场景或拿不准属性时再读取对应文件，不要把内容写回本文件：
++
++| 参考 | 何时读 |
++|---|---|
++| [references/platform-style-compat.md](references/platform-style-compat.md) | 属性级兼容速查：使用任何非常用属性前、评审样式 diff 时 |
++| [references/entry-row-cards.md](references/entry-row-cards.md) | 同排等宽布局：同排、等宽、等高或缺席回退时 |
++
++新增场景配方时：在 `references/` 加一个文件，此表加一行。
++
++## 验证
++
++运行：
++
++```bash
++node .agents/skills/detail-less-bem/scripts/check-public-less.mjs [本次修改的-less-文件]
++git diff --check
++npx stylelint path/to/index.less
++```
++
++不传文件时，校验脚本检查当前 Git diff 中新增或修改的 `.less`。脚本检查 Less、BEM、条件编译与禁用属性；Text、`numberOfLines`、modifier 同挂由人工检查。
++
++普通颜色或类名调整：校验脚本、`git diff --check`、定向 stylelint。公共 Less 属性、布局或单位变更：补受影响端构建。尺寸、间距、横竖排、文本截断、层叠、渐变或图片变更：补三端页面视觉验证。兼容表修改：构建微信小程序、H5、RN，并三端页面验证。
++
++校验失败后必须修复并重复执行；无法修复时报告文件、行号、规则与阻塞原因。
++
++## 输出前自检
++
++- [ ] 不含 `gap`、`row-gap`、`column-gap`
++- [ ] 不含 Less 嵌套、`&` 拼接、后代或子代选择器
++- [ ] 不含 `:not()` 及任何伪类
++- [ ] 所有类名符合 BEM，modifier 与基础类同挂
++- [ ] 横向 flex 显式声明 `flex-direction: row`
++- [ ] 文案均包 `Text`，最终 Text 显式获得样式，截断用 `numberOfLines`
++- [ ] 不含 `fixed` / `sticky`、`calc()`、`var()`、`vh` / `vw`、`box-shadow`、`transition` / `animation`
++- [ ] 无 RN 不支持的滤镜、CSS 渐变、背景图或边框写法
++- [ ] `width: 100%` + padding 已补 `box-sizing: border-box`
++- [ ] 拿不准的属性已对照 `references/platform-style-compat.md` 确认
++- [ ] 已运行校验脚本、`git diff --check` 和定向 stylelint
+--- a/_eval_target_skills/detail-less-bem/agents/openai.yaml
++++ b/_eval_target_skills/detail-less-bem/agents/openai.yaml
+@@ -0,0 +1,4 @@
++interface:
++  display_name: "detail Less BEM"
++  short_description: "detail-taro3 三端 Less 与 BEM 硬约束"
++  default_prompt: "Use $detail-less-bem to create or review detail-taro3 multi-platform Less without gap, nested selectors, or RN-incompatible styles."
+--- a/_eval_target_skills/detail-less-bem/references/entry-row-cards.md
++++ b/_eval_target_skills/detail-less-bem/references/entry-row-cards.md
+@@ -0,0 +1,63 @@
++# 同排等宽布局参考
++
++## 适用条件
++
++同一行放 N 个（常见 2 个）等宽等高的入口卡片；任一卡片可因业务条件缺席，缺席时剩余入口回退为整行形态（横条或独占卡）。典型实例：详情页金融入口 + 置换入口同排。
++
++同一 block 因此存在**互斥形态**（如整行横条 `--bar` 与同排卡片 `--entry-card`），形态由 JSX 分支决定，每种形态都有自己的正向 modifier。
++
++## JSX 结构
++
++```tsx
++<View className="block__entry-row">
++  <View className={`block${isPaired ? ' block--entry-card' : ' block--bar'}`} />
++</View>
++```
++
++## Less
++
++```less
++/* 行容器：只管方向与对齐，不管间距 */
++.block__entry-row {
++  width: 100%;
++  display: flex;
++  flex-direction: row;
++  align-items: stretch;
++}
++
++/* 卡片形态：等分 + 宽度下限 + 固定高 */
++.block--entry-card {
++  flex: 1;
++  min-width: 187px;
++  height: 112px;
++  margin-right: 16px; /* 末位卡片不加间距 */
++  overflow: hidden;
++  box-sizing: border-box;
++}
++
++/* 整行形态：与卡片形态互斥，显式命名 */
++.block--bar {
++  height: 48px;
++}
++```
++
++```
++
++## 缺席回退
++
++卡片缺席时由 JSX 选择 `block--bar`，不使用 `:not()` 或后代选择器表达回退状态。
++
++## 三端注意事项
++
++按布局意图查表选路由；「禁止路由」列的写法 H5 常能跑，RN 静默失效。
++
++| 布局意图 | 三端兼容路由 | 禁止路由 |
++|---|---|---|
++| 两卡同排等宽 | 行容器 flex row + **每卡** `flex: 1` + `min-width` | 只写行容器，依赖卡片默认宽度（RN 下各自占满整行） |
++| 卡片间距 | 首卡 `margin-right`，多卡用每卡 margin + `--last` 清零 | `gap`；`space-between` 当固定间距用 |
++| 同 block 互斥形态 | 每种形态一个正向 modifier，JSX 分支显式同挂 | `:not(.--x)` 表达「非某形态」；默认类 + 形态类覆盖 |
++| 子元素随形态变化 | 子元素自身挂 `--modifier`（如 `__icon--entry-card`） | 后代选择器 `.block--x .block__icon` |
++| 同排卡片等高 | 行容器 `align-items: stretch` + 卡片显式 `height` | 依赖内容撑高（各端字体/行高差异导致不齐） |
++| 卡片渐变背景 | `LinearGradient` 组件包裹内容 | CSS `linear-gradient` |
++| 三方组件尺寸（如 `AtIcon` 的 `fontSize`） | 内联 `style` + px 转换函数 | Less 选择器试图命中三方组件内部节点 |
++| 内联 `style` 迁 Less（CSS 化） | 顶层 BEM + modifier 承接原条件逻辑 | 把条件逻辑翻译成 `:not()` / 后代选择器 |
+--- a/_eval_target_skills/detail-less-bem/references/platform-style-compat.md
++++ b/_eval_target_skills/detail-less-bem/references/platform-style-compat.md
+@@ -0,0 +1,33 @@
++# Taro 三端公共样式兼容表
++
++验证环境：以当前项目 Taro 编译链和微信小程序、H5、RN 实测为准。
++
++裁决优先级：项目三端实测 > 项目构建与适配层文档 > Taro 文档 > 原生 RN 文档。
++
++| 规则 | 三端路由 |
++|---|---|
++| 固定兄弟间距 | 子元素 margin + `--last` 清零 |
++| 横向排列 | `display: flex` + `flex-direction: row` |
++| `width: 100%` + 横向 padding | 显式 `box-sizing: border-box` |
++| 文本样式 | 最终 Text 显式获得样式，或来自统一 Text 封装 |
++| `line-height` | 仅使用 px 数值，例如 `24px` |
++| 单行/多行截断 | Text `numberOfLines` |
++| 吸顶/悬浮 | 页面级 `absolute` 或端能力 |
++| 阴影 | 端专属能力或设计降级 |
++| 渐变 | `LinearGradient` |
++| 重要图片 | Image 组件 |
++| 动态尺寸 | flex 分配或 JS 计算 |
++
++公共 Less 禁止 `gap`、组合选择器、伪类、嵌套、`&` 拼接和所有主 Skill 列出的禁用属性。端专属属性仅可写在端专属文件、`TARO_ENV` 分支或 `#ifdef` / `#ifndef` 条件编译块中。
++
++条件编译仅支持小写 `rn`、`h5`、`weapp`：
++
++```less
++/* #ifndef rn */
++.vehicle-card__shadow {
++  box-shadow: 0 2px 4px #000;
++}
++/* #endif */
++```
++
++可用空格指定多个平台，例如 `/* #ifdef h5 weapp */`。不使用 `#if` 或 `#else`。
+--- a/_eval_target_skills/detail-less-bem/scripts/check-public-less.mjs
++++ b/_eval_target_skills/detail-less-bem/scripts/check-public-less.mjs
+@@ -0,0 +1,201 @@
++#!/usr/bin/env node
++
++import { execFileSync } from 'node:child_process';
++import { existsSync, readFileSync } from 'node:fs';
++import path from 'node:path';
++import process from 'node:process';
++
++const PLATFORMS = new Set(['rn', 'h5', 'weapp']);
++const FORBIDDEN_PROPERTIES = new Set([
++  'gap',
++  'row-gap',
++  'column-gap',
++  'float',
++  'filter',
++  'backdrop-filter',
++  'background-image',
++  'background',
++  'outline',
++  'visibility',
++  'transition',
++  'animation',
++  'text-overflow',
++  'white-space',
++  'word-break',
++]);
++const BEM_SELECTOR = /^\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;
++
++function parseCondition(line, lineNumber) {
++  const match = line.match(/^\s*\/\*\s*#(ifdef|ifndef)\s+([^*]+?)\s*\*\/\s*$/);
++  if (!match) return null;
++
++  const platforms = match[2].trim().split(/\s+/);
++  const invalidPlatform = platforms.find((platform) => !PLATFORMS.has(platform));
++  if (invalidPlatform) {
++    return {
++      issue: {
++        file: '',
++        line: lineNumber,
++        rule: 'platform-condition',
++        message: `条件编译平台必须使用小写 rn、h5、weapp，当前为 ${invalidPlatform}`,
++      },
++    };
++  }
++  return { type: match[1], platforms };
++}
++
++function getIncludedPlatforms(conditionStack) {
++  let included = new Set(PLATFORMS);
++  for (const condition of conditionStack) {
++    if (condition.type === 'ifdef') {
++      included = new Set([...included].filter((platform) => condition.platforms.includes(platform)));
++    } else {
++      included = new Set([...included].filter((platform) => !condition.platforms.includes(platform)));
++    }
++  }
++  return included;
++}
++
++function createIssue(file, line, rule, message) {
++  return { file, line, rule, message };
++}
++
++function isForbiddenDeclaration(property, value) {
++  if (FORBIDDEN_PROPERTIES.has(property)) return true;
++  if (property === 'position' && /\b(?:fixed|sticky)\b/.test(value)) return true;
++  if (property === 'border-style' && /\bnone\b/.test(value)) return true;
++  if (property === 'transform' && /translateZ\s*\(/i.test(value)) return true;
++  if (property === 'line-height' && !/^-?\d+(?:\.\d+)?px$/i.test(value)) return true;
++  if (/\b(?:calc|var)\s*\(/.test(value)) return true;
++  if (/\b\d+(?:\.\d+)?(?:vh|vw|em|rem|rpx)\b/.test(value)) return true;
++  return false;
++}
++
++export function validateLess(source, file = '<input>') {
++  const issues = [];
++  const conditionStack = [];
++  const ruleStack = [];
++  const lines = source.split(/\r?\n/);
++
++  for (let index = 0; index < lines.length; index += 1) {
++    const lineNumber = index + 1;
++    const line = lines[index];
++    const trimmed = line.trim();
++
++    const condition = parseCondition(line, lineNumber);
++    if (condition) {
++      if (condition.issue) {
++        issues.push({ ...condition.issue, file });
++      } else {
++        conditionStack.push(condition);
++      }
++      continue;
++    }
++    if (/^\s*\/\*\s*#endif\s*\*\/\s*$/.test(line)) {
++      if (!conditionStack.pop()) {
++        issues.push(createIssue(file, lineNumber, 'platform-condition', '#endif 没有匹配的条件编译开始标记'));
++      }
++      continue;
++    }
++    if (/^\s*\/\*\s*#(?:if|else)\b/.test(line)) {
++      issues.push(createIssue(file, lineNumber, 'platform-condition', 'Less 条件编译仅支持 #ifdef、#ifndef、#endif'));
++      continue;
++    }
++    if (/^@keyframes\b/.test(trimmed)) {
++      issues.push(createIssue(file, lineNumber, 'forbidden-property', '@keyframes 不可用于公共 Less'));
++      continue;
++    }
++
++    const selectorMatch = trimmed.match(/^(.+?)\s*\{\s*$/);
++    if (selectorMatch) {
++      const selector = selectorMatch[1].trim();
++      if (ruleStack.length > 0 || !BEM_SELECTOR.test(selector)) {
++        issues.push(
++          createIssue(
++            file,
++            lineNumber,
++            ruleStack.length > 0 ? 'top-level-single-selector' : 'bem-selector',
++            `只允许顶层单个 BEM 类选择器，当前为 ${selector}`,
++          ),
++        );
++      }
++      ruleStack.push({ line: lineNumber, selector, declarations: [], includesRn: getIncludedPlatforms(conditionStack).has('rn') });
++      continue;
++    }
++
++    const declaration = trimmed.match(/^([a-z-]+)\s*:\s*([^;]+);?\s*$/i);
++    if (declaration && ruleStack.length > 0) {
++      const property = declaration[1].toLowerCase();
++      const value = declaration[2].trim();
++      const rule = ruleStack.at(-1);
++      rule.declarations.push({ property, value, line: lineNumber });
++
++      const includesRn = getIncludedPlatforms(conditionStack).has('rn');
++      if (includesRn && property === 'line-height' && !/^-?\d+(?:\.\d+)?px$/i.test(value)) {
++        issues.push(createIssue(file, lineNumber, 'line-height-px', '公共 Less 的 line-height 必须使用 px 数值'));
++      } else if (includesRn && isForbiddenDeclaration(property, value)) {
++        issues.push(createIssue(file, lineNumber, 'forbidden-property', `${property}: ${value} 不可用于三端公共 Less`));
++      }
++      continue;
++    }
++
++    if (trimmed === '}') {
++      const rule = ruleStack.pop();
++      if (!rule) {
++        issues.push(createIssue(file, lineNumber, 'syntax', '存在未匹配的 }'));
++        continue;
++      }
++      if (rule.declarations.length === 0) {
++        issues.push(createIssue(file, rule.line, 'empty-rule', `${rule.selector} 为空规则`));
++      }
++      const properties = new Map(rule.declarations.map((declaration) => [declaration.property, declaration.value]));
++      const hasHorizontalPadding = ['padding', 'padding-left', 'padding-right', 'padding-inline', 'padding-inline-start', 'padding-inline-end'].some((property) => properties.has(property));
++      if (rule.includesRn && properties.get('width') === '100%' && hasHorizontalPadding && properties.get('box-sizing') !== 'border-box') {
++        issues.push(createIssue(file, rule.line, 'width-padding-box-sizing', 'width: 100% 与横向 padding 同用时必须声明 box-sizing: border-box'));
++      }
++    }
++  }
++
++  for (const rule of ruleStack) {
++    issues.push(createIssue(file, rule.line, 'syntax', `${rule.selector} 缺少结束 }`));
++  }
++  if (conditionStack.length > 0) {
++    issues.push(createIssue(file, lines.length, 'platform-condition', '条件编译块缺少 #endif'));
++  }
++  return issues;
++}
++
++function changedLessFiles() {
++  try {
++    return execFileSync('git', ['diff', '--name-only', '--diff-filter=ACMR', '--', '*.less'], { encoding: 'utf8' })
++      .split(/\r?\n/)
++      .filter(Boolean);
++  } catch {
++    return [];
++  }
++}
++
++function main() {
++  const files = process.argv.slice(2);
++  const targets = files.length > 0 ? files : changedLessFiles();
++  if (targets.length === 0) {
++    console.log('未发现本次修改的 Less 文件。');
++    return;
++  }
++
++  const issues = targets.flatMap((file) => {
++    if (!existsSync(file)) return [createIssue(file, 0, 'file', '文件不存在')];
++    return validateLess(readFileSync(file, 'utf8'), path.normalize(file));
++  });
++  if (issues.length === 0) {
++    console.log(`PASS ${targets.length} 个 Less 文件`);
++    return;
++  }
++
++  for (const issue of issues) {
++    console.error(`${issue.file}:${issue.line} [${issue.rule}] ${issue.message}`);
++  }
++  process.exitCode = 1;
++}
++
++if (import.meta.url === `file://${process.argv[1]}`) main();
+--- a/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs
++++ b/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs
+@@ -0,0 +1,125 @@
++import assert from 'node:assert/strict';
++import test from 'node:test';
++
++import { validateLess } from '../scripts/check-public-less.mjs';
++
++const validate = (source) => validateLess(source, 'fixture.less');
++
++test('accepts a top-level BEM selector and a compliant layout rule', () => {
++  assert.deepEqual(
++    validate(`
++.vehicle-card__title--compact {
++  width: 100%;
++  padding-left: 12px;
++  padding-right: 12px;
++  box-sizing: border-box;
++}
++`),
++    [],
++  );
++});
++
++test('rejects forbidden public properties', () => {
++  const issues = validate(`
++.vehicle-card {
++  gap: 12px;
++}
++`);
++
++  assert.equal(issues.length, 1);
++  assert.match(issues[0].message, /gap/);
++  assert.equal(issues[0].line, 3);
++});
++
++test('rejects nested and compound selectors', () => {
++  const issues = validate(`
++.vehicle-card {
++  .vehicle-card__title {
++    color: #111;
++  }
++}
++`);
++
++  assert.ok(issues.some((issue) => issue.rule === 'top-level-single-selector'));
++});
++
++test('rejects pseudo selectors, non-BEM selectors, and empty rules', () => {
++  const issues = validate(`
++.vehicle-card:hover {
++  color: #111;
++}
++
++.vehicle-card__title__label {
++  color: #111;
++}
++
++.vehicle-card__empty {
++}
++`);
++
++  assert.ok(issues.some((issue) => issue.rule === 'bem-selector'));
++  assert.ok(issues.some((issue) => issue.rule === 'bem-selector'));
++  assert.ok(issues.some((issue) => issue.rule === 'empty-rule'));
++});
++
++test('allows a non-RN property inside a lowercase #ifndef rn block', () => {
++  assert.deepEqual(
++    validate(`
++.vehicle-card {
++  /* #ifndef rn */
++  box-shadow: 0 2px 4px #000;
++  /* #endif */
++}
++`),
++    [],
++  );
++});
++
++test('allows multi-platform style conditions and rejects uppercase platform names', () => {
++  const valid = validate(`
++.vehicle-card {
++  /* #ifdef h5 weapp */
++  position: fixed;
++  /* #endif */
++}
++`);
++  const invalid = validate(`
++.vehicle-card {
++  /* #ifdef RN */
++  color: #111;
++  /* #endif */
++}
++`);
++
++  assert.deepEqual(valid, []);
++  assert.ok(invalid.some((issue) => issue.rule === 'platform-condition'));
++});
++
++test('requires border-box for width 100 percent with horizontal padding', () => {
++  const issues = validate(`
++.vehicle-card {
++  width: 100%;
++  padding-left: 12px;
++}
++`);
++
++  assert.ok(issues.some((issue) => issue.rule === 'width-padding-box-sizing'));
++});
++
++test('requires a px value for public line-height', () => {
++  const issues = validate(`
++.vehicle-card__title {
++  line-height: 1.5;
++}
++
++.vehicle-card__subtitle {
++  line-height: normal;
++}
++
++.vehicle-card__caption {
++  line-height: 120%;
++}
++`);
++
++  assert.equal(issues.filter((issue) => issue.rule === 'line-height-px').length, 3);
++});
+--- a/_test_context.json
++++ b/_test_context.json
+@@ -0,0 +1 @@
++{"run_id": "26c3396b-6465-4ac2-8f9b-0b73878773ed", "treatment_name": "DETAIL_LESS_BEM", "events": {"tool_calls": [], "files_read": [], "files_created": [], "files_modified": [], "commands_run": [], "skills_invoked": [], "duration_seconds": null, "num_turns": null, "input_tokens": null, "output_tokens": null, "cache_read_input_tokens": null, "cache_creation_input_tokens": null, "total_tokens": null, "total_cost_usd": null, "model_usage": {}, "profile": "detail-less-bem", "skill_sources": [{"name": "detail-less-bem", "source_type": "path", "path": "/Users/zhangshuo12/.agents/skills/detail-less-bem", "hash": "sha256:6fd7d5169d4e9b1930619904e77577edf4c410f9894ebaecd5bc68fbf48362ef"}], "eval_manifest": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "business", "rep": 2, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}}, "profile": "detail-less-bem", "skill_sources": [{"name": "detail-less-bem", "source_type": "path", "path": "/Users/zhangshuo12/.agents/skills/detail-less-bem", "hash": "sha256:6fd7d5169d4e9b1930619904e77577edf4c410f9894ebaecd5bc68fbf48362ef"}], "eval_manifest": null, "required_skills": ["detail-less-bem"], "expected_artifacts": ["src/EqualWidthRow.tsx", "src/equal-width-row.less"], "require_skill_invocation": false, "rubric_criteria": [], "skill_package_path": "_eval_target_skills/detail-less-bem", "generated_node_skills": [], "route_conformance_task": null, "route_conformance_expected_node_order": [], "baseline_treatments": [], "quality_gates": {}, "required_output_schemas": [], "expected_evidence": [], "draft_hash": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "business", "rep": 2, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}, "target_artifacts": ["src/EqualWidthRow.tsx", "src/equal-width-row.less"]}--- a/comet_checks.py
++++ b/comet_checks.py
+@@ -0,0 +1,187 @@
++"""Shared comet-workflow validation checks for eval tasks.
++
++Each comet task validator imports :func:`run_comet_checks` to get the four
++generic checks (openspec artifacts, comet state, workflow phases, tests written)
++and appends its own task-specific checks. All checks run inside Docker and emit
++results via the standard ``_test_results.json`` protocol.
++
++A check is a dict ``{"check": <name>, "status": "passed"|"failed", "message": ...}``.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++WORKSPACE = Path("/workspace")
++RESULTS_FILE = "_test_results.json"
++
++
++def _passed(name: str, message: str = "") -> dict:
++    return {"check": name, "status": "passed", "message": message}
++
++
++def _failed(name: str, message: str) -> dict:
++    return {"check": name, "status": "failed", "message": message}
++
++
++def check_openspec_artifacts() -> dict:
++    """proposal.md + tasks.md exist in a change dir (active or archived)."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("openspec_artifacts", "openspec/changes/ directory not found")
++
++    candidates: list[Path] = []
++    for d in changes_dir.iterdir():
++        if not d.is_dir():
++            continue
++        if d.name == "archive":
++            candidates.extend(s for s in d.iterdir() if s.is_dir())
++        else:
++            candidates.append(d)
++
++    if not candidates:
++        return _failed("openspec_artifacts", "No change directories found")
++
++    for change_dir in candidates:
++        if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++            return _passed("openspec_artifacts", f"found in {change_dir.name}")
++
++    return _failed("openspec_artifacts", f"proposal.md/tasks.md not found together (checked {len(candidates)} dirs)")
++
++
++def check_comet_state() -> dict:
++    """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("comet_state", "openspec/changes/ not found")
++
++    # Search active + archived change dirs for .comet.yaml.
++    state_files: list[Path] = []
++    for root, _dirs, files in os_walk(changes_dir):
++        for f in files:
++            if f == ".comet.yaml":
++                state_files.append(Path(root) / f)
++
++    if not state_files:
++        archive_dir = changes_dir / "archive"
++        if archive_dir.exists():
++            for change_dir in archive_dir.iterdir():
++                if not change_dir.is_dir():
++                    continue
++                if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++                    return _passed("comet_state", "phase=archived")
++        return _failed("comet_state", "No .comet.yaml found under openspec/changes/")
++
++    # Read the first one and check it has a recognised phase.
++    try:
++        text = state_files[0].read_text(errors="ignore")
++    except OSError:
++        return _failed("comet_state", f"Cannot read {state_files[0]}")
++
++    m = re.search(r"^phase:\s*(\S+)", text, re.MULTILINE)
++    if not m:
++        return _failed("comet_state", "No 'phase:' field in .comet.yaml")
++    phase = m.group(1)
++    valid = {"open", "design", "build", "verify", "archive", "archived"}
++    if phase not in valid:
++        return _failed("comet_state", f"Unrecognised phase: {phase}")
++    return _passed("comet_state", f"phase={phase}")
++
++
++def check_workflow_phases() -> dict:
++    """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
++    evidence = 0
++    found: list[str] = []
++
++    # Phase 1 (open): proposal/tasks
++    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
++        evidence += 1; found.append("open")
++    # Phase 2 (design): design.md or docs/superpowers/specs/
++    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
++        evidence += 1; found.append("design")
++    # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
++    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
++        evidence += 1; found.append("build")
++    # Phase 4 (verify): verification report or docs/superpowers/reports/
++    if (
++        _glob_exists("openspec/changes/**/verification.md")
++        or _glob_exists("openspec/changes/**/verification-report.md")
++        or _glob_exists("docs/superpowers/reports/*.md")
++    ):
++        evidence += 1; found.append("verify")
++    # Phase 5 (archive): openspec/changes/archive/
++    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
++        evidence += 1; found.append("archive")
++
++    if evidence >= 4:
++        return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")
++    if evidence >= 2:
++        return _failed("workflow_phases", f"Only {evidence}/5 phases evidenced ({','.join(found)})")
++    return _failed("workflow_phases", f"Only {evidence}/5 phases ({','.join(found)})")
++
++
++def check_tests_written() -> dict:
++    """The agent wrote or extended tests (test_*.py with real assertions)."""
++    test_files = list(WORKSPACE.glob("test_*.py")) + list(WORKSPACE.glob("**/test_*.py"))
++    # Filter out the validator itself and scaffold copies.
++    test_files = [f for f in test_files if "scaffold" not in str(f) and "validation" not in str(f)]
++    has_assert = False
++    for tf in test_files:
++        try:
++            if "assert" in tf.read_text(errors="ignore").lower():
++                has_assert = True
++                break
++        except OSError:
++            continue
++    if has_assert:
++        return _passed("tests_written", f"{len(test_files)} test file(s) with assertions")
++    if test_files:
++        return _failed("tests_written", f"{len(test_files)} test file(s) but none with assertions")
++    return _failed("tests_written", "No test files written by the agent")
++
++
++def run_comet_checks() -> list[dict]:
++    """Run all four generic comet-workflow checks."""
++    return [
++        check_openspec_artifacts(),
++        check_comet_state(),
++        check_workflow_phases(),
++        check_tests_written(),
++    ]
++
++
++def write_results(results: list[dict]) -> None:
++    """Write the combined results to _test_results.json and print a summary."""
++    out = {"checks": results}
++    results_path = WORKSPACE / RESULTS_FILE
++    try:
++        results_path.write_text(json.dumps(out))
++    except OSError:
++        pass
++    failed = [r for r in results if r["status"] == "failed"]
++    for r in results:
++        status = "✓" if r["status"] == "passed" else "✗"
++        print(f"  {status} {r['check']}: {r.get('message', '')}")
++    print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")
++    if failed:
++        import sys
++        sys.exit(1)
++
++
++# --- helpers ---------------------------------------------------------------
++
++def os_walk(root: Path):
++    """os.walk that tolerates permission errors."""
++    import os
++    for dirpath, dirnames, filenames in os.walk(root):
++        yield dirpath, dirnames, filenames
++
++
++def _glob_exists(pattern: str) -> bool:
++    """True if any file matches the glob pattern under WORKSPACE."""
++    try:
++        return any(WORKSPACE.glob(pattern))
++    except Exception:
++        return False

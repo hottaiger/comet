@@ -1,0 +1,231 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -0,0 +1 @@
++Complete the assigned task in the provided workspace. Do not use external services.--- a/_test_context.json
++++ b/_test_context.json
+@@ -0,0 +1 @@
++{"run_id": "fb5a1626-e588-45f5-bc5a-ba81c12c1a5e", "treatment_name": "CONTROL", "events": {"tool_calls": [{"tool": "Bash", "input": {"command": "ls -la /workspace", "description": "List workspace contents"}, "output": "total 16\ndrwx------ 8  501 dialout  256 Jul 22 02:59 .\ndrwxr-xr-x 1 root root    4096 Jul 22 02:59 ..\ndrwxr-xr-x 3  501 dialout   96 Jul 22 02:59 .claude\n-rw-r--r-- 1  501 dialout  268 Jul 21 15:56 .stylelintrc.json\n-rw-r--r-- 1  501 dialout   83 Jul 22 02:59 CLAUDE.md\n-rw-r--r-- 1  501 dialout  896 Jul 22 02:31 Dockerfile\ndrwxr-xr-x 3  501 dialout   96 Jul 21 15:56 scripts\ndrwxr-xr-x 4  501 dialout  128 Jul 21 15:56 src"}, {"tool": "Bash", "input": {"command": "find /workspace/src -type f | head -50", "description": "Find all source files"}, "output": "/workspace/src/EntranceRow.tsx\n/workspace/src/entrance-row.less"}, {"tool": "Read", "input": {"file_path": "/workspace/src/EntranceRow.tsx"}, "output": "1\timport { Text, View } from '@tarojs/components';\n2\timport './entrance-row.less';\n3\t\n4\texport function EntranceRow() {\n5\t  return (\n6\t    <View className=\"entrance-row\">\n7\t      <View className=\"entrance-row__card\">\n8\t        <Text className=\"entrance-row__title\">\u91d1\u878d\u65b9\u6848</Text>\n9\t      </View>\n10\t      <View className=\"entrance-row__card\">\n11\t        <Text className=\"entrance-row__title\">\u7f6e\u6362\u670d\u52a1</Text>\n12\t      </View>\n13\t    </View>\n14\t  );\n15\t}\n16\t"}, {"tool": "Read", "input": {"file_path": "/workspace/src/entrance-row.less"}, "output": "1\t.entrance-row {\n2\t  display: flex;\n3\t  flex-direction: column;\n4\t}\n5\t\n6\t.entrance-row__card {\n7\t  width: 50%;\n8\t  height: 112px;\n9\t  margin-right: 16px;\n10\t}\n11\t\n12\t.entrance-row__title {\n13\t  color: #222222;\n14\t  font-size: 28px;\n15\t  line-height: 40px;\n16\t}\n17\t"}, {"tool": "Read", "input": {"file_path": "/workspace/.stylelintrc.json"}, "output": "1\t{\n2\t  \"rules\": {\n3\t    \"block-no-empty\": true,\n4\t    \"color-no-invalid-hex\": true,\n5\t    \"declaration-block-no-duplicate-properties\": true,\n6\t    \"selector-class-pattern\": \"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$\"\n7\t  }\n8\t}\n9\t"}, {"tool": "Read", "input": {"file_path": "/workspace/scripts"}, "output": "EISDIR: illegal operation on a directory, read '/workspace/scripts'"}, {"tool": "Bash", "input": {"command": "ls -la /workspace/scripts && find /workspace/scripts -type f", "description": "List scripts directory"}, "output": "total 4\ndrwxr-xr-x 3 501 dialout   96 Jul 21 15:56 .\ndrwx------ 8 501 dialout  256 Jul 22 02:59 ..\n-rw-r--r-- 1 501 dialout 2402 Jul 21 15:56 check-public-less.mjs\n/workspace/scripts/check-public-less.mjs"}, {"tool": "Read", "input": {"file_path": "/workspace/scripts/check-public-less.mjs"}, "output": "1\t#!/usr/bin/env node\n2\timport { readFileSync } from 'node:fs';\n3\timport process from 'node:process';\n4\t\n5\tconst forbidden = new Set(['gap', 'row-gap', 'column-gap', 'float', 'filter', 'backdrop-filter', 'background', 'background-image', 'box-shadow', 'outline', 'text-overflow', 'white-space', 'word-break', 'transition', 'animation']);\n6\tconst bem = /^\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$/;\n7\t\n8\tfunction issue(file, line, rule, message) {\n9\t  return `${file}:${line} [${rule}] ${message}`;\n10\t}\n11\t\n12\tfunction validate(file) {\n13\t  const errors = [];\n14\t  const lines = readFileSync(file, 'utf8').split(/\\r?\\n/);\n15\t  let depth = 0;\n16\t  for (let index = 0; index < lines.length; index += 1) {\n17\t    const line = lines[index].trim();\n18\t    const number = index + 1;\n19\t    const selector = line.match(/^(.+?)\\s*\\{$/);\n20\t    if (selector) {\n21\t      if (depth > 0) errors.push(issue(file, number, 'top-level-single-selector', '\u516c\u5171 Less \u4e0d\u5141\u8bb8\u5d4c\u5957\u89c4\u5219'));\n22\t      if (!bem.test(selector[1].trim())) errors.push(issue(file, number, 'bem-selector', '\u9009\u62e9\u5668\u5fc5\u987b\u662f\u5355\u4e2a BEM \u7c7b'));\n23\t      depth += 1;\n24\t      continue;\n25\t    }\n26\t    if (line === '}') {\n27\t      depth -= 1;\n28\t      if (depth < 0) errors.push(issue(file, number, 'syntax', '\u5b58\u5728\u672a\u5339\u914d\u7684 }'));\n29\t      continue;\n30\t    }\n31\t    const declaration = line.match(/^([a-z-]+)\\s*:\\s*([^;]+);?$/i);\n32\t    if (!declaration) continue;\n33\t    const property = declaration[1].toLowerCase();\n34\t    const value = declaration[2].trim();\n35\t    if (forbidden.has(property)) errors.push(issue(file, number, 'forbidden-property', `${property} \u4e0d\u5141\u8bb8\u7528\u4e8e\u516c\u5171 Less`));\n36\t    if (property === 'line-height' && !/^-?\\d+(?:\\.\\d+)?px$/i.test(value)) errors.push(issue(file, number, 'line-height-px', 'line-height \u5fc5\u987b\u4e3a px \u6570\u503c'));\n37\t    if (/\\b(?:calc|var)\\s*\\(/.test(value) || /\\b\\d+(?:\\.\\d+)?(?:vh|vw|em|rem|rpx)\\b/.test(value)) errors.push(issue(file, number, 'forbidden-unit', '\u516c\u5171 Less \u4e0d\u5141\u8bb8\u8be5\u5355\u4f4d\u6216\u51fd\u6570'));\n38\t  }\n39\t  if (depth !== 0) errors.push(issue(file, lines.length, 'syntax', '\u89c4\u5219\u62ec\u53f7\u4e0d\u5339\u914d'));\n40\t  return errors;\n41\t}\n42\t\n43\tconst files = process.argv.slice(2);\n44\tif (files.length === 0) {\n45\t  console.error('[file] \u5fc5\u987b\u63d0\u4f9b Less \u6587\u4ef6');\n46\t  process.exit(1);\n47\t}\n48\tconst errors = files.flatMap(validate);\n49\tif (errors.length) {\n50\t  console.error(errors.join('\\n'));\n51\t  process.exit(1);\n52\t}\n53\tconsole.log(`PASS ${files.length} \u4e2a Less \u6587\u4ef6`);\n54\t"}, {"tool": "Read", "input": {"file_path": "/workspace/Dockerfile"}, "output": "1\tFROM node:20.18.0-bookworm-slim AS node_runtime\n2\t\n3\tFROM python:3.11.9-slim-bookworm\n4\t\n5\tARG IMAGE_TAG=detail-less-bem-node20.18.0-python3.11.9-stylelint16.10.0\n6\tARG CLAUDE_CODE_VERSION=2.1.205\n7\tLABEL org.opencontainers.image.version=\"${IMAGE_TAG}\"\n8\t\n9\tCOPY --from=node_runtime /usr/local/bin/node /usr/local/bin/node\n10\tCOPY --from=node_runtime /usr/local/lib/node_modules /usr/local/lib/node_modules\n11\t\n12\tRUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \\\n13\t    ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx && \\\n14\t    node --version | grep -qx 'v20.18.0' && \\\n15\t    python --version | grep -qx 'Python 3.11.9' && \\\n16\t    npm install --global stylelint@16.10.0 @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} && \\\n17\t    stylelint --version | grep -qx '16.10.0' && \\\n18\t    pip install --no-cache-dir pytest==8.3.3 pydantic==2.9.2 python-dotenv==1.0.1\n19\t\n20\tWORKDIR /workspace\n21\tCMD [\"bash\"]\n22\t"}, {"tool": "Edit", "input": {"replace_all": false, "file_path": "/workspace/src/EntranceRow.tsx", "old_string": "      <View className=\"entrance-row__card\">\n        <Text className=\"entrance-row__title\">\u7f6e\u6362\u670d\u52a1</Text>\n      </View>", "new_string": "      <View className=\"entrance-row__card entrance-row__card--last\">\n        <Text className=\"entrance-row__title\">\u7f6e\u6362\u670d\u52a1</Text>\n      </View>"}, "output": "The file /workspace/src/EntranceRow.tsx has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "TaskCreate", "input": {"subject": "Fix entrance row layout to horizontal equal-width", "description": "Update TSX to add entrance-row__card--last class to the second card, and update Less to use display:flex, flex-direction:row, and flex:1 with flat BEM rules.", "activeForm": "Fixing entrance row layout"}, "output": "Task #1 created successfully: Fix entrance row layout to horizontal equal-width"}, {"tool": "TaskCreate", "input": {"subject": "Run public Less check", "description": "Run scripts/check-public-less.mjs against entrance-row.less to verify BEM flat structure.", "activeForm": "Running public Less check"}, "output": "Task #2 created successfully: Run public Less check"}, {"tool": "TaskCreate", "input": {"subject": "Run targeted stylelint", "description": "Run stylelint on entrance-row.less with the project's stylelintrc.json rules.", "activeForm": "Running targeted stylelint"}, "output": "Task #3 created successfully: Run targeted stylelint"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "in_progress"}, "output": "Updated task #1 status"}, {"tool": "Write", "input": {"file_path": "/workspace/src/entrance-row.less", "content": ".entrance-row {\n  display: flex;\n  flex-direction: row;\n}\n\n.entrance-row__card {\n  flex: 1;\n  height: 112px;\n  margin-right: 16px;\n}\n\n.entrance-row__card--last {\n  margin-right: 0;\n}\n\n.entrance-row__title {\n  color: #222222;\n  font-size: 28px;\n  line-height: 40px;\n}\n"}, "output": "The file /workspace/src/entrance-row.less has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}, {"tool": "TaskUpdate", "input": {"taskId": "1", "status": "completed"}, "output": "Updated task #1 status"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "in_progress"}, "output": "Updated task #2 status"}, {"tool": "Bash", "input": {"command": "node scripts/check-public-less.mjs src/entrance-row.less", "description": "Run public Less check on entrance-row.less"}, "output": "PASS 1 \u4e2a Less \u6587\u4ef6"}, {"tool": "TaskUpdate", "input": {"taskId": "2", "status": "completed"}, "output": "Updated task #2 status"}, {"tool": "TaskUpdate", "input": {"taskId": "3", "status": "in_progress"}, "output": "Updated task #3 status"}, {"tool": "Bash", "input": {"command": "npx --no-install stylelint --config .stylelintrc.json src/entrance-row.less", "description": "Run targeted stylelint on entrance-row.less"}, "output": "(Bash completed with no output)"}, {"tool": "Read", "input": {"file_path": "/workspace/src/EntranceRow.tsx"}, "output": "1\timport { Text, View } from '@tarojs/components';\n2\timport './entrance-row.less';\n3\t\n4\texport function EntranceRow() {\n5\t  return (\n6\t    <View className=\"entrance-row\">\n7\t      <View className=\"entrance-row__card\">\n8\t        <Text className=\"entrance-row__title\">\u91d1\u878d\u65b9\u6848</Text>\n9\t      </View>\n10\t      <View className=\"entrance-row__card entrance-row__card--last\">\n11\t        <Text className=\"entrance-row__title\">\u7f6e\u6362\u670d\u52a1</Text>\n12\t      </View>\n13\t    </View>\n14\t  );\n15\t}\n16\t"}, {"tool": "TaskUpdate", "input": {"taskId": "3", "status": "completed"}, "output": "Updated task #3 status"}], "files_read": ["/workspace/src/EntranceRow.tsx", "/workspace/src/entrance-row.less", "/workspace/.stylelintrc.json", "/workspace/scripts", "/workspace/scripts/check-public-less.mjs", "/workspace/Dockerfile", "/workspace/src/EntranceRow.tsx"], "files_created": ["/workspace/src/entrance-row.less"], "files_modified": ["/workspace/src/EntranceRow.tsx"], "commands_run": ["ls -la /workspace", "find /workspace/src -type f | head -50", "ls -la /workspace/scripts && find /workspace/scripts -type f", "node scripts/check-public-less.mjs src/entrance-row.less", "npx --no-install stylelint --config .stylelintrc.json src/entrance-row.less"], "skills_invoked": [], "duration_seconds": 77.481, "num_turns": 24, "input_tokens": 24625, "output_tokens": 3191, "cache_read_input_tokens": 469520, "cache_creation_input_tokens": 0, "total_tokens": 497336, "total_cost_usd": 0.44039400000000006, "model_usage": {"MiniMax-M3": {"inputTokens": 25099, "outputTokens": 3203, "cacheReadInputTokens": 469648, "cacheCreationInputTokens": 0, "webSearchRequests": 0, "costUSD": 0.44039400000000006, "contextWindow": 200000, "maxOutputTokens": 32000}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "repair", "rep": 3, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}}, "profile": "detail-less-bem", "skill_sources": [], "eval_manifest": null, "required_skills": [], "expected_artifacts": [], "require_skill_invocation": false, "rubric_criteria": [], "skill_package_path": null, "generated_node_skills": [], "route_conformance_task": null, "route_conformance_expected_node_order": [], "baseline_treatments": [], "quality_gates": {}, "required_output_schemas": [], "expected_evidence": [], "draft_hash": null, "interaction": {"mode": "none", "max_turns": 12}, "task_variant": "repair", "rep": 3, "execution": {"model": "MiniMax-M3", "timeout_sec": 600, "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.", "system_prompt_applied_via": "CLAUDE.md"}, "target_artifacts": ["src/EntranceRow.tsx", "src/entrance-row.less"]}--- a/_test_results.json
++++ b/_test_results.json
+@@ -0,0 +1 @@
++{"passed": ["[horizontal-flex-row] explicit row flex layout", "[equal-width-cards] cards use flex: 1", "[last-card-modifier] final card co-mounts base class and --last modifier", "[public-less-checker] passed", "[stylelint] passed"], "failed": []}--- a/comet_checks.py
++++ b/comet_checks.py
+@@ -0,0 +1,187 @@
++"""Shared comet-workflow validation checks for eval tasks.
++
++Each comet task validator imports :func:`run_comet_checks` to get the four
++generic checks (openspec artifacts, comet state, workflow phases, tests written)
++and appends its own task-specific checks. All checks run inside Docker and emit
++results via the standard ``_test_results.json`` protocol.
++
++A check is a dict ``{"check": <name>, "status": "passed"|"failed", "message": ...}``.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++WORKSPACE = Path("/workspace")
++RESULTS_FILE = "_test_results.json"
++
++
++def _passed(name: str, message: str = "") -> dict:
++    return {"check": name, "status": "passed", "message": message}
++
++
++def _failed(name: str, message: str) -> dict:
++    return {"check": name, "status": "failed", "message": message}
++
++
++def check_openspec_artifacts() -> dict:
++    """proposal.md + tasks.md exist in a change dir (active or archived)."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("openspec_artifacts", "openspec/changes/ directory not found")
++
++    candidates: list[Path] = []
++    for d in changes_dir.iterdir():
++        if not d.is_dir():
++            continue
++        if d.name == "archive":
++            candidates.extend(s for s in d.iterdir() if s.is_dir())
++        else:
++            candidates.append(d)
++
++    if not candidates:
++        return _failed("openspec_artifacts", "No change directories found")
++
++    for change_dir in candidates:
++        if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++            return _passed("openspec_artifacts", f"found in {change_dir.name}")
++
++    return _failed("openspec_artifacts", f"proposal.md/tasks.md not found together (checked {len(candidates)} dirs)")
++
++
++def check_comet_state() -> dict:
++    """A .comet.yaml exists somewhere under openspec/changes with a sane phase."""
++    changes_dir = WORKSPACE / "openspec" / "changes"
++    if not changes_dir.exists():
++        return _failed("comet_state", "openspec/changes/ not found")
++
++    # Search active + archived change dirs for .comet.yaml.
++    state_files: list[Path] = []
++    for root, _dirs, files in os_walk(changes_dir):
++        for f in files:
++            if f == ".comet.yaml":
++                state_files.append(Path(root) / f)
++
++    if not state_files:
++        archive_dir = changes_dir / "archive"
++        if archive_dir.exists():
++            for change_dir in archive_dir.iterdir():
++                if not change_dir.is_dir():
++                    continue
++                if (change_dir / "proposal.md").exists() and (change_dir / "tasks.md").exists():
++                    return _passed("comet_state", "phase=archived")
++        return _failed("comet_state", "No .comet.yaml found under openspec/changes/")
++
++    # Read the first one and check it has a recognised phase.
++    try:
++        text = state_files[0].read_text(errors="ignore")
++    except OSError:
++        return _failed("comet_state", f"Cannot read {state_files[0]}")
++
++    m = re.search(r"^phase:\s*(\S+)", text, re.MULTILINE)
++    if not m:
++        return _failed("comet_state", "No 'phase:' field in .comet.yaml")
++    phase = m.group(1)
++    valid = {"open", "design", "build", "verify", "archive", "archived"}
++    if phase not in valid:
++        return _failed("comet_state", f"Unrecognised phase: {phase}")
++    return _passed("comet_state", f"phase={phase}")
++
++
++def check_workflow_phases() -> dict:
++    """Evidence of the 5 phases: proposal→design→plan/build→verify→archive."""
++    evidence = 0
++    found: list[str] = []
++
++    # Phase 1 (open): proposal/tasks
++    if _glob_exists("openspec/changes/**/proposal.md") or _glob_exists("openspec/changes/**/tasks.md"):
++        evidence += 1; found.append("open")
++    # Phase 2 (design): design.md or docs/superpowers/specs/
++    if _glob_exists("openspec/changes/**/design.md") or _glob_exists("docs/superpowers/specs/*.md"):
++        evidence += 1; found.append("design")
++    # Phase 3 (build): plan.md, docs/superpowers/plans/, or .comet/ handoff
++    if _glob_exists("openspec/changes/**/plan.md") or _glob_exists("docs/superpowers/plans/*.md") or _glob_exists("openspec/changes/**/.comet/"):
++        evidence += 1; found.append("build")
++    # Phase 4 (verify): verification report or docs/superpowers/reports/
++    if (
++        _glob_exists("openspec/changes/**/verification.md")
++        or _glob_exists("openspec/changes/**/verification-report.md")
++        or _glob_exists("docs/superpowers/reports/*.md")
++    ):
++        evidence += 1; found.append("verify")
++    # Phase 5 (archive): openspec/changes/archive/
++    if (WORKSPACE / "openspec" / "changes" / "archive").exists():
++        evidence += 1; found.append("archive")
++
++    if evidence >= 4:
++        return _passed("workflow_phases", f"{evidence}/5 phases ({','.join(found)})")
++    if evidence >= 2:
++        return _failed("workflow_phases", f"Only {evidence}/5 phases evidenced ({','.join(found)})")
++    return _failed("workflow_phases", f"Only {evidence}/5 phases ({','.join(found)})")
++
++
++def check_tests_written() -> dict:
++    """The agent wrote or extended tests (test_*.py with real assertions)."""
++    test_files = list(WORKSPACE.glob("test_*.py")) + list(WORKSPACE.glob("**/test_*.py"))
++    # Filter out the validator itself and scaffold copies.
++    test_files = [f for f in test_files if "scaffold" not in str(f) and "validation" not in str(f)]
++    has_assert = False
++    for tf in test_files:
++        try:
++            if "assert" in tf.read_text(errors="ignore").lower():
++                has_assert = True
++                break
++        except OSError:
++            continue
++    if has_assert:
++        return _passed("tests_written", f"{len(test_files)} test file(s) with assertions")
++    if test_files:
++        return _failed("tests_written", f"{len(test_files)} test file(s) but none with assertions")
++    return _failed("tests_written", "No test files written by the agent")
++
++
++def run_comet_checks() -> list[dict]:
++    """Run all four generic comet-workflow checks."""
++    return [
++        check_openspec_artifacts(),
++        check_comet_state(),
++        check_workflow_phases(),
++        check_tests_written(),
++    ]
++
++
++def write_results(results: list[dict]) -> None:
++    """Write the combined results to _test_results.json and print a summary."""
++    out = {"checks": results}
++    results_path = WORKSPACE / RESULTS_FILE
++    try:
++        results_path.write_text(json.dumps(out))
++    except OSError:
++        pass
++    failed = [r for r in results if r["status"] == "failed"]
++    for r in results:
++        status = "✓" if r["status"] == "passed" else "✗"
++        print(f"  {status} {r['check']}: {r.get('message', '')}")
++    print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")
++    if failed:
++        import sys
++        sys.exit(1)
++
++
++# --- helpers ---------------------------------------------------------------
++
++def os_walk(root: Path):
++    """os.walk that tolerates permission errors."""
++    import os
++    for dirpath, dirnames, filenames in os.walk(root):
++        yield dirpath, dirnames, filenames
++
++
++def _glob_exists(pattern: str) -> bool:
++    """True if any file matches the glob pattern under WORKSPACE."""
++    try:
++        return any(WORKSPACE.glob(pattern))
++    except Exception:
++        return False
+--- a/src/EntranceRow.tsx
++++ b/src/EntranceRow.tsx
+@@ -7,7 +7,7 @@
+       <View className="entrance-row__card">
+         <Text className="entrance-row__title">金融方案</Text>
+       </View>
+-      <View className="entrance-row__card">
++      <View className="entrance-row__card entrance-row__card--last">
+         <Text className="entrance-row__title">置换服务</Text>
+       </View>
+     </View>
+--- a/src/entrance-row.less
++++ b/src/entrance-row.less
+@@ -1,12 +1,16 @@
+ .entrance-row {
+   display: flex;
+-  flex-direction: column;
++  flex-direction: row;
+ }
+ 
+ .entrance-row__card {
+-  width: 50%;
++  flex: 1;
+   height: 112px;
+   margin-right: 16px;
++}
++
++.entrance-row__card--last {
++  margin-right: 0;
+ }
+ 
+ .entrance-row__title {

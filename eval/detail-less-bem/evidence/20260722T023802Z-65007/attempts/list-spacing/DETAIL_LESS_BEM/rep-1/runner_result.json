@@ -1,0 +1,26 @@
+{
+  "passed": [
+    "check-public-less: passed",
+    "stylelint: passed",
+    "list-spacing: no gap properties or pseudo selectors",
+    "last-item-margin: item spacing and --last reset are present",
+    "modifier-attachment: last modifier is co-mounted with item base class",
+    "[HARD] target_artifacts: passed",
+    "[HARD] check_public_less_exit_code: 0",
+    "[HARD] stylelint_exit_code: 0",
+    "[RUBRIC] bem_readability: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 2.00"
+  ],
+  "failed": [],
+  "returncode": 0,
+  "task_variant": "list-spacing-a",
+  "rep": 1,
+  "execution": {
+    "model": "MiniMax-M3",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}

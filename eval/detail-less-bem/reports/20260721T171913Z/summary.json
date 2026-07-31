@@ -1,0 +1,2586 @@
+{
+  "schema_version": 1,
+  "run_root": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020",
+  "generated_at": "2026-07-21T17:19:15.310758+00:00",
+  "expected_attempts": 48,
+  "observed_attempts": 48,
+  "classification_counts": {
+    "included": 0,
+    "flagged": 0,
+    "excluded": 48
+  },
+  "overall": {
+    "CONTROL": {
+      "attempts": 24,
+      "included": 0,
+      "flagged": 0,
+      "excluded": 24,
+      "hard_passes": 0,
+      "hard_pass_rate": null,
+      "mean_duration_seconds": null,
+      "failed_rule_counts": {},
+      "mean_soft_score": null,
+      "raw_log_paths": [
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/pytest.log"
+      ]
+    },
+    "DETAIL_LESS_BEM": {
+      "attempts": 24,
+      "included": 0,
+      "flagged": 0,
+      "excluded": 24,
+      "hard_passes": 0,
+      "hard_pass_rate": null,
+      "mean_duration_seconds": null,
+      "failed_rule_counts": {},
+      "mean_soft_score": null,
+      "raw_log_paths": [
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/pytest.log"
+      ]
+    },
+    "percentage_point_delta": null
+  },
+  "by_task_treatment": {
+    "bem-create": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    },
+    "equal-width-row": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    },
+    "horizontal-layout": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    },
+    "line-height": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    },
+    "list-spacing": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    },
+    "platform-condition": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    },
+    "text-truncation": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    },
+    "violation-repair": {
+      "CONTROL": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "DETAIL_LESS_BEM": {
+        "attempts": 3,
+        "included": 0,
+        "flagged": 0,
+        "excluded": 3,
+        "hard_passes": 0,
+        "hard_pass_rate": null,
+        "mean_duration_seconds": null,
+        "failed_rule_counts": {},
+        "mean_soft_score": null,
+        "raw_log_paths": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/pytest.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      }
+    }
+  },
+  "thresholds": {
+    "minimum_percentage_point_delta": 20.0,
+    "critical_tasks": [
+      "line-height",
+      "platform-condition",
+      "violation-repair"
+    ],
+    "critical_task_detail_hard_pass_rate": 1.0
+  },
+  "attempts": [
+    {
+      "schema_version": 1,
+      "attempt_id": "bem-create__CONTROL__rep-1",
+      "task": "bem-create",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "bem-create-a",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:13.897689+00:00",
+      "completed_at": "2026-07-21T17:19:13.897689+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "bem-create__CONTROL__rep-2",
+      "task": "bem-create",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "bem-create-b",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:13.928471+00:00",
+      "completed_at": "2026-07-21T17:19:13.928471+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "bem-create__CONTROL__rep-3",
+      "task": "bem-create",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "bem-create-c",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:13.957850+00:00",
+      "completed_at": "2026-07-21T17:19:13.957850+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "bem-create__DETAIL_LESS_BEM__rep-1",
+      "task": "bem-create",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "bem-create-a",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:13.987482+00:00",
+      "completed_at": "2026-07-21T17:19:13.987482+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "bem-create__DETAIL_LESS_BEM__rep-2",
+      "task": "bem-create",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "bem-create-b",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.017430+00:00",
+      "completed_at": "2026-07-21T17:19:14.017430+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "bem-create__DETAIL_LESS_BEM__rep-3",
+      "task": "bem-create",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "bem-create-c",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.045975+00:00",
+      "completed_at": "2026-07-21T17:19:14.045975+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/bem-create/DETAIL_LESS_BEM/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "equal-width-row__CONTROL__rep-1",
+      "task": "equal-width-row",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.075435+00:00",
+      "completed_at": "2026-07-21T17:19:14.075435+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "equal-width-row__CONTROL__rep-2",
+      "task": "equal-width-row",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.104022+00:00",
+      "completed_at": "2026-07-21T17:19:14.104022+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "equal-width-row__CONTROL__rep-3",
+      "task": "equal-width-row",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.132262+00:00",
+      "completed_at": "2026-07-21T17:19:14.132262+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "equal-width-row__DETAIL_LESS_BEM__rep-1",
+      "task": "equal-width-row",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.161786+00:00",
+      "completed_at": "2026-07-21T17:19:14.161786+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "equal-width-row__DETAIL_LESS_BEM__rep-2",
+      "task": "equal-width-row",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.190829+00:00",
+      "completed_at": "2026-07-21T17:19:14.190829+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "equal-width-row__DETAIL_LESS_BEM__rep-3",
+      "task": "equal-width-row",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.219265+00:00",
+      "completed_at": "2026-07-21T17:19:14.219265+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "horizontal-layout__CONTROL__rep-1",
+      "task": "horizontal-layout",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.249178+00:00",
+      "completed_at": "2026-07-21T17:19:14.249178+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "horizontal-layout__CONTROL__rep-2",
+      "task": "horizontal-layout",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.277983+00:00",
+      "completed_at": "2026-07-21T17:19:14.277983+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "horizontal-layout__CONTROL__rep-3",
+      "task": "horizontal-layout",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.306701+00:00",
+      "completed_at": "2026-07-21T17:19:14.306701+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "horizontal-layout__DETAIL_LESS_BEM__rep-1",
+      "task": "horizontal-layout",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.335508+00:00",
+      "completed_at": "2026-07-21T17:19:14.335508+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "horizontal-layout__DETAIL_LESS_BEM__rep-2",
+      "task": "horizontal-layout",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.364998+00:00",
+      "completed_at": "2026-07-21T17:19:14.364998+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "horizontal-layout__DETAIL_LESS_BEM__rep-3",
+      "task": "horizontal-layout",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.394789+00:00",
+      "completed_at": "2026-07-21T17:19:14.394789+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/horizontal-layout/DETAIL_LESS_BEM/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "line-height__CONTROL__rep-1",
+      "task": "line-height",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.424031+00:00",
+      "completed_at": "2026-07-21T17:19:14.424031+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "line-height__CONTROL__rep-2",
+      "task": "line-height",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.453013+00:00",
+      "completed_at": "2026-07-21T17:19:14.453013+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "line-height__CONTROL__rep-3",
+      "task": "line-height",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.482265+00:00",
+      "completed_at": "2026-07-21T17:19:14.482265+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "line-height__DETAIL_LESS_BEM__rep-1",
+      "task": "line-height",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.512251+00:00",
+      "completed_at": "2026-07-21T17:19:14.512251+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "line-height__DETAIL_LESS_BEM__rep-2",
+      "task": "line-height",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.540949+00:00",
+      "completed_at": "2026-07-21T17:19:14.540949+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "line-height__DETAIL_LESS_BEM__rep-3",
+      "task": "line-height",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.571515+00:00",
+      "completed_at": "2026-07-21T17:19:14.571515+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/line-height/DETAIL_LESS_BEM/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "list-spacing__CONTROL__rep-1",
+      "task": "list-spacing",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "list-spacing-a",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.601401+00:00",
+      "completed_at": "2026-07-21T17:19:14.601401+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "list-spacing__CONTROL__rep-2",
+      "task": "list-spacing",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "list-spacing-b",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.631648+00:00",
+      "completed_at": "2026-07-21T17:19:14.631648+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "list-spacing__CONTROL__rep-3",
+      "task": "list-spacing",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "list-spacing-c",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.660727+00:00",
+      "completed_at": "2026-07-21T17:19:14.660727+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "list-spacing__DETAIL_LESS_BEM__rep-1",
+      "task": "list-spacing",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "list-spacing-a",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.689629+00:00",
+      "completed_at": "2026-07-21T17:19:14.689629+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "list-spacing__DETAIL_LESS_BEM__rep-2",
+      "task": "list-spacing",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "list-spacing-b",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.718616+00:00",
+      "completed_at": "2026-07-21T17:19:14.718616+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "list-spacing__DETAIL_LESS_BEM__rep-3",
+      "task": "list-spacing",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "list-spacing-c",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.747857+00:00",
+      "completed_at": "2026-07-21T17:19:14.747857+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/list-spacing/DETAIL_LESS_BEM/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "platform-condition__CONTROL__rep-1",
+      "task": "platform-condition",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.777080+00:00",
+      "completed_at": "2026-07-21T17:19:14.777080+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "platform-condition__CONTROL__rep-2",
+      "task": "platform-condition",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.805648+00:00",
+      "completed_at": "2026-07-21T17:19:14.805648+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "platform-condition__CONTROL__rep-3",
+      "task": "platform-condition",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.834763+00:00",
+      "completed_at": "2026-07-21T17:19:14.834763+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "platform-condition__DETAIL_LESS_BEM__rep-1",
+      "task": "platform-condition",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.864258+00:00",
+      "completed_at": "2026-07-21T17:19:14.864258+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "platform-condition__DETAIL_LESS_BEM__rep-2",
+      "task": "platform-condition",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.894530+00:00",
+      "completed_at": "2026-07-21T17:19:14.894530+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "platform-condition__DETAIL_LESS_BEM__rep-3",
+      "task": "platform-condition",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.924661+00:00",
+      "completed_at": "2026-07-21T17:19:14.924661+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/platform-condition/DETAIL_LESS_BEM/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "text-truncation__CONTROL__rep-1",
+      "task": "text-truncation",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.955963+00:00",
+      "completed_at": "2026-07-21T17:19:14.955963+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "text-truncation__CONTROL__rep-2",
+      "task": "text-truncation",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:14.984777+00:00",
+      "completed_at": "2026-07-21T17:19:14.984777+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "text-truncation__CONTROL__rep-3",
+      "task": "text-truncation",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.014065+00:00",
+      "completed_at": "2026-07-21T17:19:15.014065+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "text-truncation__DETAIL_LESS_BEM__rep-1",
+      "task": "text-truncation",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.045325+00:00",
+      "completed_at": "2026-07-21T17:19:15.045325+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "text-truncation__DETAIL_LESS_BEM__rep-2",
+      "task": "text-truncation",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.073634+00:00",
+      "completed_at": "2026-07-21T17:19:15.073634+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "text-truncation__DETAIL_LESS_BEM__rep-3",
+      "task": "text-truncation",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.102112+00:00",
+      "completed_at": "2026-07-21T17:19:15.102112+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/text-truncation/DETAIL_LESS_BEM/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "violation-repair__CONTROL__rep-1",
+      "task": "violation-repair",
+      "treatment": "CONTROL",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.131211+00:00",
+      "completed_at": "2026-07-21T17:19:15.131211+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "violation-repair__CONTROL__rep-2",
+      "task": "violation-repair",
+      "treatment": "CONTROL",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.160719+00:00",
+      "completed_at": "2026-07-21T17:19:15.160719+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "violation-repair__CONTROL__rep-3",
+      "task": "violation-repair",
+      "treatment": "CONTROL",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.189849+00:00",
+      "completed_at": "2026-07-21T17:19:15.189849+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/CONTROL/rep-3/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "violation-repair__DETAIL_LESS_BEM__rep-1",
+      "task": "violation-repair",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 1,
+      "variant": "direct",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.218617+00:00",
+      "completed_at": "2026-07-21T17:19:15.218617+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "violation-repair__DETAIL_LESS_BEM__rep-2",
+      "task": "violation-repair",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 2,
+      "variant": "business",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.248208+00:00",
+      "completed_at": "2026-07-21T17:19:15.248208+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-2/metadata.json"
+    },
+    {
+      "schema_version": 1,
+      "attempt_id": "violation-repair__DETAIL_LESS_BEM__rep-3",
+      "task": "violation-repair",
+      "treatment": "DETAIL_LESS_BEM",
+      "rep": 3,
+      "variant": "repair",
+      "status": "excluded",
+      "hard_pass": null,
+      "failed_rules": [],
+      "soft_score": null,
+      "started_at": "2026-07-21T17:19:15.277061+00:00",
+      "completed_at": "2026-07-21T17:19:15.277061+00:00",
+      "duration_seconds": 0.0,
+      "execution": {
+        "model": "claude-sonnet-4-20250514",
+        "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+        "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+        "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+        "timeout_sec": 600,
+        "tool_permissions": [
+          "filesystem-write",
+          "shell"
+        ]
+      },
+      "paths": {
+        "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stdout.log",
+        "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stderr.log",
+        "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/pytest.log",
+        "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/diff.patch",
+        "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+        "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/_test_results.json",
+        "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/runner_result.json",
+        "raw_logs": [
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stdout.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/stderr.log",
+          "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/pytest.log"
+        ]
+      },
+      "exclusion_reason": "docker_unavailable",
+      "metadata_path": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T171913Z-71020/attempts/violation-repair/DETAIL_LESS_BEM/rep-3/metadata.json"
+    }
+  ],
+  "decision": "INCONCLUSIVE",
+  "decision_reasons": [
+    "The 48-attempt matrix is incomplete or contains flagged/excluded attempts."
+  ]
+}

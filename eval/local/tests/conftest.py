@@ -17,7 +17,6 @@ import shutil
 import subprocess
 import tempfile
 import time
-import uuid
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
@@ -27,7 +26,7 @@ from typing import Any
 import pytest
 from dotenv import load_dotenv
 
-from scaffold import run_claude_in_docker, run_node_in_docker, run_python_in_docker, run_shell
+from scaffold import run_claude_in_docker, run_python_in_docker, run_shell
 from scaffold.python import (
     ExperimentLogger,
     TreatmentResult,
@@ -609,7 +608,7 @@ def prebuild_docker_image(request):
         yield
         return
 
-    tasks_dir = PROJECT_ROOT / "tasks"
+    tasks_dir = Path(os.environ.get("BENCH_TASKS_DIR", PROJECT_ROOT / "tasks"))
     if tasks_dir.exists():
         for task_dir in tasks_dir.iterdir():
             if task_dir.is_dir():

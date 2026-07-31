@@ -1,0 +1,29 @@
+[metadata]
+name = "line-height"
+description = "Repair non-pixel line-height values in Taro public Less."
+difficulty = "easy"
+category = "generic"
+tags = ["detail-less-bem", "typography", "line-height", "taro"]
+default_treatments = ["CONTROL", "DETAIL_LESS_BEM"]
+instruction_variants = ["direct", "business", "repair"]
+image_tag = "detail-less-bem-node20.18.0-python3.11.9-stylelint16.10.0"
+
+[template]
+required = []
+
+[environment]
+description = "Taro TSX and public Less line-height repair workspace."
+dockerfile = "environment/Dockerfile"
+timeout_sec = 600
+image_tag = "detail-less-bem-node20.18.0-python3.11.9-stylelint16.10.0"
+
+[validation]
+test_scripts = ["test_line_height.py"]
+target_artifacts = ["src/VehicleSummary.tsx", "src/vehicle-summary.less"]
+timeout = 120
+
+[evaluation]
+profile = "detail-less-bem"
+
+[interaction]
+mode = "none"

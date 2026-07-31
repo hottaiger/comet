@@ -1,0 +1,1 @@
+{"passed": ["[horizontal-flex-row] explicit row flex layout", "[equal-width-cards] cards use flex: 1", "[last-card-modifier] final card co-mounts base class and --last modifier", "[public-less-checker] passed", "[stylelint] passed"], "failed": []}

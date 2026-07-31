@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "attempt_id": "equal-width-row__DETAIL_LESS_BEM__rep-3",
+  "task": "equal-width-row",
+  "treatment": "DETAIL_LESS_BEM",
+  "rep": 3,
+  "variant": "repair",
+  "status": "included",
+  "hard_pass": false,
+  "failed_rules": [
+    "Test execution error (test_equal_width_row.py)",
+    "check_public_less_exit_code",
+    "stylelint_exit_code",
+    "build_exit_code"
+  ],
+  "soft_score": 0.0,
+  "started_at": "2026-07-21T17:40:24.404849+00:00",
+  "completed_at": "2026-07-21T17:40:33.655630+00:00",
+  "duration_seconds": 9.251,
+  "exit_code": 1,
+  "command": [
+    "/Users/zhangshuo12/Documents/my-project/comet/eval/.venv/bin/pytest",
+    "local/tests/tasks/test_tasks.py",
+    "--task=equal-width-row",
+    "--treatment=DETAIL_LESS_BEM",
+    "--count=1",
+    "--interaction-mode=none",
+    "-rs",
+    "-q"
+  ],
+  "execution": {
+    "model": "claude-sonnet-4-20250514",
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+    "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+    "timeout_sec": 600,
+    "tool_permissions": [
+      "filesystem-write",
+      "shell"
+    ]
+  },
+  "paths": {
+    "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stdout.log",
+    "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stderr.log",
+    "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/pytest.log",
+    "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/diff.patch",
+    "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/agent_trajectory.jsonl",
+    "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/_test_results.json",
+    "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/runner_result.json",
+    "raw_logs": [
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stdout.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/stderr.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173855Z-46703/attempts/equal-width-row/DETAIL_LESS_BEM/rep-3/pytest.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/_eval_target_skills/detail-less-bem/SKILL.md",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/_eval_target_skills/detail-less-bem/agents/openai.yaml",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/_eval_target_skills/detail-less-bem/references/entry-row-cards.md",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/_eval_target_skills/detail-less-bem/references/platform-style-compat.md",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/_eval_target_skills/detail-less-bem/scripts/check-public-less.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/comet_checks.py",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/scripts/check-public-less.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/src/EqualWidthRow.tsx",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/claude/src/equal-width-row.less",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/artifacts/equal-width-row-detail_less_bem-r3_rep1/execution/comet_checks_error.txt",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/events/equal_width_row_DETAIL_LESS_BEM_r3_rep1.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/metadata.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/raw/equal_width_row_DETAIL_LESS_BEM_r3_rep1_stderr.txt",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/raw/equal_width_row_DETAIL_LESS_BEM_r3_rep1_stdout.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/reports/equal_width_row_DETAIL_LESS_BEM_r3_rep1_report.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_014024/summary.md"
+    ]
+  }
+}

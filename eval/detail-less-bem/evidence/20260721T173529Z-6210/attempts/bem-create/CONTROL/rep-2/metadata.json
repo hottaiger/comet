@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "attempt_id": "bem-create__CONTROL__rep-2",
+  "task": "bem-create",
+  "treatment": "CONTROL",
+  "rep": 2,
+  "variant": "bem-create-b",
+  "status": "included",
+  "hard_pass": false,
+  "failed_rules": [
+    "Test execution error (test_bem_create.py)",
+    "check_public_less_exit_code",
+    "stylelint_exit_code",
+    "build_exit_code"
+  ],
+  "soft_score": 0.0,
+  "started_at": "2026-07-21T17:35:35.905695+00:00",
+  "completed_at": "2026-07-21T17:35:41.788244+00:00",
+  "duration_seconds": 5.883,
+  "exit_code": 1,
+  "command": [
+    "/Users/zhangshuo12/Documents/my-project/comet/eval/.venv/bin/pytest",
+    "local/tests/tasks/test_tasks.py",
+    "--task=bem-create",
+    "--treatment=CONTROL",
+    "--count=1",
+    "--interaction-mode=none",
+    "-rs",
+    "-q"
+  ],
+  "execution": {
+    "model": "claude-sonnet-4-20250514",
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+    "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+    "timeout_sec": 600,
+    "tool_permissions": [
+      "filesystem-write",
+      "shell"
+    ]
+  },
+  "paths": {
+    "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/stdout.log",
+    "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/stderr.log",
+    "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/pytest.log",
+    "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/diff.patch",
+    "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/agent_trajectory.jsonl",
+    "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/_test_results.json",
+    "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/runner_result.json",
+    "raw_logs": [
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/stdout.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/stderr.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260721T173529Z-6210/attempts/bem-create/CONTROL/rep-2/pytest.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/artifacts/bem-create-control-r2_rep1/claude/comet_checks.py",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/artifacts/bem-create-control-r2_rep1/claude/scripts/check-public-less.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/artifacts/bem-create-control-r2_rep1/claude/src/vehicle-summary.less",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/artifacts/bem-create-control-r2_rep1/claude/src/vehicle-summary.tsx",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/artifacts/bem-create-control-r2_rep1/execution/comet_checks_error.txt",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/events/bem_create_CONTROL_r2_rep1.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/metadata.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/raw/bem_create_CONTROL_r2_rep1_stderr.txt",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/raw/bem_create_CONTROL_r2_rep1_stdout.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/reports/bem_create_CONTROL_r2_rep1_report.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260722_013536/summary.md"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+[metadata]
+name = "platform-condition"
+description = "Repair platform-specific public Less conditions while keeping RN free of box-shadow"
+difficulty = "medium"
+category = "generic"
+tags = ["detail-less-bem", "platform", "conditional-compilation", "rn"]
+default_treatments = ["CONTROL", "DETAIL_LESS_BEM"]
+instruction_variants = ["direct", "business", "repair"]
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+
+[template]
+required = []
+
+[environment]
+description = "Taro TSX and public Less with a platform-condition regression."
+dockerfile = "environment/Dockerfile"
+image_tag = "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0"
+timeout_sec = 600
+
+[validation]
+test_scripts = "test_platform_condition.py"
+target_artifacts = ["src/PlatformCondition.tsx", "src/platform-condition.less"]
+timeout = 120
+
+[evaluation]
+profile = "detail-less-bem"
+required_skills = ["detail-less-bem"]
+expected_artifacts = ["src/PlatformCondition.tsx", "src/platform-condition.less"]
+require_skill_invocation = false
+
+[interaction]
+mode = "none"
