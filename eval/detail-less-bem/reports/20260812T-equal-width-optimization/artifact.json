@@ -1,0 +1,445 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "detail-less-bem：低通过率场景优化评估",
+    "generatedAt": "2026-08-12T15:00:00Z",
+    "cards": [
+      {
+        "id": "equal_width_final",
+        "description": "最终 Skill 版本在 direct、business、repair 三种等价表述下的有效硬通过率。",
+        "dataset": "stage_results",
+        "sourceId": "rerun_evidence",
+        "filter": { "stage": "最终 v3" },
+        "metrics": [
+          { "label": "equal-width-row", "field": "pass_rate", "format": "percent" },
+          { "label": "有效样本", "field": "included", "format": "number" }
+        ]
+      },
+      {
+        "id": "violation_final",
+        "description": "更新后 Skill 在关键场景 violation-repair 的有效硬通过率。",
+        "dataset": "stage_results",
+        "sourceId": "rerun_evidence",
+        "filter": { "stage": "关键项复测" },
+        "metrics": [
+          { "label": "violation-repair", "field": "pass_rate", "format": "percent" },
+          { "label": "有效样本", "field": "included", "format": "number" }
+        ]
+      },
+      {
+        "id": "equal_width_uplift",
+        "description": "与 2026-07-22 初始 Skill 评测相比的通过率变化。",
+        "dataset": "stage_results",
+        "sourceId": "baseline_summary",
+        "filter": { "stage": "最终 v3" },
+        "metrics": [
+          { "label": "通过率提升", "field": "uplift_pp", "format": "number", "unit": "pp" },
+          { "label": "初始基线", "field": "baseline_rate", "format": "percent" }
+        ]
+      },
+      {
+        "id": "paired_skill_wins",
+        "description": "24 对同任务同表述样本中，实验组独立通过而对照组失败的配对数。",
+        "dataset": "paired_outcomes",
+        "sourceId": "baseline_summary",
+        "filter": { "outcome": "Skill 独立通过" },
+        "metrics": [
+          { "label": "实验组独立通过", "field": "pair_count", "format": "number" },
+          { "label": "对照组独立通过", "field": "control_only_wins", "format": "number" }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "equal_width_progress",
+        "title": "equal-width-row 有效硬通过率",
+        "subtitle": "每阶段 3 个等价表述；v2 原始轮因 Docker 不可用被排除。",
+        "type": "bar",
+        "dataset": "stage_results",
+        "sourceId": "rerun_evidence",
+        "valueFormat": "percent",
+        "encodings": {
+          "x": { "field": "stage", "type": "nominal", "label": "阶段" },
+          "y": { "field": "pass_rate", "type": "quantitative", "label": "硬通过率" },
+          "tooltip": [
+            { "field": "included", "type": "quantitative", "label": "有效样本" },
+            { "field": "hard_passes", "type": "quantitative", "label": "硬通过" },
+            { "field": "excluded", "type": "quantitative", "label": "排除样本" }
+          ]
+        }
+      },
+      {
+        "id": "attempt_duration",
+        "title": "最终 v3 三轮运行时长",
+        "subtitle": "direct、business、repair 均通过；单位为秒。",
+        "type": "bar",
+        "dataset": "v3_attempts",
+        "sourceId": "v3_evidence",
+        "encodings": {
+          "x": { "field": "variant", "type": "nominal", "label": "提示词表述" },
+          "y": { "field": "duration_seconds", "type": "quantitative", "label": "运行时长（秒）" },
+          "tooltip": [
+            { "field": "hard_pass", "type": "nominal", "label": "硬通过" }
+          ]
+        }
+      },
+      {
+        "id": "task_treatment_rate",
+        "title": "初始 48 样本：各任务的硬通过率",
+        "subtitle": "每个柱代表同一任务、同一处理组的 3 个等价表述样本。",
+        "type": "bar",
+        "dataset": "task_treatment_summary",
+        "sourceId": "baseline_summary",
+        "valueFormat": "percent",
+        "encodings": {
+          "x": { "field": "task", "type": "nominal", "label": "任务" },
+          "y": { "field": "pass_rate", "type": "quantitative", "label": "硬通过率" },
+          "color": { "field": "treatment", "type": "nominal", "label": "处理组" },
+          "tooltip": [
+            { "field": "hard_passes", "type": "quantitative", "label": "硬通过" },
+            { "field": "included", "type": "quantitative", "label": "有效样本" },
+            { "field": "mean_duration_seconds", "type": "quantitative", "label": "平均耗时（秒）" }
+          ]
+        }
+      },
+      {
+        "id": "paired_outcome_counts",
+        "title": "24 对配对样本的胜负分布",
+        "subtitle": "实验组在 7 对中独立通过；对照组仅在 1 对中独立通过。",
+        "type": "bar",
+        "dataset": "paired_outcomes",
+        "sourceId": "baseline_summary",
+        "encodings": {
+          "x": { "field": "outcome", "type": "nominal", "label": "配对结果" },
+          "y": { "field": "pair_count", "type": "quantitative", "label": "样本对数" },
+          "tooltip": [
+            { "field": "pair_count", "type": "quantitative", "label": "样本对数" }
+          ]
+        }
+      }
+    ],
+    "tables": [
+      {
+        "id": "round_details",
+        "title": "每轮优化与结果",
+        "subtitle": "仅统计 validator 产出结果的样本；基础设施排除项不进入通过率分母。",
+        "dataset": "round_details",
+        "sourceId": "rerun_evidence",
+        "defaultSort": { "field": "round_order", "direction": "asc" },
+        "columns": [
+          { "field": "round_order", "label": "序号", "type": "number" },
+          { "field": "round", "label": "轮次", "type": "text" },
+          { "field": "scope", "label": "场景", "type": "text" },
+          { "field": "change", "label": "Skill/环境改动", "type": "text" },
+          { "field": "result", "label": "结果", "type": "text" },
+          { "field": "failed_rule", "label": "主要失败规则", "type": "text" },
+          { "field": "evidence_status", "label": "证据状态", "type": "text" }
+        ]
+      },
+      {
+        "id": "task_coverage",
+        "title": "8 个任务的覆盖意图与初始结果",
+        "subtitle": "任务按约束类别拆分；每项都包含 3 种等价自然语言表述，并在对照/实验之间配对。",
+        "dataset": "task_coverage",
+        "sourceId": "baseline_summary",
+        "defaultSort": { "field": "task_order", "direction": "asc" },
+        "columns": [
+          { "field": "task_order", "label": "序号", "type": "number" },
+          { "field": "task", "label": "任务", "type": "text" },
+          { "field": "coverage", "label": "覆盖的核心约束", "type": "text" },
+          { "field": "why_in_matrix", "label": "纳入原因", "type": "text" },
+          { "field": "control_result", "label": "对照组", "type": "text" },
+          { "field": "detail_result", "label": "实验组", "type": "text" }
+        ]
+      },
+      {
+        "id": "full_pair_matrix",
+        "title": "完整 24 对配对样本矩阵",
+        "subtitle": "每一行配对同一任务、同一自然语言表述与同一复现环境；硬通过由 pytest validator 判定。",
+        "dataset": "pair_matrix",
+        "sourceId": "baseline_summary",
+        "defaultSort": { "field": "pair_order", "direction": "asc" },
+        "columns": [
+          { "field": "pair_order", "label": "对", "type": "number" },
+          { "field": "task", "label": "任务", "type": "text" },
+          { "field": "variant", "label": "表述", "type": "text" },
+          { "field": "control", "label": "对照", "type": "text" },
+          { "field": "detail", "label": "实验", "type": "text" },
+          { "field": "effect", "label": "配对结论", "type": "text" },
+          { "field": "control_seconds", "label": "对照秒", "format": "number" },
+          { "field": "detail_seconds", "label": "实验秒", "format": "number" }
+        ]
+      },
+      {
+        "id": "failure_matrix",
+        "title": "初始矩阵的全部失败样本",
+        "subtitle": "只列 48 个有效样本中的失败项；同一配对可能两组都失败。",
+        "dataset": "failure_matrix",
+        "sourceId": "baseline_summary",
+        "defaultSort": { "field": "failure_order", "direction": "asc" },
+        "columns": [
+          { "field": "failure_order", "label": "序号", "type": "number" },
+          { "field": "task", "label": "任务", "type": "text" },
+          { "field": "variant", "label": "表述", "type": "text" },
+          { "field": "treatment", "label": "处理组", "type": "text" },
+          { "field": "failed_rules", "label": "validator 失败规则", "type": "text" },
+          { "field": "diagnosis", "label": "失败解读", "type": "text" }
+        ]
+      }
+    ],
+    "sources": [
+      { "id": "baseline_summary", "label": "初始全量评测汇总", "path": "eval/detail-less-bem/reports/20260722T023802Z/summary.json" },
+      { "id": "rerun_evidence", "label": "低通过率场景重测证据", "path": "eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/" },
+      { "id": "v2_evidence", "label": "equal-width-row v2 迭代证据", "path": "eval/detail-less-bem/evidence/20260812T-equal-width-skill-v2-retry/" },
+      { "id": "v3_evidence", "label": "equal-width-row v3 最终回归证据", "path": "eval/detail-less-bem/evidence/20260812T-equal-width-skill-v3/" },
+      { "id": "equal_width_case", "label": "equal-width-row 题目与成功修改", "path": "eval/detail-less-bem/local/tasks/equal-width-row/" },
+      { "id": "violation_repair_case", "label": "violation-repair 题目与成功修改", "path": "eval/detail-less-bem/local/tasks/violation-repair/" }
+    ],
+    "blocks": [
+      { "id": "title", "type": "markdown", "body": "# detail-less-bem：低通过率场景优化评估" },
+      {
+        "id": "matrix_design",
+        "type": "markdown",
+        "body": "## 48 样本矩阵：为何这样设计\n\n矩阵固定为 **8 个任务 × 3 种等价自然语言表述 × 2 个处理组 = 48 个样本**。\n\n- **8 个任务按约束簇分层抽样。** 覆盖 BEM 建模、列表间距、横向等宽、文本截断、像素行高、平台条件编译、动态单/双入口回退，以及多违规联合修复。它们分别检验“能否生成规则”“能否替换禁用写法”“能否处理动态状态”和“能否在多个约束同时存在时不漏项”。\n- **3 种表述检验措辞稳健性。** direct 是直接规范；business 是业务语义；repair 是从缺陷/回归出发。通过不应只依赖某一种提示措辞。\n- **同表述配对检验处理效应。** 每个 `(任务, 表述)` 都运行 CONTROL 与 DETAIL_LESS_BEM；两者使用同一固定 Docker 镜像、同一 validator、相同工具权限和模型配置。配对后可直接观察 Skill 是否改变该样本结果。\n- **没有双 agent 模拟或 LangSmith 依赖。** 每个样本是一次独立 Agent 执行，保留 diff、stdout/stderr、轨迹与 validator 结果；通过率分母仅含 `included` 样本。"
+      },
+      { "id": "coverage_table", "type": "table", "tableId": "task_coverage" },
+      {
+        "id": "technical_summary",
+        "type": "markdown",
+        "body": "## 技术结论\n\n- **关键项已恢复。** 更新后的 Skill 在 `violation-repair` 达到 **3/3**，在 `equal-width-row` 最终达到 **3/3**。\n- **equal-width-row 的有效通过率从初始 Skill 的 1/3（33.3%）升至 3/3（100%），提升 66.7 个百分点。**\n- **结论只适用于实验组。** 本轮未重跑无 Skill 对照组；历史对照组不能构成与当前模型、代理和 Skill 版本完全同期的因果对照。"
+      },
+      {
+        "id": "initial_matrix_overview",
+        "type": "markdown",
+        "body": "## 初始 48 样本结果：总体增益存在，但两类动态状态失败拉低结论\n\n实验组总体 **20/24（83.3%）**，对照组 **14/24（58.3%）**，硬通过率提升 **25.0pp**。不过判定协议要求关键任务 `line-height`、`platform-condition`、`violation-repair` 均为 3/3；初始 `violation-repair` 仅 1/3，所以初始报告判定 **FAIL**。\n\n通过率高的任务可简略解读：`horizontal-layout`、`line-height`、`text-truncation` 在两组均为 3/3，说明任务约束本身较局部、指令已足够直接，Skill 没有可观测增益；`bem-create` 和 `platform-condition` 的增益各来自一对；`list-spacing` 是最明确的 Skill 增益，实验组 3/3、对照组 0/3。重点风险集中在 `equal-width-row` 与 `violation-repair`。"
+      },
+      { "id": "task_rate_chart", "type": "chart", "chartId": "task_treatment_rate" },
+      {
+        "id": "paired_analysis",
+        "type": "markdown",
+        "body": "## 实验组与对照组逐题对比：实验组多通过 7 项，仅少通过 1 项\n\n- **实验组独立通过 7 项**：BEM 创建（`bem-create`）1 项、等宽行（`equal-width-row`）1 项、列表间距（`list-spacing`）3 项、平台条件（`platform-condition`）1 项、违规修复（`violation-repair`）1 项。它们是初始 25.0pp 总体增益的直接来源。\n- **对照组独立通过 1 项**：`violation-repair/direct`。这说明初始 Skill 对动态操作项末项 modifier 的约束仍有盲点，并非对所有表述都单调更好。\n- **共同失败 3 项**：`equal-width-row` 的 direct/business 与 `violation-repair` 的 repair。共同失败比单侧失败更能定位 Skill/任务契约共同缺口。\n- **共同通过 13 项**：这些样本验证基础能力未退化，但无法单独证明 Skill 增益。"
+      },
+      { "id": "paired_outcome_chart_block", "type": "chart", "chartId": "paired_outcome_counts" },
+      { "id": "full_pair_table", "type": "table", "tableId": "full_pair_matrix" },
+      {
+        "id": "failure_analysis",
+        "type": "markdown",
+        "body": "## 失败样本重点分析\n\n### 1. equal-width-row：单项与末项是两个独立状态，初始 Skill 只覆盖了部分\n\n初始实验组为 **1/3**。direct 漏 `entry-card--bar` 和 `--last`；business 同时漏两项；repair 通过。对照组 0/3，三个表述均漏单项横条。根因不是 flex 基础知识，而是动态列表在 **单项回退** 与 **末项清间距** 两个分支上没有成为不可省略的生成与验证契约。\n\n### 2. violation-repair：Less 静态检查通过不能代表 TSX BEM 语义正确\n\n初始实验组为 **1/3**。direct 与 repair 都遗漏 `Text` 上的 `service-card__action--last`；business 通过。对照组也在 repair 漏同一项，business 还叠加单位行高、checker 退出码等 Less 问题。根因是验证重点在 Less 语法与属性，未把“map 末项判断 + 基础类/modifier 同挂在 Text”设为强制 TSX 契约。\n\n### 3. list-spacing：Skill 对单一末项间距模式的增益最稳定\n\n对照 0/3、实验 3/3；三次对照均违反 modifier attachment。该结果说明当 Skill 给出明确的 `margin + --last + index` 配方时，Agent 能稳定执行。它也反向证明后续应把等宽行和违规修复中的动态状态写成同样明确、可运行的配方。\n\n### 4. platform-condition：业务表述更易漏端隔离\n\n仅 business 对照失败，未将 `box-shadow` 限定在 h5，且 RN 仍接收阴影；实验组 3/3。该样本说明业务语义提示会诱发“实现视觉效果”优先于“端隔离”的倾向，Skill 的小写条件编译与 RN 禁止属性清单有明确价值。"
+      },
+      {
+        "id": "equal_width_case_detail",
+        "type": "markdown",
+        "sourceId": "equal_width_case",
+        "body": "## 用例展示一：equal-width-row\n\n**题目目标**：两张入口卡片同排等宽；只有一张时变成独占整行横条；禁止 `gap`、后代选择器和伪类。\n\n### 给 Agent 的三种提示词\n\n**direct（直接规范）**\n\n> 修复 `src/equal-width-row.less` 和必要的 TSX：双入口时横向等宽，单入口时回退为独占整行横条。行容器必须显式 `display: flex` 和 `flex-direction: row`，双入口卡片使用 `flex: 1`；单入口显式同挂 `entry-card--bar`。禁止 `gap`、后代/子代选择器、伪类；固定间距用卡片自身 `margin-right`，末项通过与基础类同挂的 `--last` modifier 清零。运行 checker 与 stylelint。\n\n**business（业务表达）**\n\n> 金融和置换入口同时存在时要同排等宽，置换入口缺席时金融入口需回退为独占整行横条，且最后一项不能留下右侧空隙。请用公共 Less 的 BEM 顶层规则实现：行负责横向排列，卡片自身负责等分和间距，TSX 对单入口显式附加 `entry-card--bar`、对末项附加 `--last`。不要依赖 `gap`、`:last-child` 或 `.row .card` 这类层级选择器。\n\n**repair（故障修复）**\n\n> 当前入口行在 RN 上布局不稳定，原因是 `gap` 与后代选择器。修复 `src/equal-width-row.less` 和关联 TSX：两张卡存在时必须在横向 flex 行内等宽；仅一张卡存在时必须以 `entry-card--bar` 回退为整行横条。间距由 `margin-right` 和 `entry-card--last` 表示，所有 Less 规则保持顶层单个 BEM 类，checker 与 stylelint 最终通过。\n\n### 初始代码要解决的问题\n\n- `entries.map` 没有 `index`，无法识别末项。\n- 所有入口只有 `entry-card`，没有单项 `--bar` 和末项 `--last` 状态。\n- Less 使用 `gap` 和 `.entry-row .entry-card` 后代选择器。\n\n### 最终通过版本的修改\n\n```diff\n- {entries.map((entry) => (\n-   <View key={entry} className=\"entry-card\">\n+ {entries.map((entry, index) => (\n+   <View\n+     key={entry}\n+     className={\n+       entries.length === 1\n+         ? 'entry-card entry-card--bar entry-card--last'\n+         : index === entries.length - 1\n+           ? 'entry-card entry-card--last'\n+           : 'entry-card'\n+     }\n+   >\n```\n\n```diff\n .entry-row {\n   display: flex;\n   flex-direction: row;\n-  gap: 12px;\n }\n \n-.entry-row .entry-card {\n+.entry-card {\n   flex: 1;\n   height: 112px;\n+  margin-right: 12px;\n+}\n+\n+.entry-card--last {\n+  margin-right: 0;\n+}\n+\n+.entry-card--bar {\n+  height: 48px;\n+  margin-right: 0;\n }\n```\n\n### 最终结构\n\n- **行容器**：`entry-row` 只负责横向 flex。\n- **基础卡片**：`entry-card` 负责等分、高度和默认右间距。\n- **末项状态**：`entry-card--last` 清除右间距。\n- **单项状态**：`entry-card--bar` 切换为 48px 高的整行横条。\n- **TSX 状态来源**：`entries.length === 1` 判断单项，`index === entries.length - 1` 判断末项。"
+      },
+      {
+        "id": "violation_repair_case_detail",
+        "type": "markdown",
+        "sourceId": "violation_repair_case",
+        "body": "## 用例展示二：violation-repair\n\n**题目目标**：一次修复嵌套、伪类、`gap`、无单位 `line-height` 和列表末项 modifier，保证公共 Less 可稳定转换到 RN。\n\n### 给 Agent 的三种提示词\n\n**direct（直接规范）**\n\n> 修复 `src/violation-repair.less` 中的公共 Less 违规：嵌套规则、伪类、`gap`、无单位 `line-height`。每条最终规则都必须是顶层单个 BEM 类；用 TSX 的 `--last` modifier 代替伪类和 gap；`line-height` 必须为 px 数值。保留卡片标题和操作文案，运行 checker 与 stylelint 并让两者通过。\n\n**business（业务表达）**\n\n> 服务卡片需要保留标题、操作项和固定间距，但现有写法无法稳定下发到 RN。请把层级样式和 hover 状态改为独立 BEM 类/修饰符，把 `gap` 改为操作项自身 margin，并使所有文本样式直接挂在 Text 类上。公共 Less 不可保留嵌套、伪类或无单位行高。\n\n**repair（故障修复）**\n\n> 这是一次公共 Less 违规修复任务。初始代码同时含嵌套、`&:hover`、`gap` 与 `line-height: 1.5`；请在 `src/violation-repair.less` 和必要 TSX 中完成等价修复。最终必须经过给定 Node checker 和定向 stylelint，且不能用删除内容或后代选择器规避规则。\n\n### 初始代码要解决的问题\n\n- `.service-card` 内含 `gap: 12px`、嵌套 `.service-card__title` 和 `&:hover`。\n- 标题使用 `line-height: 1.5`，不符合公共 Less 的 px 约束。\n- 操作项没有 `index` 和 `--last`，无法用 margin 表达固定间距。\n\n### 最终通过版本的修改\n\n```diff\n- {actions.map((action) => (\n-   <Text key={action} className=\"service-card__action\">{action}</Text>\n+ {actions.map((action, index) => (\n+   <Text\n+     key={action}\n+     className={\n+       index === actions.length - 1\n+         ? 'service-card__action service-card__action--last'\n+         : 'service-card__action'\n+     }\n+   >\n+     {action}\n+   </Text>\n```\n\n```diff\n .service-card {\n   padding: 16px;\n-  gap: 12px;\n-  .service-card__title { ... }\n-  &:hover { opacity: 0.9; }\n }\n+\n+.service-card__title {\n+  color: #222222;\n+  line-height: 24px;\n+}\n \n .service-card__action {\n+  margin-right: 12px;\n   color: #666666;\n }\n+\n+.service-card__action--last {\n+  margin-right: 0;\n+}\n```\n\n### 最终结构\n\n- **卡片容器**：`service-card` 只保留容器自身 padding。\n- **标题文本**：`service-card__title` 提升为顶层 BEM 规则，行高改为 `24px`。\n- **操作列表**：`service-card__actions` 保持横向 flex。\n- **操作项**：`service-card__action` 使用右 margin 提供间距。\n- **末项状态**：TSX 同挂 `service-card__action--last`，Less 将末项 margin 清零。\n- **删除的违规结构**：`gap`、Less 嵌套和 `&:hover`。"
+      },
+      { "id": "failure_table_block", "type": "table", "tableId": "failure_matrix" },
+      { "id": "metrics", "type": "metric-strip", "cardIds": ["equal_width_final", "violation_final", "equal_width_uplift"] },
+      {
+        "id": "findings_intro",
+        "type": "markdown",
+        "body": "## 通过率演进：动态列表状态由不稳定变为可验证\n\n初始失败集中在两类 TSX 语义：单项回退漏挂 `entry-card--bar`，以及末项漏挂 `entry-card--last`。第一次重测后，`violation-repair` 已稳定，但 `equal-width-row` 仍只有 1/3。后续把这两类状态转为显式 Skill 配方和可执行校验，最终三个提示词表述全部通过。"
+      },
+      { "id": "progress_chart", "type": "chart", "chartId": "equal_width_progress" },
+      {
+        "id": "round_by_round",
+        "type": "markdown",
+        "body": "## 每轮改动与结果\n\n1. **初始基线（2026-07-22）**：全量 48 个有效样本；实验组整体 20/24（83.3%），但 `equal-width-row` 仅 1/3，`violation-repair` 仅 1/3，整体判定 FAIL。\n2. **低通过率场景重测（2026-08-09）**：在用户更新的 Skill 上仅重跑实验组。`violation-repair` 3/3，通过；`equal-width-row` 1/3，失败分别是单项 `--bar` 与末项 `--last`。\n3. **v2 规则化（2026-08-12）**：新增单项状态矩阵、`--require-single` 静态校验，并要求同排入口同时校验末项与单项。原始 3 轮因 Docker daemon 不可用全部排除；Docker 恢复后的 2 个有效样本为 1/2。第 2 轮揭示 Skill 校验与评测 validator 的语义不一致。\n4. **v3 契约对齐（2026-08-12）**：禁止 `lastIndex/isLast` 中间变量，强制在 `map` 回调 className 分支直接写 `index === list.length - 1`；保留 `list.length === 1` 的 `--bar` 条件。最终 direct、business、repair 三轮均通过。"
+      },
+      { "id": "round_table", "type": "table", "tableId": "round_details" },
+      {
+        "id": "methodology",
+        "type": "markdown",
+        "body": "## 优化方法论\n\n**1. 以 validator 失败规则定义问题。** 不用抽象的“BEM 不稳定”描述失败，直接把失败拆为可观察契约：末项类、单项横条、基础类与 modifier 同挂。\n\n**2. 把动态状态矩阵写成生成配方。** 对 `map` 类布局固定检查普通项、末项、单项、空列表；每个状态要求同时有 TSX className 和 Less 落点。\n\n**3. 让 Skill 校验器覆盖人类易漏项。** `--require-last` 检查基础类、`--last` 与直接末项条件；`--require-single` 检查基础类、`--bar` 与 `list.length === 1`。\n\n**4. 对齐生成约束与评测约束。** v2 允许 `lastIndex`，评测 validator 不接受，导致“Skill 自检通过、任务失败”。v3 收紧为评测可识别的直接表达式。\n\n**5. 分离基础设施与能力信号。** Docker 不可用、接口拒连样本标记为 excluded，不计入 Skill 通过率；只用含 validator 结果的 included 样本判断效果。\n\n**6. 用三种等价提示词回归。** direct、business、repair 覆盖指令直给、业务描述和修复导向三种表达，3/3 才确认规则稳定。"
+      },
+      {
+        "id": "duration_intro",
+        "type": "markdown",
+        "body": "## 最终回归运行特征\n\n最终 v3 三轮全部通过，耗时 89.0–137.8 秒。当前样本量只能说明三种表述下的稳定通过，不能估计更广泛任务分布的置信区间。"
+      },
+      { "id": "duration_chart", "type": "chart", "chartId": "attempt_duration" },
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "body": "## 限制与后续动作\n\n- **无同期对照组。** 建议使用相同 Docker、MiniMax-M3、三种提示词重跑 `CONTROL` 3 次，才能量化当前 Skill 的净增益。\n- **范围有限。** 本次针对两个低通过率场景；其余 6 个任务仍采用 2026-07-22 的历史证据。\n- **规则特异性。** 末项条件被收紧为直接语法以适配当前 validator；若后续需要支持更多等价实现，应同时扩展 validator，而非仅放宽 Skill 文案。"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-12T15:00:00Z",
+    "status": "ready",
+    "datasets": {
+      "stage_results": [
+        { "stage": "初始 Skill", "scenario": "equal-width-row", "hard_passes": 1, "included": 3, "excluded": 0, "pass_rate": 0.3333, "baseline_rate": 0.3333, "uplift_pp": 0 },
+        { "stage": "低通过率重测", "scenario": "equal-width-row", "hard_passes": 1, "included": 3, "excluded": 0, "pass_rate": 0.3333, "baseline_rate": 0.3333, "uplift_pp": 0 },
+        { "stage": "v2 重试", "scenario": "equal-width-row", "hard_passes": 1, "included": 2, "excluded": 0, "pass_rate": 0.5, "baseline_rate": 0.3333, "uplift_pp": 16.7 },
+        { "stage": "最终 v3", "scenario": "equal-width-row", "hard_passes": 3, "included": 3, "excluded": 0, "pass_rate": 1, "baseline_rate": 0.3333, "uplift_pp": 66.7 },
+        { "stage": "关键项复测", "scenario": "violation-repair", "hard_passes": 3, "included": 3, "excluded": 0, "pass_rate": 1, "baseline_rate": 0.3333, "uplift_pp": 66.7 }
+      ],
+      "v3_attempts": [
+        { "variant": "direct", "rep": 1, "hard_pass": "通过", "duration_seconds": 89.008 },
+        { "variant": "business", "rep": 2, "hard_pass": "通过", "duration_seconds": 137.832 },
+        { "variant": "repair", "rep": 3, "hard_pass": "通过", "duration_seconds": 111.972 }
+      ],
+      "round_details": [
+        { "round_order": 1, "round": "初始基线", "scope": "全量 8 任务 / 实验组", "change": "建立 48 样本评测矩阵", "result": "整体 20/24；equal-width-row 1/3；violation-repair 1/3；判定 FAIL", "failed_rule": "单项 --bar、末项 --last", "evidence_status": "48 included" },
+        { "round_order": 2, "round": "低通过率重测", "scope": "equal-width-row + violation-repair / 实验组", "change": "用户更新 Skill 后重测；修复 Docker 与 MiniMax 连通性", "result": "equal-width-row 1/3；violation-repair 3/3", "failed_rule": "单项 --bar（1 次）；末项 --last（1 次）", "evidence_status": "6 included" },
+        { "round_order": 3, "round": "v2 原始轮", "scope": "equal-width-row / 实验组", "change": "增加状态矩阵与 --require-single", "result": "未计分", "failed_rule": "Docker daemon unavailable", "evidence_status": "3 excluded" },
+        { "round_order": 4, "round": "v2 重试", "scope": "equal-width-row / 实验组", "change": "Docker 恢复后重试；单项校验生效", "result": "direct 通过；business 失败；repair 未运行", "failed_rule": "评测要求直接末项条件，Agent 使用 lastIndex/isLast", "evidence_status": "2 included" },
+        { "round_order": 5, "round": "v3 最终回归", "scope": "equal-width-row / 实验组", "change": "Skill 与 checker 强制直接末项表达式；参考配方同步", "result": "direct、business、repair 全部通过（3/3）", "failed_rule": "无", "evidence_status": "3 included" }
+      ],
+      "task_treatment_summary": [
+        { "task": "bem-create", "treatment": "CONTROL", "hard_passes": 2, "included": 3, "pass_rate": 0.6667, "mean_duration_seconds": 100.941 },
+        { "task": "bem-create", "treatment": "DETAIL_LESS_BEM", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 71.503 },
+        { "task": "list-spacing", "treatment": "CONTROL", "hard_passes": 0, "included": 3, "pass_rate": 0, "mean_duration_seconds": 63.894 },
+        { "task": "list-spacing", "treatment": "DETAIL_LESS_BEM", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 91.729 },
+        { "task": "horizontal-layout", "treatment": "CONTROL", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 68.081 },
+        { "task": "horizontal-layout", "treatment": "DETAIL_LESS_BEM", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 90.486 },
+        { "task": "text-truncation", "treatment": "CONTROL", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 65.651 },
+        { "task": "text-truncation", "treatment": "DETAIL_LESS_BEM", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 91.815 },
+        { "task": "line-height", "treatment": "CONTROL", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 121.586 },
+        { "task": "line-height", "treatment": "DETAIL_LESS_BEM", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 55.486 },
+        { "task": "platform-condition", "treatment": "CONTROL", "hard_passes": 2, "included": 3, "pass_rate": 0.6667, "mean_duration_seconds": 102.938 },
+        { "task": "platform-condition", "treatment": "DETAIL_LESS_BEM", "hard_passes": 3, "included": 3, "pass_rate": 1, "mean_duration_seconds": 144.303 },
+        { "task": "equal-width-row", "treatment": "CONTROL", "hard_passes": 0, "included": 3, "pass_rate": 0, "mean_duration_seconds": 95.087 },
+        { "task": "equal-width-row", "treatment": "DETAIL_LESS_BEM", "hard_passes": 1, "included": 3, "pass_rate": 0.3333, "mean_duration_seconds": 124.002 },
+        { "task": "violation-repair", "treatment": "CONTROL", "hard_passes": 1, "included": 3, "pass_rate": 0.3333, "mean_duration_seconds": 180.264 },
+        { "task": "violation-repair", "treatment": "DETAIL_LESS_BEM", "hard_passes": 1, "included": 3, "pass_rate": 0.3333, "mean_duration_seconds": 148.477 }
+      ],
+      "paired_outcomes": [
+        { "outcome": "共同通过", "pair_count": 13, "control_only_wins": 1 },
+        { "outcome": "Skill 独立通过", "pair_count": 7, "control_only_wins": 1 },
+        { "outcome": "对照独立通过", "pair_count": 1, "control_only_wins": 1 },
+        { "outcome": "共同失败", "pair_count": 3, "control_only_wins": 1 }
+      ],
+      "task_coverage": [
+        { "task_order": 1, "task": "bem-create", "coverage": "单 block BEM、元素命名、根 modifier 同挂、Text 显式样式", "why_in_matrix": "验证从零建立命名与选择器结构的基础能力", "control_result": "2/3", "detail_result": "3/3" },
+        { "task_order": 2, "task": "list-spacing", "coverage": "gap 替换、重复项 margin、末项 --last", "why_in_matrix": "验证最小动态列表状态与固定间距替代", "control_result": "0/3", "detail_result": "3/3" },
+        { "task_order": 3, "task": "horizontal-layout", "coverage": "row flex、等宽卡片、末项间距", "why_in_matrix": "验证静态双卡横排基础，不含单项回退", "control_result": "3/3", "detail_result": "3/3" },
+        { "task_order": 4, "task": "text-truncation", "coverage": "Text numberOfLines、去除 Web 截断属性", "why_in_matrix": "验证跨端文本截断与 Text 样式落点", "control_result": "3/3", "detail_result": "3/3" },
+        { "task_order": 5, "task": "line-height", "coverage": "所有公共 line-height 使用 px", "why_in_matrix": "验证单属性跨端兼容限制", "control_result": "3/3", "detail_result": "3/3" },
+        { "task_order": 6, "task": "platform-condition", "coverage": "小写条件编译、H5 阴影与 RN 隔离", "why_in_matrix": "验证属性豁免仍保持公共选择器/BEM 约束", "control_result": "2/3", "detail_result": "3/3" },
+        { "task_order": 7, "task": "equal-width-row", "coverage": "双卡等宽、末项清间距、单项 --bar 回退", "why_in_matrix": "验证动态状态组合，是最高风险布局样本", "control_result": "0/3", "detail_result": "1/3" },
+        { "task_order": 8, "task": "violation-repair", "coverage": "嵌套、伪类、gap、行高、Text 末项 modifier 联合修复", "why_in_matrix": "验证多规则同时存在时的完整修复能力", "control_result": "1/3", "detail_result": "1/3" }
+      ],
+      "pair_matrix": [
+        { "pair_order": 1, "task": "bem-create", "variant": "bem-create-a", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 36.941, "detail_seconds": 49.542 },
+        { "pair_order": 2, "task": "bem-create", "variant": "bem-create-b", "control": "失败", "detail": "通过", "effect": "Skill 独立通过", "control_seconds": 193.429, "detail_seconds": 48.614 },
+        { "pair_order": 3, "task": "bem-create", "variant": "bem-create-c", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 72.454, "detail_seconds": 116.352 },
+        { "pair_order": 4, "task": "equal-width-row", "variant": "direct", "control": "失败", "detail": "失败", "effect": "共同失败", "control_seconds": 98.154, "detail_seconds": 113.209 },
+        { "pair_order": 5, "task": "equal-width-row", "variant": "business", "control": "失败", "detail": "失败", "effect": "共同失败", "control_seconds": 99.85, "detail_seconds": 158.364 },
+        { "pair_order": 6, "task": "equal-width-row", "variant": "repair", "control": "失败", "detail": "通过", "effect": "Skill 独立通过", "control_seconds": 87.257, "detail_seconds": 100.434 },
+        { "pair_order": 7, "task": "horizontal-layout", "variant": "direct", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 19.758, "detail_seconds": 37.084 },
+        { "pair_order": 8, "task": "horizontal-layout", "variant": "business", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 102.669, "detail_seconds": 91.224 },
+        { "pair_order": 9, "task": "horizontal-layout", "variant": "repair", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 81.815, "detail_seconds": 143.15 },
+        { "pair_order": 10, "task": "line-height", "variant": "direct", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 293.436, "detail_seconds": 36.739 },
+        { "pair_order": 11, "task": "line-height", "variant": "business", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 26.778, "detail_seconds": 59.358 },
+        { "pair_order": 12, "task": "line-height", "variant": "repair", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 44.544, "detail_seconds": 70.362 },
+        { "pair_order": 13, "task": "list-spacing", "variant": "list-spacing-a", "control": "失败", "detail": "通过", "effect": "Skill 独立通过", "control_seconds": 101.078, "detail_seconds": 52.84 },
+        { "pair_order": 14, "task": "list-spacing", "variant": "list-spacing-b", "control": "失败", "detail": "通过", "effect": "Skill 独立通过", "control_seconds": 53.295, "detail_seconds": 146.326 },
+        { "pair_order": 15, "task": "list-spacing", "variant": "list-spacing-c", "control": "失败", "detail": "通过", "effect": "Skill 独立通过", "control_seconds": 37.309, "detail_seconds": 76.022 },
+        { "pair_order": 16, "task": "platform-condition", "variant": "direct", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 51.513, "detail_seconds": 90.714 },
+        { "pair_order": 17, "task": "platform-condition", "variant": "business", "control": "失败", "detail": "通过", "effect": "Skill 独立通过", "control_seconds": 129.148, "detail_seconds": 121.266 },
+        { "pair_order": 18, "task": "platform-condition", "variant": "repair", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 128.154, "detail_seconds": 220.93 },
+        { "pair_order": 19, "task": "text-truncation", "variant": "direct", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 77.854, "detail_seconds": 116.976 },
+        { "pair_order": 20, "task": "text-truncation", "variant": "business", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 49.345, "detail_seconds": 55.284 },
+        { "pair_order": 21, "task": "text-truncation", "variant": "repair", "control": "通过", "detail": "通过", "effect": "共同通过", "control_seconds": 69.754, "detail_seconds": 103.186 },
+        { "pair_order": 22, "task": "violation-repair", "variant": "direct", "control": "通过", "detail": "失败", "effect": "对照独立通过", "control_seconds": 228.702, "detail_seconds": 101.481 },
+        { "pair_order": 23, "task": "violation-repair", "variant": "business", "control": "失败", "detail": "通过", "effect": "Skill 独立通过", "control_seconds": 119.177, "detail_seconds": 127.433 },
+        { "pair_order": 24, "task": "violation-repair", "variant": "repair", "control": "失败", "detail": "失败", "effect": "共同失败", "control_seconds": 192.914, "detail_seconds": 216.518 }
+      ],
+      "failure_matrix": [
+        { "failure_order": 1, "task": "bem-create", "variant": "bem-create-b", "treatment": "CONTROL", "failed_rules": "modifier-attachment rule", "diagnosis": "根 disabled modifier 未与 vehicle-summary 基础类同挂。" },
+        { "failure_order": 2, "task": "equal-width-row", "variant": "direct", "treatment": "CONTROL", "failed_rules": "single-card-fallback", "diagnosis": "遗漏单入口 entry-card--bar 与横条高度。" },
+        { "failure_order": 3, "task": "equal-width-row", "variant": "direct", "treatment": "DETAIL_LESS_BEM", "failed_rules": "single-card-fallback；bem-modifier", "diagnosis": "同时遗漏单项横条与末项 --last。" },
+        { "failure_order": 4, "task": "equal-width-row", "variant": "business", "treatment": "CONTROL", "failed_rules": "single-card-fallback；bem-modifier", "diagnosis": "业务语义下遗漏两个动态状态。" },
+        { "failure_order": 5, "task": "equal-width-row", "variant": "business", "treatment": "DETAIL_LESS_BEM", "failed_rules": "single-card-fallback；bem-modifier", "diagnosis": "Skill 初始配方不足以锁定动态状态矩阵。" },
+        { "failure_order": 6, "task": "equal-width-row", "variant": "repair", "treatment": "CONTROL", "failed_rules": "single-card-fallback", "diagnosis": "遗漏单入口 entry-card--bar 与横条高度。" },
+        { "failure_order": 7, "task": "list-spacing", "variant": "list-spacing-a", "treatment": "CONTROL", "failed_rules": "modifier-attachment rule", "diagnosis": "末项 modifier 未与重复项基础类同挂。" },
+        { "failure_order": 8, "task": "list-spacing", "variant": "list-spacing-b", "treatment": "CONTROL", "failed_rules": "modifier-attachment rule", "diagnosis": "末项 modifier 未与重复项基础类同挂。" },
+        { "failure_order": 9, "task": "list-spacing", "variant": "list-spacing-c", "treatment": "CONTROL", "failed_rules": "modifier-attachment rule", "diagnosis": "末项 modifier 未与重复项基础类同挂。" },
+        { "failure_order": 10, "task": "platform-condition", "variant": "business", "treatment": "CONTROL", "failed_rules": "h5 阴影条件缺失；RN 含 box-shadow", "diagnosis": "视觉需求未隔离到 h5 条件块。" },
+        { "failure_order": 11, "task": "violation-repair", "variant": "direct", "treatment": "DETAIL_LESS_BEM", "failed_rules": "Text 上缺 service-card__action--last", "diagnosis": "Less 修复未扩展到操作 Text 的末项语义。" },
+        { "failure_order": 12, "task": "violation-repair", "variant": "business", "treatment": "CONTROL", "failed_rules": "line-height-px；Text modifier；checker exit", "diagnosis": "多违规联合修复时同时遗漏属性、TSX 语义和 checker 收尾。" },
+        { "failure_order": 13, "task": "violation-repair", "variant": "repair", "treatment": "CONTROL", "failed_rules": "Text 上缺 service-card__action--last", "diagnosis": "末项 modifier 语义遗漏。" },
+        { "failure_order": 14, "task": "violation-repair", "variant": "repair", "treatment": "DETAIL_LESS_BEM", "failed_rules": "Text 上缺 service-card__action--last", "diagnosis": "初始 Skill 的 TSX 校验未覆盖 Text 列表边界。" }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "baseline_summary",
+      "query": {
+        "engine": "file",
+        "sql": "SELECT task, treatment, rep, variant, status, hard_pass, duration_seconds, failed_rules FROM summary_json.attempts WHERE status = 'included'",
+        "description": "2026-07-22 全量评测汇总，含 48 个有效样本与任务/处理组分组结果。",
+        "tables_used": ["eval/detail-less-bem/reports/20260722T023802Z/summary.json"],
+        "filters": ["status = included", "8 tasks × 3 instruction variants × CONTROL/DETAIL_LESS_BEM"],
+        "metric_definitions": ["硬通过率 = hard_passes / included；excluded 不进入分母。"]
+      }
+    },
+    {
+      "id": "rerun_evidence",
+      "query": {
+        "engine": "file",
+        "sql": "SELECT task, treatment, rep, variant, status, hard_pass, duration_seconds, failed_rules FROM attempt_metadata WHERE treatment = 'DETAIL_LESS_BEM' AND status = 'included'",
+        "description": "2026-08-09 两个低通过率场景的实验组重测 metadata 与 validator 结果。",
+        "tables_used": ["eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts"],
+        "filters": ["treatment = DETAIL_LESS_BEM", "status = included"],
+        "metric_definitions": ["每个场景使用 direct、business、repair 三种等价表述，各 1 次。"]
+      }
+    },
+    {
+      "id": "v2_evidence",
+      "query": {
+        "engine": "file",
+        "sql": "SELECT task, treatment, rep, variant, status, hard_pass, exclusion_reason, duration_seconds, failed_rules FROM attempt_metadata WHERE treatment = 'DETAIL_LESS_BEM'",
+        "description": "2026-08-12 equal-width-row v2 的排除样本与 Docker 恢复后的重试证据。",
+        "tables_used": ["eval/detail-less-bem/evidence/20260812T-equal-width-skill-v2/attempts", "eval/detail-less-bem/evidence/20260812T-equal-width-skill-v2-retry/attempts"],
+        "filters": ["treatment = DETAIL_LESS_BEM"],
+        "metric_definitions": ["Docker unavailable 样本分类为 excluded，不计入硬通过率。"]
+      }
+    },
+    {
+      "id": "v3_evidence",
+      "query": {
+        "engine": "file",
+        "sql": "SELECT task, treatment, rep, variant, status, hard_pass, duration_seconds, failed_rules FROM attempt_metadata WHERE task = 'equal-width-row' AND treatment = 'DETAIL_LESS_BEM' AND status = 'included'",
+        "description": "2026-08-12 equal-width-row v3 三轮最终回归 metadata 与 validator 结果。",
+        "tables_used": ["eval/detail-less-bem/evidence/20260812T-equal-width-skill-v3/attempts"],
+        "filters": ["treatment = DETAIL_LESS_BEM", "status = included"],
+        "metric_definitions": ["硬通过 = validator failed 为空；有效样本 = status 为 included。"]
+      }
+    },
+    {
+      "id": "equal_width_case",
+      "query": {
+        "engine": "file",
+        "sql": "READ instruction.md, initial TSX/Less, and successful diff.patch for equal-width-row",
+        "description": "equal-width-row 的三种原始提示词、初始代码与最终 v3 direct 成功修改。",
+        "tables_used": ["eval/detail-less-bem/local/tasks/equal-width-row/instruction.md", "eval/detail-less-bem/local/tasks/equal-width-row/environment/src", "eval/detail-less-bem/evidence/20260812T-equal-width-skill-v3/attempts/equal-width-row/DETAIL_LESS_BEM/rep-1/diff.patch"],
+        "filters": ["variant = direct for representative successful diff"],
+        "metric_definitions": ["最终代码取自 hard_pass = true 的 direct 样本；三种提示词原文均来自 instruction.md。"]
+      }
+    },
+    {
+      "id": "violation_repair_case",
+      "query": {
+        "engine": "file",
+        "sql": "READ instruction.md, initial TSX/Less, and successful diff.patch for violation-repair",
+        "description": "violation-repair 的三种原始提示词、初始代码与关键项复测 direct 成功修改。",
+        "tables_used": ["eval/detail-less-bem/local/tasks/violation-repair/instruction.md", "eval/detail-less-bem/local/tasks/violation-repair/environment/src", "eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/diff.patch"],
+        "filters": ["variant = direct for representative successful diff"],
+        "metric_definitions": ["最终代码取自 hard_pass = true 的 direct 样本；三种提示词原文均来自 instruction.md。"]
+      }
+    }
+  ]
+}

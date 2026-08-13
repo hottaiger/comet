@@ -1,0 +1,29 @@
+{
+  "passed": [
+    "[stylelint] \u901a\u8fc7",
+    "[HARD] target_artifacts: passed",
+    "[HARD] stylelint_exit_code: 0",
+    "[RUBRIC] bem_readability: 1.00 - hard-check proxy 2/3 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 1.00 - hard-check proxy 2/3 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 1.00 - hard-check proxy 2/3 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 1.00"
+  ],
+  "failed": [
+    "[forbidden-property] \u516c\u5171 Less \u4e0d\u5f97\u4f7f\u7528 gap/row-gap/column-gap",
+    "[top-level-single-selector] \u4e0d\u5f97\u4f7f\u7528 Less \u5d4c\u5957\u3001& \u6216\u540e\u4ee3\u89c4\u5219",
+    "[bem-selector] \u516c\u5171 Less \u4e0d\u5f97\u4f7f\u7528\u4f2a\u7c7b\u6216\u4f2a\u5143\u7d20",
+    "[line-height-px] \u516c\u5171 Less \u7684 line-height \u5fc5\u987b\u662f px \u6570\u503c",
+    "[bem-modifier] TSX \u5fc5\u987b\u5728 Text \u4e0a\u5e94\u7528\u64cd\u4f5c\u7c7b\uff0c\u5e76\u4ee5\u672b\u9879\u5224\u65ad\u540c\u6302 service-card__action--last",
+    "[check-public-less] /workspace/src/violation-repair.less:3 [forbidden-property] gap: 12px \u4e0d\u53ef\u7528\u4e8e\u4e09\u7aef\u516c\u5171 Less\n/workspace/src/violation-repair.less:5 [top-level-single-selector] \u53ea\u5141\u8bb8\u9876\u5c42\u5355\u4e2a BEM \u7c7b\u9009\u62e9\u5668\uff0c\u5f53\u524d\u4e3a .service-card__title\n/workspace/src/violation-repair.less:7 [line-height-px] \u516c\u5171 Less \u7684 line-height \u5fc5\u987b\u4f7f\u7528 px \u6570\u503c\n/workspace/src/violation-repair.less:10 [top-level-single-selector] \u53ea\u5141\u8bb8\u9876\u5c42\u5355\u4e2a BEM \u7c7b\u9009\u62e9\u5668\uff0c\u5f53\u524d\u4e3a &:hover",
+    "[HARD] check_public_less_exit_code: expected 0, completion reported failure"
+  ],
+  "returncode": 1,
+  "task_variant": "repair",
+  "rep": 3,
+  "execution": {
+    "model": "MiniMax-M3",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}

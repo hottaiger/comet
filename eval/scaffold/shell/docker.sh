@@ -81,6 +81,14 @@ ENV_KEYS=(
     ANTHROPIC_DEFAULT_OPUS_MODEL_NAME
     ANTHROPIC_DEFAULT_SONNET_MODEL_NAME
     CLAUDE_CODE_SUBAGENT_MODEL
+    # Standard proxy variables for model providers that must be reached from
+    # inside the isolated Docker evaluation environment.
+    HTTP_PROXY
+    HTTPS_PROXY
+    NO_PROXY
+    http_proxy
+    https_proxy
+    no_proxy
 )
 
 # =============================================================================

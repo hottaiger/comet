@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "attempt_id": "violation-repair__DETAIL_LESS_BEM__rep-1",
+  "task": "violation-repair",
+  "treatment": "DETAIL_LESS_BEM",
+  "rep": 1,
+  "variant": "direct",
+  "status": "included",
+  "hard_pass": true,
+  "failed_rules": [],
+  "soft_score": 2.0,
+  "started_at": "2026-08-09T10:39:34.647657+00:00",
+  "completed_at": "2026-08-09T10:48:01.161108+00:00",
+  "duration_seconds": 506.513,
+  "exit_code": 0,
+  "command": [
+    "/Users/zhangshuo12/Documents/my-project/comet/eval/.venv/bin/pytest",
+    "local/tests/tasks/test_tasks.py::test_task_treatment",
+    "--task=violation-repair",
+    "--treatment=DETAIL_LESS_BEM",
+    "--count=1",
+    "--interaction-mode=none",
+    "-rs",
+    "-q"
+  ],
+  "execution": {
+    "model": "MiniMax-M3",
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "repository_snapshot": "1f0a6a3f71fb2e0d2b9e926e65377e29b7400371",
+    "container_image": "detail-less-bem:node20.18.0-python3.11.9-stylelint16.10.0",
+    "timeout_sec": 600,
+    "tool_permissions": [
+      "filesystem-write",
+      "shell"
+    ]
+  },
+  "sample_quality": {
+    "status": "included",
+    "reason_code": "valid_signal",
+    "reason": "Run completed with validator evidence",
+    "include_in_analysis": true,
+    "confidence": "high",
+    "evidence": [
+      "result event present"
+    ]
+  },
+  "paths": {
+    "stdout": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stdout.log",
+    "stderr": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stderr.log",
+    "pytest_log": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/pytest.log",
+    "diff": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/diff.patch",
+    "agent_trajectory": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/agent_trajectory.jsonl",
+    "test_results": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/_test_results.json",
+    "runner_result": "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/runner_result.json",
+    "raw_logs": [
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stdout.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/stderr.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/evidence/20260809T093825Z-rerun-55227-retry/attempts/violation-repair/DETAIL_LESS_BEM/rep-1/pytest.log",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/_eval_target_skills/detail-less-bem/SKILL.md",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/_eval_target_skills/detail-less-bem/agents/openai.yaml",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/_eval_target_skills/detail-less-bem/references/entry-row-cards.md",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/_eval_target_skills/detail-less-bem/references/platform-style-compat.md",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/_eval_target_skills/detail-less-bem/scripts/check-public-less.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/_eval_target_skills/detail-less-bem/tests/check-public-less.test.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/comet_checks.py",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/scripts/check-public-less.mjs",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/src/ViolationRepair.tsx",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/claude/src/violation-repair.less",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/artifacts/violation-repair-detail_less_bem-r1_rep1/execution/comet_checks_success.txt",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/events/violation_repair_DETAIL_LESS_BEM_r1_rep1.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/metadata.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/raw/violation_repair_DETAIL_LESS_BEM_r1_rep1_stdout.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/reports/violation_repair_DETAIL_LESS_BEM_r1_rep1_report.json",
+      "/Users/zhangshuo12/Documents/my-project/comet/eval/detail-less-bem/local/logs/experiments/experiment_20260809_183934/summary.md"
+    ]
+  }
+}

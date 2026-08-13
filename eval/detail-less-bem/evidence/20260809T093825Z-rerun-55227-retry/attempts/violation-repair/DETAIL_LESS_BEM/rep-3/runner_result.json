@@ -1,0 +1,28 @@
+{
+  "passed": [
+    "[forbidden-property] \u672a\u4f7f\u7528 gap",
+    "[top-level-single-selector] \u6240\u6709\u89c4\u5219\u5747\u4e3a\u9876\u5c42\u89c4\u5219",
+    "[bem-selector] \u672a\u4f7f\u7528\u4f2a\u7c7b\u6216\u4f2a\u5143\u7d20",
+    "[line-height-px] line-height \u4f7f\u7528 px \u6570\u503c",
+    "[bem-modifier] TSX \u4e3a\u672b\u9879\u64cd\u4f5c\u540c\u6302 --last modifier",
+    "[check-public-less] \u901a\u8fc7",
+    "[stylelint] \u901a\u8fc7",
+    "[HARD] target_artifacts: passed",
+    "[HARD] check_public_less_exit_code: 0",
+    "[HARD] stylelint_exit_code: 0",
+    "[RUBRIC] bem_readability: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] jsx_less_alignment: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] layout_reasonableness: 2.00 - hard-check proxy 3/3 passed; no LLM score used",
+    "[RUBRIC] weighted_score: 2.00"
+  ],
+  "failed": [],
+  "returncode": 0,
+  "task_variant": "repair",
+  "rep": 3,
+  "execution": {
+    "model": "MiniMax-M3",
+    "timeout_sec": 600,
+    "system_prompt": "Complete the assigned task in the provided workspace. Do not use external services.",
+    "system_prompt_applied_via": "CLAUDE.md"
+  }
+}
