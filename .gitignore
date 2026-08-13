@@ -116,3 +116,4 @@ eval/local/.pytest_docker_build.lock
 # outside cmd.exe semantics); never track these.
 nul
 **/nul
+.zcode/
