@@ -31,31 +31,31 @@ Runtime 的本机数据固定保存在被 Git 忽略的 `.comet/runtime/native/`
 
 Shape、Build、Verify 和 Archive 会复查正式文件与已确认需求的绑定。目标规格必须位于 `specs/<capability>/spec.md`；`specs/` 下的其他文件不会被当作正式 Spec，Hook 会拒绝并提示正确位置。空文档、只有标题或围栏、以及只含模板占位（如 `TODO`、`<TODO>`、`{{reason}}`）的内容都不能满足完整规格。无产品行为变更豁免也必须写具体理由，注释和占位理由不算。Archive 预检若只报告 `verification.md` 缺失、过期或无效，`continuation` 会直接给出 `comet native doctor <change> --repair`；完成后重新运行 dry-run。
 
+Shape、Verify 和 Archive 中的普通文档写入默认保持当前阶段和候选：范围为仓库根目录及 `docs/`、`doc/`、`documentation/`、`.github/` 下的 Markdown/text 和 LICENSE 类文件，且必须位于 Native 产物根目录之外。在 `.comet/config.yaml` 设置 `native.document_writes: revert` 可恢复严格行为。正式需求文件始终按上面的绑定规则检查。
+
 `.comet/config.yaml` 决定使用哪种工作流，以及 change 产物保存在哪个目录。使用非默认产物目录并需要跨设备恢复时，应同步该文件；其余 `.comet/*` 只保留在本机。
 
 Runtime 返回的 `artifacts` 是当前工作区的唯一位置依据：`briefPath`、`childrenPath`、`specsDir` 和 `statePath` 都位于配置解析出的 `<artifact-root>/comet/changes/<change-name>/`，本机 `runtimeDir` 仍位于项目 `.comet/runtime/native/`。不要用 `.comet/comet/` 或其他目录中的同名文件替代缺失产物；若 Hook 指出路径错误，按拒绝信息给出的正确绝对路径重试原编辑，保留已有内容并先读取合并。
 
 ### Brief
 
-`brief.md` 保存 Native 的需求澄清记录，使用以下一级标题，各节内容不能为空：
+`brief.md` 保存 Native 的需求澄清记录，使用以下四个核心一级标题，各节内容不能为空：
 
 ```text
 # Outcome
 # Scope
 # Non-goals
 # Acceptance examples
-# Constraints and invariants
-# Decisions
-# Open questions
-# Verification expectations
 ```
 
-`# Scope` 下必须包含「## 目录结构」二级章节，用树形结构呈现该需求的改动范围。章节固定四个三级子节，无内容的子节保留标题并写「无」：
+有实际约束、关键决定、未决问题或特殊检查要求时，再补 `Constraints and invariants`、`Decisions`、`Open questions` 或 `Verification expectations` 章节。已有章节必须填写真实内容；简单任务无需补写“无”来满足模板。用户决定可记录在相关核心章节；需要追踪多个决定时使用 Decisions。
 
-- `### 新建`、`### 修改`、`### 删除`：各自用树形结构（`├─`、`└─`、`│`）呈现路径层级；每个路径后以「— 说明」标注职责或改动点，可带大致行号；说明过长可折行并对齐缩进。
-- `### 明确不建`：无序列表写出明确不建的内容与理由，例如不新建 store slice、hook 或子目录的取舍。
+`# Scope` 下必须包含「## 目录结构」二级章节，写清该需求预计改动的位置和职责。章节固定四个三级子节，无内容的子节保留标题并写「无」：
 
-目录结构与范围说明一起填写，随最终确认一并确认；Runtime 在 Shape 确认边界检查该章节存在且四个子节齐全。落点选择遵循项目自身的目录层级与命名规则；项目没有相关规则时按仓库现状选择，并在说明中写明依据。示例：
+- `### 新建`、`### 修改`、`### 删除`：列出预计新建、修改、删除的模块和关键文件；目录树（`├─`、`└─`、`│`）或列表均可，每个路径后以「— 说明」标注职责或改动点，可带大致行号。
+- `### 明确不建`：写出明确不建的内容与理由，例如不新建 store slice、hook 或子目录的取舍。
+
+Shape 阶段先明确模块和关键文件即可；实现过程中在已确认模块内部新增常规辅助文件，不需要重新确认。扩大改动范围或改变职责分配时，先更新目录结构和对应 Decision，再继续实现。目录结构随最终确认一并确认；Runtime 在 Shape 确认边界检查该章节存在且四个子节齐全。落点选择遵循项目自身的目录层级与命名规则；项目没有相关规则时按仓库现状选择，并在说明中写明依据。示例：
 
 ```text
 ## 目录结构
@@ -88,9 +88,9 @@ Open questions 中只有真实未解决的用户问题使用：
 - [blocking] Q1: <Batch 问题>
 ```
 
-用户确认每个决定后，立即将结论写入 Decisions 和完整目标规格，再移除对应阻塞项。Runtime 会保存最终 Shape 的确认摘要，并通过 `await-user` 等待用户确认；不在 brief 中另加一条确认问题。正式文件只记录结论和理由，不记录模型的隐藏推理过程。按[源文档完整覆盖](#源文档完整覆盖)记录需求来源与 Spec、验收项的对应关系。
+用户确认每个决定后，立即将结论写入 brief 的相关章节和完整目标规格，再移除对应阻塞项。Runtime 会保存最终 Shape 的确认摘要，并通过 `await-user` 等待用户确认；不在 brief 中另加一条确认问题。正式文件只记录结论和理由，不记录模型的隐藏推理过程。按[源文档完整覆盖](#源文档完整覆盖)记录需求来源与 Spec、验收项的对应关系。
 
-验收标准必须具体，结果能够验证，各项互不重复。Runtime 只从 brief 顶层的验收示例和 Spec 中明确以 `Scenario:` 标出的完整场景生成验收项；说明段落、普通列表和单独的 WHEN/THEN 行不能拆成额外验收项。验收 ID 按顺序编号，例如 `A1`、`A2`、`A3`；ID 用于把验收结果对应到验收项，不根据内容计算，也不用于标识文件。Runtime 在 Shape 确认时保存完整验收文字及其来源。
+验收标准必须具体，结果能够验证，各项互不重复。Runtime 只从 brief 顶层的验收示例和 Spec 中明确以 `Scenario:` 标出的完整场景生成验收项；说明段落、普通列表和单独的 WHEN/THEN 行不能拆成额外验收项。验收 ID 按顺序编号，例如 `A1`、`A2`、`A3`；ID 用于把验收结果对应到验收项，不根据内容计算，也不用于标识文件。Runtime 在 Shape 确认时保存完整验收文字及其来源。Spec 场景与 brief 已有验收项对应时，在场景正文单独写 `Acceptance: A1`（中文可用 `验收：A1`），引用当前 brief 的真实 ID，不再生成重复验收项。一个场景只能引用一个 ID；新的行为仍写成独立场景。引用只合并验收身份，完整 Spec 仍绑定确认且必须由 Verifier 核对。
 
 新版 `children.yaml` 使用 `comet.native.children.v2`：
 

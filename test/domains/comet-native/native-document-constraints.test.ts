@@ -284,7 +284,7 @@ src/features/Common/CouponPopup/
       state: { status: 'await-user' },
     });
     await expect(readNativePortableChange(paths, 'doc-change')).resolves.toMatchObject({
-      document_constraints_version: 1,
+      document_constraints_version: 2,
     });
   });
 

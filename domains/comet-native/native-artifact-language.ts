@@ -236,17 +236,13 @@ export function nativeBriefStructureSubsectionKey(
   return BRIEF_STRUCTURE_SUBSECTION_KEYS.get(heading.trim().toLocaleLowerCase('en-US')) ?? null;
 }
 
-export function nativeBriefTemplate(language: NativeArtifactLanguage): string {
-  const sections: NativeBriefSection[] = [
-    'outcome',
-    'scope',
-    'nonGoals',
-    'acceptanceExamples',
-    'constraints',
-    'decisions',
-    'openQuestions',
-    'verificationExpectations',
-  ];
+export function nativeBriefTemplate(
+  language: NativeArtifactLanguage,
+  options: { compact?: boolean } = {},
+): string {
+  const sections: NativeBriefSection[] = ['outcome', 'scope', 'nonGoals', 'acceptanceExamples'];
+  if (!options.compact)
+    sections.push('constraints', 'decisions', 'openQuestions', 'verificationExpectations');
   return sections
     .map((section) => {
       if (section !== 'scope') return `# ${nativeBriefHeading(language, section)}\n`;
