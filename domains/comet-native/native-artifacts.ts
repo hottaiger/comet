@@ -48,6 +48,8 @@ export interface NativeBriefValidationOptions {
   strict?: boolean;
   /** Require the four core sections; validate optional sections when present. */
   compact?: boolean;
+  /** Require the directory structure section under Scope (document constraints v3). */
+  structure?: boolean;
 }
 
 export class NativeDocumentConstraintError extends Error {
@@ -254,17 +256,45 @@ export function nativeBriefHasBlockingQuestion(source: string): boolean {
   return false;
 }
 
+interface MarkdownFenceState {
+  marker: '`' | '~' | null;
+  length: number;
+}
+
+/**
+ * CommonMark fence pairing: a fence closes only when it repeats the opening
+ * marker character with at least the opening length and nothing else on the line,
+ * so a stray tilde line cannot close a backtick block and vice versa.
+ */
+function markdownFenceTransition(
+  line: string,
+  state: MarkdownFenceState,
+): 'opened' | 'closed' | null {
+  const match = /^ {0,3}(`{3,}|~{3,})/u.exec(line);
+  if (match === null) return null;
+  const fence = match[1] ?? '';
+  const marker = fence[0] as '`' | '~';
+  if (state.marker === null) {
+    state.marker = marker;
+    state.length = fence.length;
+    return 'opened';
+  }
+  if (marker === state.marker && fence.length >= state.length && line.trim() === fence) {
+    state.marker = null;
+    state.length = 0;
+    return 'closed';
+  }
+  return null;
+}
+
 function briefStructureSectionBody(scopeBody: string): string | null {
   const lines = meaningfulMarkdown(scopeBody).split(/\r?\n/u);
-  let inFence = false;
+  const fence: MarkdownFenceState = { marker: null, length: 0 };
   let start = -1;
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index] ?? '';
-    if (/^\s*(?:```|~~~)/u.test(line)) {
-      inFence = !inFence;
-      continue;
-    }
-    if (inFence) continue;
+    if (markdownFenceTransition(line, fence) !== null) continue;
+    if (fence.marker !== null) continue;
     const heading = /^##\s+(.+)$/u.exec(line);
     if (heading === null) continue;
     if (start === -1) {
@@ -280,17 +310,16 @@ function briefStructureSubsectionBodies(body: string): Map<NativeBriefStructureS
   const subsections = new Map<NativeBriefStructureSubsection, string>();
   let currentKey: NativeBriefStructureSubsection | null = null;
   let currentLines: string[] = [];
-  let inFence = false;
+  const fence: MarkdownFenceState = { marker: null, length: 0 };
   const flush = () => {
     if (currentKey !== null) subsections.set(currentKey, currentLines.join('\n').trim());
   };
   for (const line of meaningfulMarkdown(body).split(/\r?\n/u)) {
-    if (/^\s*(?:```|~~~)/u.test(line)) {
-      inFence = !inFence;
+    if (markdownFenceTransition(line, fence) !== null) {
       if (currentKey !== null) currentLines.push(line);
       continue;
     }
-    const heading = !inFence ? /^###\s+(.+)$/u.exec(line) : null;
+    const heading = fence.marker === null ? /^###\s+(.+)$/u.exec(line) : null;
     if (heading !== null) {
       flush();
       currentKey = nativeBriefStructureSubsectionKey(heading[1] ?? '');
@@ -391,7 +420,7 @@ export async function validateNativeBrief(
       });
     }
   }
-  if (options.strict) {
+  if (options.strict && options.structure) {
     findings.push(...validateBriefStructureSection(sections.get('scope') ?? '', briefRef));
   }
   if (nativeBriefHasBlockingQuestion(source)) {

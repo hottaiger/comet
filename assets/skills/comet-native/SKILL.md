@@ -45,7 +45,7 @@ Investigate facts that can be established without the user. Ask only about decis
 
 Complete when requirements sources are fully processed within the coverage boundary and classified by purpose, all outcome-affecting decisions and assumptions are resolved, no `[blocking]` remains, the user explicitly confirms the outcome, scope, key decisions, all acceptance items, and non-goals, and Runtime has entered Build.
 
-New or reconfirmed briefs need outcome, scope, non-goals, and acceptance examples, with a directory structure under `# Scope`. Add constraints, decisions, open questions, or special verification requirements when applicable. Runtime also checks formal paths and a complete target Spec or concrete no-product-behavior-change reason. Repair reported artifacts and rerun continuation. Existing later-phase changes retain progress until Shape.
+New or reconfirmed briefs need outcome, scope, non-goals, and acceptance examples. Add constraints, decisions, open questions, or special verification requirements when applicable. Runtime also checks formal paths and a complete target Spec or concrete no-product-behavior-change reason. Repair reported artifacts and rerun continuation. Existing later-phase changes retain progress until Shape.
 
 ## Build ↔ Verify Loop
 
@@ -55,7 +55,7 @@ After the Builder submits a candidate, Runtime runs required checks and a new re
 
 ## Build
 
-Before the first implementation, read the current brief, complete target Specs, and every acceptance item. Edit project code and tests within confirmed scope. Keep changes consistent with the directory structure; update it and the corresponding Decision before deviating. During repair, prioritize the Verifier's failed or blocked items and failed checks, then recheck other confirmed behavior before submission. `previous_unresolved_ids` identifies the repair focus; the next formal verification still covers every acceptance item.
+Before the first implementation, read the current brief, complete target Specs, and every acceptance item. Edit project code and tests within confirmed scope. During repair, prioritize the Verifier's failed or blocked items and failed checks, then recheck other confirmed behavior before submission. `previous_unresolved_ids` identifies the repair focus; the next formal verification still covers every acceptance item.
 
 Build, Verify, and Archive recheck formal bindings. New Shapes bind Markdown content: blank lines and soft wraps preserve confirmation; content, structure, code, link, or acceptance changes require reconfirmation. After an edit, Hooks check actual content before the next implementation write; Runtime also checks before advancement. Existing Shapes retain their binding. Invalid documents or reports return repair actions and preserve work. Ordinary documents preserve candidates by default; use `native.document_writes: revert` for strict behavior. See [formal artifacts](reference/artifacts.md#formal-artifacts) for paths.
 
